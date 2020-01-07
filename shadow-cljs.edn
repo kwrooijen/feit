@@ -1,0 +1,15 @@
+{:lein true
+ :builds {:dev {:target :browser
+                :output-dir "resources/public/js/compiled"
+                :asset-path "/js/compiled"
+                :modules {:app {:entries [cardo.core]}}
+                :devtools {:before-load cardo.core/stop
+                           :after-load cardo.core/start
+                           :http-root "resources/public"
+                           :http-port 3449
+                           :preloads [devtools.preload]}}
+          :prod {:target :browser
+                 :output-dir "resources/public/js/compiled"
+                 :asset-path "/js/compiled"
+                 :release {:compiler-options {:optimizations :simple}}
+                 :modules {:app {:entries [cardo.core]}}}}}

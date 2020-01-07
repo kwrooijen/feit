@@ -1,0 +1,14 @@
+/checkouts
+/*.log
+/target
+/*-init.clj
+/resources/public/js/compiled
+/resources/public/style.css
+/resources/public/style.css.map
+/out
+/.shadow-cljs/
+/node_modules/
+/.nrepl-port
+/.lein-failures
+/.lein-repl-history
+/.clj-kondo/.cache/

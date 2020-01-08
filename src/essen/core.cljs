@@ -2,25 +2,29 @@
   (:require [integrant.core :as ig]
             [essen.scene]
             [essen.module]
-            [phaser]
-            [essen.state :refer [system phaser-game phaser-scenes]]))
+            [phaser]))
+
+(defonce system (atom nil))
+(defonce phaser-game (atom nil))
 
 (defmethod ig/init-key :essen/core [_ {:essen/keys [game] :as opts}]
   (reset! phaser-game (js/Phaser.Game. (clj->js game)))
   opts)
 
-(defmethod ig/halt-key! :essen/core [_ opts]
+(defmethod ig/halt-key! :essen/core [_ _]
   (when @phaser-game
     (.destroy @phaser-game)
     (.remove (js/document.querySelector "canvas"))))
 
-(defmethod ig/suspend-key! :essen/core [_ opts]
+(defmethod ig/suspend-key! :essen/core [_ _]
   (when @phaser-game
     (.destroy @phaser-game)
     (.remove (js/document.querySelector "canvas"))))
 
-(defmethod ig/resume-key :essen/core [_ {:essen/keys [game] :as opts} old-opts old-impl]
-  (reset! phaser-game (js/Phaser.Game. (clj->js game))))
+(defmethod ig/resume-key :essen/core
+  [_ {:essen/keys [game] :as opts} _old-opts _old-impl]
+  (reset! phaser-game (js/Phaser.Game. (clj->js game)))
+  opts)
 
 (defmethod ig/init-key :essen/scenes [_ opts]
   opts)
@@ -35,6 +39,7 @@
   (ig/suspend! @system))
 
 (defn resume [config]
-  (reset! system (-> config
-                     (ig/prep)
-                     (ig/resume @system))))
+  (reset! system
+          (-> config
+              (ig/prep)
+              (ig/resume @system))))

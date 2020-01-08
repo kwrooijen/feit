@@ -1,6 +1,5 @@
 (ns essen.scene
-  (:require [integrant.core :as ig]
-            [essen.state :refer [phaser-scenes phaser-game]]))
+  (:require [integrant.core :as ig]))
 
 (defmethod ig/init-key :essen/this [_ opts]
   opts)

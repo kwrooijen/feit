@@ -12,6 +12,8 @@
 
    ;; Scene.Boot
 
+   ;; Phaser Example:
+   ;; http://labs.phaser.io/edit.html?src=src/camera/follow%20user%20controlled%20sprite.js&v=3.21.0
    [:essen/scene :scene/boot]
 
    {:essen.scene/preload

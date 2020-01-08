@@ -1,22 +1,30 @@
 (ns essen.module
   (:require [integrant.core :as ig]
-            [essen.state :refer [this]]))
+            [essen.state :refer [phaser-scenes]]))
 
 (defn module-apply [obj opts]
   (when (:apply opts)
     ((:apply opts) obj opts)))
 
 (defmethod ig/init-key :essen.module/add.image [[_ _] opts]
-  (println "THIS" @this)
-  (-> @this
-      (.. -add (image (:x opts) (:y opts) (:texture opts) (:frame opts)))
-      (module-apply opts)))
+  (println "ADD IMAGE OPTS " opts)
+  (-> (:scene/boot @phaser-scenes)
+      (.. -add (image (:x opts) (:y opts) (:texture opts) (:frame opts))))
+  opts)
 
 (defmethod ig/init-key :essen.module/load.image [[_ _] opts]
-  (.. @this -load (image (:key opts) (:url opts))))
+  ;; (.. @this -load (image (:key opts) (:url opts)))
+  (println "LOADING IMAGE " opts)
+  (-> (:scene/boot @phaser-scenes)
+      (.. -load (image (:key opts) (:url opts))))
+  opts
+  )
 
 (defmethod ig/init-key :essen.module/scene.start [_ opts]
-  #(.. % this -scene (start (:name opts))))
+  {}
+
+  ;; #(.. % this -scene (start (:name opts)))
+  )
 
 (defmethod ig/init-key :essen.module/cameras-main [_ opts]
   (fn [this]

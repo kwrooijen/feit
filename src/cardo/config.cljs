@@ -4,20 +4,83 @@
 
 (def config
   {:essen/core
-   {:type js/Phaser.AUTO
-    ;; :width 600
-    ;; :height 400
-    :backgroundColor 0xecf0f1
-    :physics {:default :arcade
-              ;; :arcade {:gravity {:y 500}}
-              }
-    :scene [ ;; (ig/ref :scene/boot)
-            ]
-    :tweenSpeed 2000}
+   {:essen/game {:type js/Phaser.AUTO
+                 :backgroundColor 0xecf0f1
+                 :physics {:default :arcade}
+                 :tweenSpeed 2000
+                 :scene [(ig/ref :scene/foo)]}}
 
    ;; Scene.Boot
 
    ;; [:essen/scene :scene/boot]
+   ;; {:kevin [(ig/ref :kevin/image)
+   ;;          (ig/ref :load.image/bg)]}
+
+   [:essen/scene :scene/foo]
+
+   {:essen.scene/preload
+    {[:essen.scene/load :load/bg]
+     {:essen/methods [[:image "bg" "images/bg.jpg"]]}
+
+     [:essen.scene/load :load/block]
+     {:essen/methods [[:image "block" "images/block.png"]]}}
+
+
+    :essen.scene/create
+    {[:essen.scene/add :add/bg]
+     {:essen/methods [[:image 0 0 "bg"]
+                      [:set-flip-x true]]}
+     }
+    ;; {[:essen.scene/add :user/kevin]
+    ;;  {:mijn-demi (ig/ref :user/demi)}
+
+    ;;  [:essen.scene/add :user/demi]
+    ;;  {:says "Hoi, ik ben Demi"}}
+
+
+
+    ;; :essen.scene/update {}
+    }
+
+
+   ;; [:essen/a-scene :scene/bar]
+   ;; {:create {:loaders [(ig/ref :my/kevin)]
+   ;;           :my/kevin {:create-image "foo"}}}
+
+
+   ;; [:essen/const :scene.create.foo/hoi]
+   ;; {:something 123}
+
+   ;; [:essen/scene :scene/boot]
+   ;; {:essen.scene/create
+   ;;  {:kevin (ig/ref :my/kevin)
+   ;;   :poep (ig/ref :my/poep)
+   ;;   :demi (ig/ref :my/demi)}
+
+   ;;  :my/poep {:kevin (ig/ref :my/kevin)}
+   ;;  :my/demi {:kevin (ig/ref :my/kevin)}
+   ;;  :my/kevin {:create-image "foo"}}
+
+   ;; :essen.scene/global
+   ;; {:my/kevin {:create-image "foo"}}
+
+   ;; :scene.boot/load
+   ;; {:loaders [:] }
+
+   ;; [:essen.module/add.image :kevin/image] {:x 0 :y 0 :texture "bg" :kevin (ig/ref :load.image/bg)}
+
+   ;; [:essen.module/load.image :load.image/bg]
+   ;; {:key "bg" :url "images/bg.jpg"}
+
+
+
+   ;; [:essen.module/const :my/ground-tiles]
+   ;; {:tilemap (essen/ref :my/tilemap)
+   ;;  :apply (fn [{:keys [:tilemap]} ])}
+
+   ;; [:essen.module/make.tilemap :my/tilemap]
+   ;; {:key "map"}
+
    ;; {:key :scene/boot
 
    ;;  :modules/update [ ;; (ig/ref :my/update)
@@ -91,5 +154,4 @@
 
    ;; [:essen.module/add.image :add.image/block]
    ;; {:key "block" :x 0 :y 0}
-
    })

@@ -1,3 +1,5 @@
 (ns essen.state)
 
-(defonce this (atom nil))
+(defonce system (atom nil))
+(defonce phaser-game (atom nil))
+(defonce phaser-scenes (atom {}))

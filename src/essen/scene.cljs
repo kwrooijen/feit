@@ -1,23 +1,26 @@
 (ns essen.scene
-  (:require [integrant.core :as ig]))
+  (:require
+   [integrant.core :as ig]))
 
 (defmethod ig/init-key :essen/this [_ opts]
   opts)
 
 (def method-collection
-  {[:image 3]                    #(.image %1 %2 %3)
-   [:image 4]                    #(.image %1 %2 %3 %4)
-   [:set-origin 2]               #(.setOrigin %1 %2)
-   [:set-flip-x 2]               #(.setFlipX %1 %2)
-   [:set-flip-y 2]               #(.setFlipY %1 %2)
-   [:set-bounds 5]               #(.setBounds %1 %2 %3 %4 %5)
-   [:create-cursor-keys 1]       #(.createCursorKeys %1)
-   [:start-follow 5]             #(.startFollow %1 %2 %3 %4 %5)
-   [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)})
+  (atom
+   {[:image 3]                    #(.image %1 %2 %3)
+    [:image 4]                    #(.image %1 %2 %3 %4)
+    [:set-origin 2]               #(.setOrigin %1 %2)
+    [:set-flip-x 2]               #(.setFlipX %1 %2)
+    [:set-flip-y 2]               #(.setFlipY %1 %2)
+    [:set-bounds 5]               #(.setBounds %1 %2 %3 %4 %5)
+    [:create-cursor-keys 1]       #(.createCursorKeys %1)
+    [:start-follow 5]             #(.startFollow %1 %2 %3 %4 %5)
+    [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)}))
 
 (def essen-scene-key-collection
   {:essen.scene/load           #(.. % -load)
    :essen.scene/add            #(.. % -add)
+   :essen.scene/lights         #(.. % -lights)
    :essen.scene/physics.world  #(.. % -physics -world)
    :essen.scene/physics.add    #(.. % -physics -add)
    :essen.scene/input.keyboard #(.. % -input -keyboard)
@@ -42,14 +45,15 @@
   ;; TODO Check if we can provide a proper error message if method exists, but
   ;; errors
   (let [keys (map method->method-key methods)
-        fns (map (partial get method-collection) keys)
+        fns (map (partial get @method-collection) keys)
         args (map rest methods)
         fargs (map vector fns args)]
     (reduce apply-method obj fargs)))
 
 (defmethod ig/prep-key :essen.scene/key [[_ k] opts]
   (derive k :essen.scene/key)
-  (assoc opts :essen/this (ig/ref :essen/this)))
+  {:essen/methods opts
+   :essen/this (ig/ref :essen/this)})
 
 (defmethod ig/init-key :essen.scene/key [[k _] {:essen/keys [this methods] :as opts}]
   (apply-methods ((get essen-scene-key-collection k) this) methods))

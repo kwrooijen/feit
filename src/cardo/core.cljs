@@ -3,6 +3,16 @@
             [integrant.core :as ig]
             [essen.core]))
 
+(defn set-bg [obj x y flip-x flip-y]
+  (.. obj
+      (image x y "bg")
+      (setOrigin 0)
+      (setFlipX flip-x)
+      (setFlipY flip-y)))
+
+(essen.core/custom-methods!
+ {[:set-bg 5] set-bg})
+
 (defmethod ig/init-key :my/updater [_ opts]
   (fn [{:game/keys [cursor player] :as state} delta this]
     (.setVelocity player 0)

@@ -1,11 +1,14 @@
 (ns essen.core
-  (:require [integrant.core :as ig]
-            [essen.scene]
-            [essen.module]
-            [phaser]))
+  (:require
+   [integrant.core :as ig]
+   [essen.scene]
+   [phaser]))
 
 (defonce system (atom nil))
 (defonce phaser-game (atom nil))
+
+(defn custom-methods! [methods]
+  (swap! essen.scene/method-collection merge methods))
 
 (defmethod ig/init-key :essen/core [_ {:essen/keys [game] :as opts}]
   (reset! phaser-game (js/Phaser.Game. (clj->js game)))

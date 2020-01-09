@@ -18,8 +18,8 @@
 
    {:essen.scene/preload
     {[:essen.scene/load :load/assets]
-     {:essen/methods [[:image "bg" "images/bg.jpg"]
-                      [:image "block" "images/block.png"]]}}
+     [[:image "bg" "images/bg.jpg"]
+      [:image "block" "images/block.png"]]}
 
     :essen.scene/create
     {[:essen.scene/state :game/player]
@@ -28,41 +28,22 @@
      [:essen.scene/state :game/cursor]
      (ig/ref :boot/cursor)
 
-
-     [:essen.scene/add :add/bg1]
-     {:essen/methods [[:image 0 0 "bg"]
-                      [:set-origin 0]]}
-
-     [:essen.scene/add :add/bg2]
-     {:essen/methods [[:image 1920 0 "bg"]
-                      [:set-origin 0]
-                      [:set-flip-x true]]}
-
-     [:essen.scene/add :add/bg3]
-     {:essen/methods [[:image 0 1080 "bg"]
-                      [:set-origin 0]
-                      [:set-flip-y true]]}
-
-     [:essen.scene/add :add/bg4]
-     {:essen/methods [[:image 1920 1080 "bg"]
-                      [:set-origin 0]
-                      [:set-flip-x true]
-                      [:set-flip-y true]]}
+     [:essen.scene/add :add/bg1] [[:set-bg 0 0 false false]]
+     [:essen.scene/add :add/bg2] [[:set-bg 1920 0 true false]]
+     [:essen.scene/add :add/bg3] [[:set-bg 0 1080 false true]]
+     [:essen.scene/add :add/bg4] [[:set-bg 1920 1080 true true]]
 
      [:essen.scene/cameras.main :boot/camera]
-     {:essen/methods [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]
-                      [:start-follow (ig/ref :boot/player) true 0.05 0.05]]}
+      [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]
+       [:start-follow (ig/ref :boot/player) true 0.05 0.05]]
 
-     [:essen.scene/physics.world :boot/world]
-     {:essen/methods [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]]}
+     [:essen.scene/physics.world :boot/world] [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]]
 
-
-     [:essen.scene/input.keyboard :boot/cursor]
-     {:essen/methods [[:create-cursor-keys]]}
+     [:essen.scene/input.keyboard :boot/cursor] [[:create-cursor-keys]]
 
      [:essen.scene/physics.add :boot/player]
-     {:essen/methods [[:image 900 300 "block"]
-                      [:set-collide-world-bounds true]]}}
+      [[:image 900 300 "block"]
+       [:set-collide-world-bounds true]]}
 
     :essen.scene/update
     {:essen.scene.update/list

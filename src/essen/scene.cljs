@@ -2,10 +2,11 @@
   (:require
    [integrant.core :as ig]))
 
-(defmethod ig/init-key :essen/this [_ opts]
-  opts)
-
 (def custom-methods (atom {}))
+(def scene-states (atom {}))
+
+(defn scene-state [k]
+  (get @scene-states k))
 
 (def method-collection
   {[:image 3]                    #(.image %1 %2 %3)
@@ -30,6 +31,9 @@
 (doall
  (for [[k _] essen-scene-key-collection]
    (derive k :essen.scene/key)))
+
+(defmethod ig/init-key :essen/this [_ opts]
+  opts)
 
 ;;
 ;; :essen.scene/key
@@ -103,11 +107,11 @@
          (ig/prep)
          (ig/init))))
 
-(defn scene-create [opts state]
+(defn scene-create [opts k]
   #(this-as this
      (-> ((:essen.scene/create opts))
          (assoc :essen/this this)
-         (assoc :essen.scene.state/atom state)
+         (assoc :essen.scene.state/atom (scene-state k))
          (ig/prep)
          (ig/init))))
 
@@ -117,26 +121,26 @@
       (ig/init)
       (:essen.scene.update/list)))
 
-(defn scene-update [opts state]
-  (let [updaters (scene-updaters opts)]
+(defn scene-update [opts k]
+  (let [updaters (scene-updaters opts)
+        state (scene-state k)]
     (fn [delta]
       (this-as this
         (reset! state (reduce #(%2 %1 delta this) @state updaters))))))
 
-;; TODO save state to global scene registry
 (defmethod ig/init-key :essen/scene [[_ k] opts]
-  (let [state (atom {})]
-    (-> (merge {:key (name k)}
-               (:essen.scene/config opts))
-        (cond->
-            ((:essen.scene/preload opts))
-            (assoc :preload (scene-preload opts)))
-        (cond->
-            ((:essen.scene/create opts))
-            (assoc :create (scene-create opts state)))
-        (cond->
-            ((:essen.scene/update opts))
-            (assoc :update (scene-update opts state))))))
+  (swap! scene-states assoc k (atom {}))
+  (-> (merge {:key (name k)}
+             (:essen.scene/config opts))
+      (cond->
+          ((:essen.scene/preload opts))
+          (assoc :preload (scene-preload opts)))
+      (cond->
+          ((:essen.scene/create opts))
+          (assoc :create (scene-create opts k)))
+      (cond->
+          ((:essen.scene/update opts))
+          (assoc :update (scene-update opts k)))))
 
 ;; TODO reset scene?
 ;; Preserve state of the atom

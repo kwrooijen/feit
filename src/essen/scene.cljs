@@ -2,8 +2,8 @@
   (:require
    [integrant.core :as ig]))
 
-(def custom-methods (atom {}))
-(def scene-states (atom {}))
+(defonce custom-methods (atom {}))
+(defonce scene-states (atom {}))
 
 (defn scene-state [k]
   (get @scene-states k))

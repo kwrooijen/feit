@@ -8,7 +8,7 @@
 (defonce phaser-game (atom nil))
 
 (defn custom-methods! [methods]
-  (swap! essen.scene/method-collection merge methods))
+  (swap! essen.scene/custom-methods merge methods))
 
 (defmethod ig/init-key :essen/core [_ {:essen/keys [game] :as opts}]
   (reset! phaser-game (js/Phaser.Game. (clj->js game)))

@@ -5,17 +5,18 @@
 (defmethod ig/init-key :essen/this [_ opts]
   opts)
 
+(def custom-methods (atom {}))
+
 (def method-collection
-  (atom
-   {[:image 3]                    #(.image %1 %2 %3)
-    [:image 4]                    #(.image %1 %2 %3 %4)
-    [:set-origin 2]               #(.setOrigin %1 %2)
-    [:set-flip-x 2]               #(.setFlipX %1 %2)
-    [:set-flip-y 2]               #(.setFlipY %1 %2)
-    [:set-bounds 5]               #(.setBounds %1 %2 %3 %4 %5)
-    [:create-cursor-keys 1]       #(.createCursorKeys %1)
-    [:start-follow 5]             #(.startFollow %1 %2 %3 %4 %5)
-    [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)}))
+  {[:image 3]                    #(.image %1 %2 %3)
+   [:image 4]                    #(.image %1 %2 %3 %4)
+   [:set-origin 2]               #(.setOrigin %1 %2)
+   [:set-flip-x 2]               #(.setFlipX %1 %2)
+   [:set-flip-y 2]               #(.setFlipY %1 %2)
+   [:set-bounds 5]               #(.setBounds %1 %2 %3 %4 %5)
+   [:create-cursor-keys 1]       #(.createCursorKeys %1)
+   [:start-follow 5]             #(.startFollow %1 %2 %3 %4 %5)
+   [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)})
 
 (def essen-scene-key-collection
   {:essen.scene/load           #(.. % -load)
@@ -45,7 +46,7 @@
   ;; TODO Check if we can provide a proper error message if method exists, but
   ;; errors
   (let [keys (map method->method-key methods)
-        fns (map (partial get @method-collection) keys)
+        fns (map (partial get (merge method-collection @custom-methods)) keys)
         args (map rest methods)
         fargs (map vector fns args)]
     (reduce apply-method obj fargs)))

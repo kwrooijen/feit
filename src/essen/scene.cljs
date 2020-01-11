@@ -8,6 +8,8 @@
 (defn scene-state [k]
   (get @scene-states k))
 
+;; TODO Maybe create ig/init-key for these?
+;; Then the end user can create methods that way
 (def method-collection
   {[:image 3]                    #(.image %1 %2 %3)
    [:image 4]                    #(.image %1 %2 %3 %4)

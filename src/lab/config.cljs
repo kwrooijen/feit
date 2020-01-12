@@ -1,4 +1,4 @@
-(ns cardo.config
+(ns lab.config
   (:require [integrant.core :as ig]
             [phaser]))
 
@@ -43,17 +43,29 @@
      [:essen.scene/state :game/cursor]
      (ig/ref :boot/cursor)
 
-     [:essen.scene/state :game/bgs]
-     (ig/ref :my/bgs)
+     ;; [:essen.scene/state :game/bgs]
+     ;; (ig/ref :my/bgs)
 
-     [:es.obj/add :my/bgs]
-     [[:group {:classType (ig/ref :add/bg1)
-               :maxSize 4}]]
+     ;; [:es.obj-do/apply :bg/create-beforehand]
+     ;; [(ig/ref :my/bgs)
+     ;;  [:create 400 400 "bg" 0 true true]
+     ;;  [:create 400 400 "bg" 0 true true]
+     ;;  [:create 400 400 "bg" 0 true true]
+     ;;  [:create 400 400 "bg" 0 true true]]
 
-     [:es.obj-fn/add :add/bg1] [[:set-bg 0 0 false false]]
-     ;; [::es.obj/add :add/bg2] [[:set-bg 1920 0 true false] [:set-visible false]]
-     ;; [::es.obj/add :add/bg3] [[:set-bg 0 1080 false true] [:set-visible false]]
-     ;; [::es.obj/add :add/bg4] [[:set-bg 1920 1080 true true] [:set-visible false]]
+     ;; [:es.obj/apply :bg/create-beforehand2] [(ig/ref :my/bgs) [:create 4]]
+     ;; [:es.obj/apply :bg/create-beforehand3] [(ig/ref :my/bgs) [:create 4]]
+     ;; [:es.obj/apply :bg/create-beforehand4] [(ig/ref :my/bgs) [:create 4]]
+
+
+     ;; [:es.obj/add :my/bgs]
+     ;; [[:group {:classType (ig/ref :add/bg1)
+     ;;           :maxSize 4}]]
+
+     [:es.obj/add :add/bg1] [[:set-bg 0 0 false false]]
+     [:es.obj/add :add/bg2] [[:set-bg 1920 0 true false]]
+     [:es.obj/add :add/bg3] [[:set-bg 0 1080 false true]]
+     [:es.obj/add :add/bg4] [[:set-bg 1920 1080 true true]]
 
      [:es.obj/cameras.main :boot/camera]
      [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]

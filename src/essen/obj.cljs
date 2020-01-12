@@ -42,22 +42,22 @@
 (doall
  (for [[k _] essen-scene-key-collection]
    (do
-     (derive (keyword :es.obj k) :es.obj/key)
-     (derive (keyword :es.obj-do k) :es.obj-do/key)
-     (derive (keyword :es.obj-fn k) :es.obj-fn/key))))
+     (derive (keyword :essen.obj k) :essen.obj/key)
+     (derive (keyword :essen.obj-do k) :essen.obj-do/key)
+     (derive (keyword :essen.obj-fn k) :essen.obj-fn/key))))
 
 (defmethod ig/init-key :essen/this [_ opts]
   opts)
 
 ;;
-;; ::es.obj/key
+;; ::essen.obj/key
 ;;
 
 (def method->method-key
   (juxt first count))
 
 (defn process-methods [methods k]
-  (if (keyword-identical? :es.obj/apply k)
+  (if (keyword-identical? :essen.obj/apply k)
     (rest methods)
     methods))
 
@@ -69,7 +69,7 @@
     (map vector fns args)))
 
 (defn get-obj [this k methods]
-  (if (keyword-identical? :es.obj/apply k)
+  (if (keyword-identical? :essen.obj/apply k)
     (first methods)
     ((get essen-scene-key-collection (keyword (name k))) this)))
 
@@ -93,29 +93,29 @@
   ;; errors
   (reduce apply-method-do obj fargs))
 
-(defmethod ig/prep-key :es.obj/key [[_ k] opts]
+(defmethod ig/prep-key :essen.obj/key [[_ k] opts]
   {:essen/methods opts
    :essen/this (ig/ref :essen/this)})
 
-(defmethod ig/prep-key :es.obj-do/key [[_ k] opts]
+(defmethod ig/prep-key :essen.obj-do/key [[_ k] opts]
   {:essen/methods opts
    :essen/this (ig/ref :essen/this)})
 
-(defmethod ig/prep-key :es.obj-fn/key [[_ k] opts]
+(defmethod ig/prep-key :essen.obj-fn/key [[_ k] opts]
   {:essen/methods opts})
 
 ;; TODO create version that returns a function instead of call?
-(defmethod ig/init-key :es.obj/key [[k _] {:essen/keys [this methods] :as opts}]
+(defmethod ig/init-key :essen.obj/key [[k _] {:essen/keys [this methods] :as opts}]
   (apply-fargs (get-obj this k methods)
                (methods->fargs methods k)))
 
-(defmethod ig/init-key :es.obj-do/key [[k _] {:essen/keys [this methods] :as opts}]
+(defmethod ig/init-key :essen.obj-do/key [[k _] {:essen/keys [this methods] :as opts}]
   (let [obj (get-obj this k methods)]
     (apply-fargs-do obj (methods->fargs methods k))
     obj))
 
-(defmethod ig/init-key :es.obj-fn/key [[k _] {:essen/keys [methods] :as opts}]
-  (if (keyword-identical? :es.obj-fn/apply k)
+(defmethod ig/init-key :essen.obj-fn/key [[k _] {:essen/keys [methods] :as opts}]
+  (if (keyword-identical? :essen.obj-fn/apply k)
     (let [fargs (methods->fargs methods k)]
       (fn [_this]
         (apply-fargs (first methods) fargs)))

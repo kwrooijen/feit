@@ -56,14 +56,22 @@
 (def method->method-key
   (juxt first count))
 
-(defn methods->fargs [methods]
-  (let [keys (map method->method-key methods)
+(defn process-methods [methods k]
+  (if (keyword-identical? :es.obj/apply k)
+    (rest methods)
+    methods))
+
+(defn methods->fargs [methods k]
+  (let [methods (process-methods methods k)
+        keys (map method->method-key methods)
         fns (map (partial get (merge method-collection @custom-methods)) keys)
         args (map rest methods)]
     (map vector fns args)))
 
-(defn this->obj [this k]
-  ((get essen-scene-key-collection (keyword (name k))) this))
+(defn get-obj [this k methods]
+  (if (keyword-identical? :es.obj/apply k)
+    (first methods)
+    ((get essen-scene-key-collection (keyword (name k))) this)))
 
 (defn apply-method [obj-acc [method args]]
   (apply method (cons obj-acc args)))
@@ -98,27 +106,20 @@
 
 ;; TODO create version that returns a function instead of call?
 (defmethod ig/init-key :es.obj/key [[k _] {:essen/keys [this methods] :as opts}]
-  (if (keyword-identical? :es.obj/apply k)
-    (apply-fargs (first methods)
-                 (methods->fargs (rest methods)))
-    (apply-fargs (this->obj this k)
-                 (methods->fargs methods))))
+  (apply-fargs (get-obj this k methods)
+               (methods->fargs methods k)))
 
 (defmethod ig/init-key :es.obj-do/key [[k _] {:essen/keys [this methods] :as opts}]
-  (if (keyword-identical? :es.obj-do/apply k)
-    (let [obj (first methods)]
-      (apply-fargs-do obj (methods->fargs (rest methods)))
-      obj)
-    (let [obj (this->obj this k)]
-      (apply-fargs-do obj (methods->fargs methods))
-      obj)))
+  (let [obj (get-obj this k methods)]
+    (apply-fargs-do obj (methods->fargs methods k))
+    obj))
 
 (defmethod ig/init-key :es.obj-fn/key [[k _] {:essen/keys [methods] :as opts}]
   (if (keyword-identical? :es.obj-fn/apply k)
-    (let [fargs (methods->fargs (rest methods))]
+    (let [fargs (methods->fargs methods k)]
       (fn [_this]
         (apply-fargs (first methods) fargs)))
     (let [this->obj (get essen-scene-key-collection (keyword (name k)))
-          fargs (methods->fargs methods)]
+          fargs (methods->fargs methods k)]
       (fn [this]
         (apply-fargs (this->obj this) fargs)))))

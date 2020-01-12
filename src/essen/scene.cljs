@@ -39,14 +39,14 @@
 (doall
  (for [[k _] essen-scene-key-collection]
    (do
-     (derive (keyword :essen.scene k) :essen.scene/key)
-     (derive (keyword :essen.scene-fn k) :essen.scene-fn/key))))
+     (derive (keyword :es.obj k) :es.obj/key)
+     (derive (keyword :es.obj-fn k) :es.obj-fn/key))))
 
 (defmethod ig/init-key :essen/this [_ opts]
   opts)
 
 ;;
-;; :essen.scene/key
+;; ::es.obj/key
 ;;
 
 (def method->method-key
@@ -70,20 +70,19 @@
   ;; errors
   (reduce apply-method obj fargs))
 
-(defmethod ig/prep-key :essen.scene/key [[_ k] opts]
+(defmethod ig/prep-key :es.obj/key [[_ k] opts]
   {:essen/methods opts
    :essen/this (ig/ref :essen/this)})
 
-(defmethod ig/prep-key :essen.scene-fn/key [[_ k] opts]
-  {:essen/methods opts
-   :essen/this (ig/ref :essen/this)})
+(defmethod ig/prep-key :es.obj-fn/key [[_ k] opts]
+  {:essen/methods opts})
 
 ;; TODO create version that returns a function instead of call?
-(defmethod ig/init-key :essen.scene/key [[k _] {:essen/keys [this methods] :as opts}]
+(defmethod ig/init-key :es.obj/key [[k _] {:essen/keys [this methods] :as opts}]
   (apply-fargs (this->obj this k)
                  (methods->fargs methods)))
 
-(defmethod ig/init-key :essen.scene-fn/key [[k _] {:essen/keys [methods] :as opts}]
+(defmethod ig/init-key :es.obj-fn/key [[k _] {:essen/keys [methods] :as opts}]
   (let [this->obj (get essen-scene-key-collection (keyword (name k)))
         fargs (methods->fargs methods)]
     (fn [this]

@@ -46,24 +46,24 @@
      [:essen.scene/state :game/bgs]
      (ig/ref :my/bgs)
 
-     [:essen.scene/add :my/bgs]
+     [:es.obj/add :my/bgs]
      [[:group {:classType (ig/ref :add/bg1)
                :maxSize 4}]]
 
-     [:essen.scene-fn/add :add/bg1] [[:set-bg 0 0 false false]]
-     ;; [:essen.scene/add :add/bg2] [[:set-bg 1920 0 true false] [:set-visible false]]
-     ;; [:essen.scene/add :add/bg3] [[:set-bg 0 1080 false true] [:set-visible false]]
-     ;; [:essen.scene/add :add/bg4] [[:set-bg 1920 1080 true true] [:set-visible false]]
+     [:es.obj-fn/add :add/bg1] [[:set-bg 0 0 false false]]
+     ;; [::es.obj/add :add/bg2] [[:set-bg 1920 0 true false] [:set-visible false]]
+     ;; [::es.obj/add :add/bg3] [[:set-bg 0 1080 false true] [:set-visible false]]
+     ;; [::es.obj/add :add/bg4] [[:set-bg 1920 1080 true true] [:set-visible false]]
 
-     [:essen.scene/cameras.main :boot/camera]
+     [:es.obj/cameras.main :boot/camera]
      [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]
       [:start-follow (ig/ref :boot/player) true 0.05 0.05]]
 
-     [:essen.scene/physics.world :boot/world] [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]]
+     [:es.obj/physics.world :boot/world] [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]]
 
-     [:essen.scene/input.keyboard :boot/cursor] [[:create-cursor-keys]]
+     [:es.obj/input.keyboard :boot/cursor] [[:create-cursor-keys]]
 
-     [:essen.scene/physics.add :boot/player]
+     [:es.obj/physics.add :boot/player]
      [[:image 900 300 "block"]
       [:set-collide-world-bounds true]
       [:set-depth 1]]}

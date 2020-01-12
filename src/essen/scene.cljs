@@ -28,17 +28,19 @@
    [:set-visible 2]              #(.setVisible %1 %2)})
 
 (def essen-scene-key-collection
-  {:essen.scene/load           #(.. % -load)
-   :essen.scene/add            #(.. % -add)
-   :essen.scene/lights         #(.. % -lights)
-   :essen.scene/physics.world  #(.. % -physics -world)
-   :essen.scene/physics.add    #(.. % -physics -add)
-   :essen.scene/input.keyboard #(.. % -input -keyboard)
-   :essen.scene/cameras.main   #(.. % -cameras -main)})
+  {:load           #(.. % -load)
+   :add            #(.. % -add)
+   :lights         #(.. % -lights)
+   :physics.world  #(.. % -physics -world)
+   :physics.add    #(.. % -physics -add)
+   :input.keyboard #(.. % -input -keyboard)
+   :cameras.main   #(.. % -cameras -main)})
 
 (doall
  (for [[k _] essen-scene-key-collection]
-   (derive k :essen.scene/key)))
+   (do
+     (derive (keyword :essen.scene k) :essen.scene/key)
+     (derive (keyword :essen.scene-fn k) :essen.scene-fn/key))))
 
 (defmethod ig/init-key :essen/this [_ opts]
   opts)
@@ -53,23 +55,39 @@
 (defn apply-method [obj-acc [method args]]
   (apply method (cons obj-acc args)))
 
-(defn apply-methods [obj methods]
+(defn methods->fargs [methods]
+  (let [keys (map method->method-key methods)
+        fns (map (partial get (merge method-collection @custom-methods)) keys)
+        args (map rest methods)]
+    (map vector fns args)))
+
+(defn this->obj [this k]
+  ((get essen-scene-key-collection (keyword (name k))) this))
+
+(defn apply-fargs [obj fargs]
   ;; TODO Add proper error message if method does not exist
   ;; TODO Check if we can provide a proper error message if method exists, but
   ;; errors
-  (let [keys (map method->method-key methods)
-        fns (map (partial get (merge method-collection @custom-methods)) keys)
-        args (map rest methods)
-        fargs (map vector fns args)]
-    (reduce apply-method obj fargs)))
+  (reduce apply-method obj fargs))
 
 (defmethod ig/prep-key :essen.scene/key [[_ k] opts]
   {:essen/methods opts
    :essen/this (ig/ref :essen/this)})
 
+(defmethod ig/prep-key :essen.scene-fn/key [[_ k] opts]
+  {:essen/methods opts
+   :essen/this (ig/ref :essen/this)})
+
 ;; TODO create version that returns a function instead of call?
 (defmethod ig/init-key :essen.scene/key [[k _] {:essen/keys [this methods] :as opts}]
-  (apply-methods ((get essen-scene-key-collection k) this) methods))
+  (apply-fargs (this->obj this k)
+                 (methods->fargs methods)))
+
+(defmethod ig/init-key :essen.scene-fn/key [[k _] {:essen/keys [methods] :as opts}]
+  (let [this->obj (get essen-scene-key-collection (keyword (name k)))
+        fargs (methods->fargs methods)]
+    (fn [this]
+      (apply-fargs (this->obj this) fargs))))
 
 ;;
 ;; :essen.scene/state

@@ -29,9 +29,6 @@
   (reset! phaser-game (js/Phaser.Game. (clj->js game)))
   opts)
 
-(defmethod ig/init-key :essen/scenes [_ opts]
-  opts)
-
 (defmethod ig/init-key :essen/const [_ opts]
   opts)
 

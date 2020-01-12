@@ -47,16 +47,10 @@
      (ig/ref :my/bgs)
 
      [:essen.scene/add :my/bgs]
-     [[:group {:classType (ig/ref :lala/lala)
+     [[:group {:classType (ig/ref :add/bg1)
                :maxSize 4}]]
 
-     [:essen/const :lala/lala]
-     #(.. (.-add %)
-          (image 0 0 "bg")
-          (setOrigin 0)
-          (setDepth 0))
-
-     ;; [:essen.scene/add :add/bg1] [[:set-bg 0 0 false false] [:set-visible false]]
+     [:essen.scene-fn/add :add/bg1] [[:set-bg 0 0 false false]]
      ;; [:essen.scene/add :add/bg2] [[:set-bg 1920 0 true false] [:set-visible false]]
      ;; [:essen.scene/add :add/bg3] [[:set-bg 0 1080 false true] [:set-visible false]]
      ;; [:essen.scene/add :add/bg4] [[:set-bg 1920 1080 true true] [:set-visible false]]

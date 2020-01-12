@@ -19,7 +19,13 @@
    [:set-bounds 5]               #(.setBounds %1 %2 %3 %4 %5)
    [:create-cursor-keys 1]       #(.createCursorKeys %1)
    [:start-follow 5]             #(.startFollow %1 %2 %3 %4 %5)
-   [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)})
+   [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)
+   [:set-active 2]               #(.setActive %1 %2)
+   [:group 1]                    #(.group (clj->js %1))
+   [:group 2]                    #(.group (clj->js %1) (clj->js %2))
+   [:add 2]                      #(.add %1 %2)
+   [:set-depth 2]                #(.setDepth %1 %2)
+   [:set-visible 2]              #(.setVisible %1 %2)})
 
 (def essen-scene-key-collection
   {:essen.scene/load           #(.. % -load)
@@ -58,10 +64,10 @@
     (reduce apply-method obj fargs)))
 
 (defmethod ig/prep-key :essen.scene/key [[_ k] opts]
-  (derive k :essen.scene/key)
   {:essen/methods opts
    :essen/this (ig/ref :essen/this)})
 
+;; TODO create version that returns a function instead of call?
 (defmethod ig/init-key :essen.scene/key [[k _] {:essen/keys [this methods] :as opts}]
   (apply-methods ((get essen-scene-key-collection k) this) methods))
 

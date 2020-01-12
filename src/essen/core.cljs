@@ -32,6 +32,9 @@
 (defmethod ig/init-key :essen/scenes [_ opts]
   opts)
 
+(defmethod ig/init-key :essen/const [_ opts]
+  opts)
+
 (defn init [config]
   (->> config
        (ig/prep)

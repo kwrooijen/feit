@@ -14,7 +14,23 @@
  {[:set-bg 5] set-bg})
 
 (defmethod ig/init-key :my/updater [_ opts]
-  (fn [{:game/keys [cursor player] :as state} delta this]
+  (fn [{:game/keys [cursor player bgs] :as state} delta this]
+    (when-let [bg (.get bgs)]
+      (.setPosition bg 0 0))
+    (when-let [bg (.get bgs)]
+      (.. bg
+          (setPosition 1920 0)
+          (setFlipX true)))
+    (when-let [bg (.get bgs)]
+      (.. bg
+          (setPosition 0 1080)
+          (setFlipY true)))
+    (when-let [bg (.get bgs)]
+      (.. bg
+       (setPosition 1920 1080)
+       (setFlipX true)
+       (setFlipY true)))
+
     (.setVelocity player 0)
     (when (.. cursor -left -isDown)
       (.setVelocityX player -500))

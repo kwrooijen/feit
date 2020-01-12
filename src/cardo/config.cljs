@@ -32,7 +32,7 @@
     {:active true}
 
     :essen.scene/preload
-    {[:essen.scene/load :load/assets]
+    {[:es.obj/load :load/assets]
      [[:image "bg" "images/bg.jpg"]
       [:image "block" "images/block.png"]]}
 

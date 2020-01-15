@@ -181,101 +181,101 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack1-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack1-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack1-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack1-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack1-04.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack2-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack2-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack2-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack2-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack2-04.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack2-05.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack3-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack3-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack3-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack3-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack3-04.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-attack3-05.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-clmb-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-clmb-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-clmb-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-clmb-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-clmb-04.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-grb-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-grb-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-grb-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-grb-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-jmp-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crnr-jmp-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crouch-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crouch-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crouch-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-crouch-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-die-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-die-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-die-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-die-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-die-04.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-die-05.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-die-06.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-fall-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-fall-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-hurt-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-hurt-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-hurt-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-2-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-2-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-2-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-idle-2-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-jump-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-jump-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-jump-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-jump-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-ladder-climb-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-ladder-climb-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-ladder-climb-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-ladder-climb-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-run-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-run-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-run-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-run-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-run-04.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-run-05.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-slide-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-slide-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-smrslt-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-smrslt-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-smrslt-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-smrslt-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-stand-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-stand-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-stand-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swim-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swim-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swim-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swim-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-drw-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-drw-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-drw-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-drw-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-shte-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-shte-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-shte-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-swrd-shte-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-wall-slide-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-wall-slide-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-water-tread-00.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-water-tread-01.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-water-tread-02.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-water-tread-03.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-water-tread-04.png</key>
-            <key type="filename">../../../../../../Downloads/Sprites/v2.1/adventurer/adventurer-water-tread-05.png</key>
+            <key type="filename">adventure/images/adventurer-attack1-00.png</key>
+            <key type="filename">adventure/images/adventurer-attack1-01.png</key>
+            <key type="filename">adventure/images/adventurer-attack1-02.png</key>
+            <key type="filename">adventure/images/adventurer-attack1-03.png</key>
+            <key type="filename">adventure/images/adventurer-attack1-04.png</key>
+            <key type="filename">adventure/images/adventurer-attack2-00.png</key>
+            <key type="filename">adventure/images/adventurer-attack2-01.png</key>
+            <key type="filename">adventure/images/adventurer-attack2-02.png</key>
+            <key type="filename">adventure/images/adventurer-attack2-03.png</key>
+            <key type="filename">adventure/images/adventurer-attack2-04.png</key>
+            <key type="filename">adventure/images/adventurer-attack2-05.png</key>
+            <key type="filename">adventure/images/adventurer-attack3-00.png</key>
+            <key type="filename">adventure/images/adventurer-attack3-01.png</key>
+            <key type="filename">adventure/images/adventurer-attack3-02.png</key>
+            <key type="filename">adventure/images/adventurer-attack3-03.png</key>
+            <key type="filename">adventure/images/adventurer-attack3-04.png</key>
+            <key type="filename">adventure/images/adventurer-attack3-05.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-clmb-00.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-clmb-01.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-clmb-02.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-clmb-03.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-clmb-04.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-grb-00.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-grb-01.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-grb-02.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-grb-03.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-jmp-00.png</key>
+            <key type="filename">adventure/images/adventurer-crnr-jmp-01.png</key>
+            <key type="filename">adventure/images/adventurer-crouch-00.png</key>
+            <key type="filename">adventure/images/adventurer-crouch-01.png</key>
+            <key type="filename">adventure/images/adventurer-crouch-02.png</key>
+            <key type="filename">adventure/images/adventurer-crouch-03.png</key>
+            <key type="filename">adventure/images/adventurer-die-00.png</key>
+            <key type="filename">adventure/images/adventurer-die-01.png</key>
+            <key type="filename">adventure/images/adventurer-die-02.png</key>
+            <key type="filename">adventure/images/adventurer-die-03.png</key>
+            <key type="filename">adventure/images/adventurer-die-04.png</key>
+            <key type="filename">adventure/images/adventurer-die-05.png</key>
+            <key type="filename">adventure/images/adventurer-die-06.png</key>
+            <key type="filename">adventure/images/adventurer-fall-00.png</key>
+            <key type="filename">adventure/images/adventurer-fall-01.png</key>
+            <key type="filename">adventure/images/adventurer-hurt-00.png</key>
+            <key type="filename">adventure/images/adventurer-hurt-01.png</key>
+            <key type="filename">adventure/images/adventurer-hurt-02.png</key>
+            <key type="filename">adventure/images/adventurer-idle-00.png</key>
+            <key type="filename">adventure/images/adventurer-idle-01.png</key>
+            <key type="filename">adventure/images/adventurer-idle-02.png</key>
+            <key type="filename">adventure/images/adventurer-idle-03.png</key>
+            <key type="filename">adventure/images/adventurer-idle-2-00.png</key>
+            <key type="filename">adventure/images/adventurer-idle-2-01.png</key>
+            <key type="filename">adventure/images/adventurer-idle-2-02.png</key>
+            <key type="filename">adventure/images/adventurer-idle-2-03.png</key>
+            <key type="filename">adventure/images/adventurer-jump-00.png</key>
+            <key type="filename">adventure/images/adventurer-jump-01.png</key>
+            <key type="filename">adventure/images/adventurer-jump-02.png</key>
+            <key type="filename">adventure/images/adventurer-jump-03.png</key>
+            <key type="filename">adventure/images/adventurer-ladder-climb-00.png</key>
+            <key type="filename">adventure/images/adventurer-ladder-climb-01.png</key>
+            <key type="filename">adventure/images/adventurer-ladder-climb-02.png</key>
+            <key type="filename">adventure/images/adventurer-ladder-climb-03.png</key>
+            <key type="filename">adventure/images/adventurer-run-00.png</key>
+            <key type="filename">adventure/images/adventurer-run-01.png</key>
+            <key type="filename">adventure/images/adventurer-run-02.png</key>
+            <key type="filename">adventure/images/adventurer-run-03.png</key>
+            <key type="filename">adventure/images/adventurer-run-04.png</key>
+            <key type="filename">adventure/images/adventurer-run-05.png</key>
+            <key type="filename">adventure/images/adventurer-slide-00.png</key>
+            <key type="filename">adventure/images/adventurer-slide-01.png</key>
+            <key type="filename">adventure/images/adventurer-smrslt-00.png</key>
+            <key type="filename">adventure/images/adventurer-smrslt-01.png</key>
+            <key type="filename">adventure/images/adventurer-smrslt-02.png</key>
+            <key type="filename">adventure/images/adventurer-smrslt-03.png</key>
+            <key type="filename">adventure/images/adventurer-stand-00.png</key>
+            <key type="filename">adventure/images/adventurer-stand-01.png</key>
+            <key type="filename">adventure/images/adventurer-stand-02.png</key>
+            <key type="filename">adventure/images/adventurer-swim-00.png</key>
+            <key type="filename">adventure/images/adventurer-swim-01.png</key>
+            <key type="filename">adventure/images/adventurer-swim-02.png</key>
+            <key type="filename">adventure/images/adventurer-swim-03.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-drw-00.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-drw-01.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-drw-02.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-drw-03.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-shte-00.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-shte-01.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-shte-02.png</key>
+            <key type="filename">adventure/images/adventurer-swrd-shte-03.png</key>
+            <key type="filename">adventure/images/adventurer-wall-slide-00.png</key>
+            <key type="filename">adventure/images/adventurer-wall-slide-01.png</key>
+            <key type="filename">adventure/images/adventurer-water-tread-00.png</key>
+            <key type="filename">adventure/images/adventurer-water-tread-01.png</key>
+            <key type="filename">adventure/images/adventurer-water-tread-02.png</key>
+            <key type="filename">adventure/images/adventurer-water-tread-03.png</key>
+            <key type="filename">adventure/images/adventurer-water-tread-04.png</key>
+            <key type="filename">adventure/images/adventurer-water-tread-05.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -293,7 +293,101 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>../../../../../../Downloads/Sprites/v2.1/adventurer</filename>
+            <filename>adventure/images/adventurer-attack1-00.png</filename>
+            <filename>adventure/images/adventurer-attack1-01.png</filename>
+            <filename>adventure/images/adventurer-attack1-02.png</filename>
+            <filename>adventure/images/adventurer-attack1-03.png</filename>
+            <filename>adventure/images/adventurer-attack1-04.png</filename>
+            <filename>adventure/images/adventurer-attack2-00.png</filename>
+            <filename>adventure/images/adventurer-attack2-01.png</filename>
+            <filename>adventure/images/adventurer-attack2-02.png</filename>
+            <filename>adventure/images/adventurer-attack2-03.png</filename>
+            <filename>adventure/images/adventurer-attack2-04.png</filename>
+            <filename>adventure/images/adventurer-attack2-05.png</filename>
+            <filename>adventure/images/adventurer-attack3-00.png</filename>
+            <filename>adventure/images/adventurer-attack3-01.png</filename>
+            <filename>adventure/images/adventurer-attack3-02.png</filename>
+            <filename>adventure/images/adventurer-attack3-03.png</filename>
+            <filename>adventure/images/adventurer-attack3-04.png</filename>
+            <filename>adventure/images/adventurer-attack3-05.png</filename>
+            <filename>adventure/images/adventurer-crnr-clmb-00.png</filename>
+            <filename>adventure/images/adventurer-crnr-clmb-01.png</filename>
+            <filename>adventure/images/adventurer-crnr-clmb-02.png</filename>
+            <filename>adventure/images/adventurer-crnr-clmb-03.png</filename>
+            <filename>adventure/images/adventurer-crnr-clmb-04.png</filename>
+            <filename>adventure/images/adventurer-crnr-grb-00.png</filename>
+            <filename>adventure/images/adventurer-crnr-grb-01.png</filename>
+            <filename>adventure/images/adventurer-crnr-grb-02.png</filename>
+            <filename>adventure/images/adventurer-crnr-grb-03.png</filename>
+            <filename>adventure/images/adventurer-crnr-jmp-00.png</filename>
+            <filename>adventure/images/adventurer-crnr-jmp-01.png</filename>
+            <filename>adventure/images/adventurer-crouch-00.png</filename>
+            <filename>adventure/images/adventurer-crouch-01.png</filename>
+            <filename>adventure/images/adventurer-crouch-02.png</filename>
+            <filename>adventure/images/adventurer-crouch-03.png</filename>
+            <filename>adventure/images/adventurer-die-00.png</filename>
+            <filename>adventure/images/adventurer-die-01.png</filename>
+            <filename>adventure/images/adventurer-die-02.png</filename>
+            <filename>adventure/images/adventurer-die-03.png</filename>
+            <filename>adventure/images/adventurer-die-04.png</filename>
+            <filename>adventure/images/adventurer-die-05.png</filename>
+            <filename>adventure/images/adventurer-die-06.png</filename>
+            <filename>adventure/images/adventurer-fall-00.png</filename>
+            <filename>adventure/images/adventurer-fall-01.png</filename>
+            <filename>adventure/images/adventurer-hurt-00.png</filename>
+            <filename>adventure/images/adventurer-hurt-01.png</filename>
+            <filename>adventure/images/adventurer-hurt-02.png</filename>
+            <filename>adventure/images/adventurer-idle-00.png</filename>
+            <filename>adventure/images/adventurer-idle-01.png</filename>
+            <filename>adventure/images/adventurer-idle-2-00.png</filename>
+            <filename>adventure/images/adventurer-idle-2-01.png</filename>
+            <filename>adventure/images/adventurer-idle-2-02.png</filename>
+            <filename>adventure/images/adventurer-idle-2-03.png</filename>
+            <filename>adventure/images/adventurer-idle-02.png</filename>
+            <filename>adventure/images/adventurer-idle-03.png</filename>
+            <filename>adventure/images/adventurer-jump-00.png</filename>
+            <filename>adventure/images/adventurer-jump-01.png</filename>
+            <filename>adventure/images/adventurer-jump-02.png</filename>
+            <filename>adventure/images/adventurer-jump-03.png</filename>
+            <filename>adventure/images/adventurer-ladder-climb-00.png</filename>
+            <filename>adventure/images/adventurer-ladder-climb-01.png</filename>
+            <filename>adventure/images/adventurer-ladder-climb-02.png</filename>
+            <filename>adventure/images/adventurer-ladder-climb-03.png</filename>
+            <filename>adventure/images/adventurer-run-00.png</filename>
+            <filename>adventure/images/adventurer-run-01.png</filename>
+            <filename>adventure/images/adventurer-run-02.png</filename>
+            <filename>adventure/images/adventurer-run-03.png</filename>
+            <filename>adventure/images/adventurer-run-04.png</filename>
+            <filename>adventure/images/adventurer-run-05.png</filename>
+            <filename>adventure/images/adventurer-slide-00.png</filename>
+            <filename>adventure/images/adventurer-slide-01.png</filename>
+            <filename>adventure/images/adventurer-smrslt-00.png</filename>
+            <filename>adventure/images/adventurer-smrslt-01.png</filename>
+            <filename>adventure/images/adventurer-smrslt-02.png</filename>
+            <filename>adventure/images/adventurer-smrslt-03.png</filename>
+            <filename>adventure/images/adventurer-stand-00.png</filename>
+            <filename>adventure/images/adventurer-stand-01.png</filename>
+            <filename>adventure/images/adventurer-stand-02.png</filename>
+            <filename>adventure/images/adventurer-swim-00.png</filename>
+            <filename>adventure/images/adventurer-swim-01.png</filename>
+            <filename>adventure/images/adventurer-swim-02.png</filename>
+            <filename>adventure/images/adventurer-swim-03.png</filename>
+            <filename>adventure/images/adventurer-swrd-drw-00.png</filename>
+            <filename>adventure/images/adventurer-swrd-drw-01.png</filename>
+            <filename>adventure/images/adventurer-swrd-drw-02.png</filename>
+            <filename>adventure/images/adventurer-swrd-drw-03.png</filename>
+            <filename>adventure/images/adventurer-swrd-shte-00.png</filename>
+            <filename>adventure/images/adventurer-swrd-shte-01.png</filename>
+            <filename>adventure/images/adventurer-swrd-shte-02.png</filename>
+            <filename>adventure/images/adventurer-swrd-shte-03.png</filename>
+            <filename>adventure/images/adventurer-wall-slide-00.png</filename>
+            <filename>adventure/images/adventurer-wall-slide-01.png</filename>
+            <filename>adventure/images/adventurer-water-tread-00.png</filename>
+            <filename>adventure/images/adventurer-water-tread-01.png</filename>
+            <filename>adventure/images/adventurer-water-tread-02.png</filename>
+            <filename>adventure/images/adventurer-water-tread-03.png</filename>
+            <filename>adventure/images/adventurer-water-tread-04.png</filename>
+            <filename>adventure/images/adventurer-water-tread-05.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

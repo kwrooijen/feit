@@ -8,6 +8,7 @@
 ;; Then the end user can create methods that way
 (def method-collection
   {[:add 2]                      #(.add %1 %2)
+   [:debug 2]                    #(do (println "DEBUG:" %2) %1)
    [:create 2]                   #(.create %1 %2)
    [:create 3]                   #(.create %1 %2 %3)
    [:create 4]                   #(.create %1 %2 %3 %4)
@@ -17,10 +18,16 @@
    [:create-cursor-keys 1]       #(.createCursorKeys %1)
    [:group 1]                    #(.group (clj->js %1))
    [:group 2]                    #(.group (clj->js %1) (clj->js %2))
+   [:play 2]                     #(.play %1 %2)
+   [:set-scale 2]                #(.setScale %1 %2)
+   [:multiatlas 4]               #(.multiatlas %1 %2 %3 %4)
    [:image 3]                    #(.image %1 %2 %3)
    [:image 4]                    #(.image %1 %2 %3 %4)
    [:set-active 2]               #(.setActive %1 %2)
    [:set-bounds 5]               #(.setBounds %1 %2 %3 %4 %5)
+   [:sprite 4]                   #(.sprite %1 %2 %3 %4)
+   [:sprite 5]                   #(.sprite %1 %2 %3 %4 %5)
+   [:generate-frame-names 3]     #(.generateFrameNames %1 %2 %3)
    [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)
    [:set-depth 2]                #(.setDepth %1 %2)
    [:set-flip-x 2]               #(.setFlipX %1 %2)
@@ -32,11 +39,13 @@
 (def essen-scene-key-collection
   {:add            #(.. % -add)
    :apply          #(%)
+   :this           (fn [this] this)
    :cameras.main   #(.. % -cameras -main)
    :input.keyboard #(.. % -input -keyboard)
    :lights         #(.. % -lights)
    :load           #(.. % -load)
    :physics.add    #(.. % -physics -add)
+   :anims          #(.. % -anims)
    :physics.world  #(.. % -physics -world)})
 
 (doall
@@ -73,8 +82,22 @@
     (first methods)
     ((get essen-scene-key-collection (keyword (name k))) this)))
 
+(defn get-failing-method [method]
+  (reduce (fn [acc [k v]]
+            (if (= v method)
+              (reduced k)
+              :METHOD/UNKNOWN))
+          :METHOD/UNKNOWN
+          method-collection))
+
 (defn apply-method [obj-acc [method args]]
-  (apply method (cons obj-acc args)))
+  (try
+    (apply method (cons obj-acc args))
+    (catch js/Error e
+      (println "Object Type:" (.-type obj-acc))
+      (println "Method: " (get-failing-method method))
+      (println "Args: " args)
+      (js/throw e))))
 
 (defn apply-fargs [obj fargs]
   ;; TODO Add proper error message if method does not exist

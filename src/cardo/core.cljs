@@ -25,11 +25,11 @@
     (.getElementById js/document "interface")))
 
 (defn ^:export init []
-  (essen.core/init (merge config/config
-                          config.battle/config))
   (re-frame/dispatch-sync [::initialize-db])
   (dev-setup)
-  (mount-root))
+  (mount-root)
+  (essen.core/init (merge config/config
+                          config.battle/config)))
 
 (defn stop []
   (essen.core/suspend!))
@@ -50,7 +50,6 @@
       (setFlipY flip-y)))
 
 (defn create-anim [anims k prefix end repeat framerate]
-  (println "Creating " k)
   (let [frames (.generateFrameNames anims "atlas" #js {:prefix prefix
                                                        :end end
                                                        :zeroPad 2})]

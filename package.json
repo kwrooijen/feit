@@ -8,9 +8,12 @@
     },
     "dependencies": {
         "create-react-class": "^15.6.2",
+        "highlight.js": "9.15.10",
+        "phaser": "^3.21.0",
         "react": "^16.0.0",
         "react-dom": "^16.0.0",
-        "shadow-cljs": "^2.0.80",
-        "phaser": "^3.21.0"
+        "react-flip-move": "3.0.3",
+        "react-highlight.js": "1.0.7",
+        "shadow-cljs": "^2.0.80"
     }
 }

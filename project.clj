@@ -21,5 +21,6 @@
   {:dev
    {:dependencies [[binaryage/devtools "0.9.10"]
                    [thheller/shadow-cljs "2.8.39"]
+                   [re-frisk "0.5.4.1"]
                    [com.cemerick/pomegranate "1.1.0"]]}
    :prod {}})

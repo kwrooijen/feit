@@ -6,7 +6,9 @@
    [integrant.core :as ig]
    [cardo.views :as views]
    [cardo.db :as db]
-   [cardo.config :as config]))
+
+   [cardo.config :as config]
+   [cardo.config.battle :as config.battle]))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -23,7 +25,8 @@
     (.getElementById js/document "interface")))
 
 (defn ^:export init []
-  (essen.core/init config/config)
+  (essen.core/init (merge config/config
+                          config.battle/config))
   (re-frame/dispatch-sync [::initialize-db])
   (dev-setup)
   (mount-root))
@@ -32,7 +35,8 @@
   (essen.core/suspend!))
 
 (defn start []
-  (essen.core/resume config/config))
+  (essen.core/resume (merge config/config
+                            config.battle/config)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -62,6 +66,7 @@
 (defmethod ig/init-key :my/updater [_ opts]
   (fn [{:game/keys [cursor adventurer] :as state} delta this]
     (when (.. cursor -space -isDown)
+      (re-frame/dispatch [:set-component/attack 1])
       (set! (.-delay (:attack/timer state)) 600))
     state))
 

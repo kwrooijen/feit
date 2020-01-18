@@ -11,33 +11,33 @@
 (defn custom-methods! [methods]
   (swap! essen.obj/custom-methods merge methods))
 
-(defmethod ig/init-key :essen/core [_ {:essen/keys [game] :as opts}]
-  (reset! phaser-game (js/Phaser.Game. (clj->js game)))
+(defmethod ig/init-key :essen/game [_ opts]
+  (reset! phaser-game (js/Phaser.Game. (clj->js opts)))
   opts)
 
-(defmethod ig/halt-key! :essen/core [_ _]
+(defmethod ig/halt-key! :essen/game [_ _]
   (when @phaser-game
     (.destroy @phaser-game)
     (.remove (js/document.querySelector "canvas"))))
 
-(defmethod ig/suspend-key! :essen/core [_ _]
+(defmethod ig/suspend-key! :essen/game [_ _]
   (when @phaser-game
     (.destroy @phaser-game)
     (.remove (js/document.querySelector "canvas"))))
 
-(defmethod ig/resume-key :essen/core
-  [_ {:essen/keys [game] :as opts} _old-opts _old-impl]
-  (reset! phaser-game (js/Phaser.Game. (clj->js game)))
+(defmethod ig/resume-key :essen/game
+  [_ opts _old-opts _old-impl]
+  (reset! phaser-game (js/Phaser.Game. (clj->js opts)))
   opts)
 
 (defmethod ig/init-key :essen/const [_ opts]
   opts)
 
 (defn init [config]
-  (->> config
+  (-> config
        (ig/prep)
-       (ig/init)
-       (reset! system)))
+       (ig/init [:essen/game])
+       (->> (reset! system))))
 
 (defn suspend! []
   (ig/suspend! @system))
@@ -46,4 +46,4 @@
   (reset! system
           (-> config
               (ig/prep)
-              (ig/resume @system))))
+              (ig/resume @system [:essen/game]))))

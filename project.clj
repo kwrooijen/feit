@@ -1,9 +1,11 @@
 (defproject cardo "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.10.1"]
-                 [org.clojure/clojurescript "1.10.520"]
+                 [org.clojure/clojurescript "1.10.597"
+                  :exclusions [com.google.javascript/closure-compiler-unshaded
+                               org.clojure/google-closure-library
+                               org.clojure/google-closure-library-third-party]]
                  [reagent "0.8.1"] ;; FIXME: go to 0.9.0 when available to possibly fix componentWillMount warning
-                 [com.google.javascript/closure-compiler-unshaded "v20190618"]
-                 [org.clojure/google-closure-library "0.0-20190213-2033d5d9"]
+                 [re-frame "0.10.9"]
                  [spec-signature "0.2.0"]
                  [integrant "0.8.0"]]
 

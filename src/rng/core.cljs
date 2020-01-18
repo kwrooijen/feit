@@ -1,6 +1,8 @@
 (ns rng.core
-  (:require [integrant.core :as ig]
-            [essen.core]))
+  (:require
+   [integrant.core :as ig]
+   [essen.core]
+   [rng.config :as config]))
 
 (defn set-bg [obj x y flip-x flip-y]
   (.. obj

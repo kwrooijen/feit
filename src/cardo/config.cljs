@@ -1,6 +1,7 @@
-(ns rng.config
-  (:require [integrant.core :as ig]
-            [phaser]))
+(ns cardo.config
+  (:require
+   [integrant.core :as ig]
+   [phaser]))
 
 (def debug?
   ^boolean goog.DEBUG)
@@ -12,6 +13,7 @@
      :backgroundColor 0xecf0f1
      :physics {:default :arcade}
      :tweenSpeed 2000
+     :parent "game"
      :scene [(ig/ref :scene/boot)]}}
 
    ;; Scene.Boot

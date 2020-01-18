@@ -17,18 +17,7 @@
    ;; http://labs.phaser.io/edit.html?src=src/camera/follow%20user%20controlled%20sprite.js&v=3.21.0
 
    [:essen/scene :scene/boot]
-   {
-
-
-    ;; [:essen/entity :my/box]
-    ;; {}
-
-    ;; [:essen/object :my/box-image]
-    ;; [:this/physics.add
-    ;;  [:image 1900 300 "block"]
-    ;;  [:set-collide-world-bounds true]]
-
-    :essen.scene/config
+   {:essen.scene/config
     {:active true}
 
     :essen.scene/preload
@@ -37,30 +26,8 @@
       [:image "block" "images/block.png"]]}
 
     :essen.scene/create
-    {[:essen.scene/state :game/player]
-     (ig/ref :boot/player)
-
-     [:essen.scene/state :game/cursor]
-     (ig/ref :boot/cursor)
-
-     ;; [:essen.scene/state :game/bgs]
-     ;; (ig/ref :my/bgs)
-
-     ;; [:essen.obj-do/apply :bg/create-beforehand]
-     ;; [(ig/ref :my/bgs)
-     ;;  [:create 400 400 "bg" 0 true true]
-     ;;  [:create 400 400 "bg" 0 true true]
-     ;;  [:create 400 400 "bg" 0 true true]
-     ;;  [:create 400 400 "bg" 0 true true]]
-
-     ;; [:essen.obj/apply :bg/create-beforehand2] [(ig/ref :my/bgs) [:create 4]]
-     ;; [:essen.obj/apply :bg/create-beforehand3] [(ig/ref :my/bgs) [:create 4]]
-     ;; [:essen.obj/apply :bg/create-beforehand4] [(ig/ref :my/bgs) [:create 4]]
-
-
-     ;; [:essen.obj/add :my/bgs]
-     ;; [[:group {:classType (ig/ref :add/bg1)
-     ;;           :maxSize 4}]]
+    {[:essen.scene/state :game/player] (ig/ref :boot/player)
+     [:essen.scene/state :game/cursor] (ig/ref :boot/cursor)
 
      [:essen.obj/add :add/bg1] [[:set-bg 0 0 false false]]
      [:essen.obj/add :add/bg2] [[:set-bg 1920 0 true false]]

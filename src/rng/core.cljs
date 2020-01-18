@@ -26,7 +26,10 @@
 (defmethod ig/init-key :my/updater [_ opts]
   (fn [{:game/keys [cursor adventurer] :as state} delta this]
     (when (.. cursor -space -isDown)
-      (.play adventurer "adventurer/attack")
-      (.. adventurer -anims (chain "adventurer/idle"))
-      (println "OM!"))
+      (set! (.-delay (:attack/timer state)) 600))
     state))
+
+(defmethod ig/init-key :adventurer/timer [_ {:keys [adventurer]}]
+  (fn []
+    (.play adventurer  "adventurer/attack")
+    (.. adventurer -anims (chain "adventurer/idle"))))

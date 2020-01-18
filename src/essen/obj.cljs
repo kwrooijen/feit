@@ -9,7 +9,7 @@
 (def method-collection
   {[:add 2]                      #(.add %1 %2)
    [:debug 2]                    #(do (println "DEBUG:" %2) %1)
-   [:create 2]                   #(.create %1 %2)
+   [:create 2]                   #(.create %1 (clj->js %2))
    [:create 3]                   #(.create %1 %2 %3)
    [:create 4]                   #(.create %1 %2 %3 %4)
    [:create 5]                   #(.create %1 %2 %3 %4 %5)
@@ -27,13 +27,14 @@
    [:set-bounds 5]               #(.setBounds %1 %2 %3 %4 %5)
    [:sprite 4]                   #(.sprite %1 %2 %3 %4)
    [:sprite 5]                   #(.sprite %1 %2 %3 %4 %5)
-   [:generate-frame-names 3]     #(.generateFrameNames %1 %2 %3)
+   [:generate-frame-names 3]     #(.generateFrameNames %1 %2 (clj->js %3))
    [:set-collide-world-bounds 2] #(.setCollideWorldBounds %1 %2)
    [:set-depth 2]                #(.setDepth %1 %2)
    [:set-flip-x 2]               #(.setFlipX %1 %2)
    [:set-flip-y 2]               #(.setFlipY %1 %2)
    [:set-origin 2]               #(.setOrigin %1 %2)
    [:set-visible 2]              #(.setVisible %1 %2)
+   [:add-event 2]                #(.addEvent %1 (clj->js %2))
    [:start-follow 5]             #(.startFollow %1 %2 %3 %4 %5)})
 
 (def essen-scene-key-collection
@@ -46,6 +47,7 @@
    :load           #(.. % -load)
    :physics.add    #(.. % -physics -add)
    :anims          #(.. % -anims)
+   :time           #(.. % -time)
    :physics.world  #(.. % -physics -world)})
 
 (doall

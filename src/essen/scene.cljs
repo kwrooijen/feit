@@ -68,9 +68,9 @@
 (defn scene-update [opts k]
   (let [updaters (scene-updaters opts)
         state (scene-state k)]
-    (fn [delta]
+    (fn [time delta]
       (this-as this
-        (reset! state (reduce #(%2 %1 delta this) @state updaters))))))
+        (reset! state (reduce #(%2 %1 this time delta) @state updaters))))))
 
 (defmethod ig/init-key :essen/scene [[_ k] opts]
   (swap! scene-states assoc k (atom {}))

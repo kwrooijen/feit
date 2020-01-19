@@ -1,19 +1,15 @@
 (ns essen.core
   (:require
+   [phaser]
+   [essen.events.scene]
+   [essen.subs.scene]
    [integrant.core :as ig]
    [essen.scene]
    [essen.obj]
-   [phaser]
    [essen.spec.scene]
    [clojure.spec.alpha :as s]
-   [spec-signature.core :refer-macros [sdef]]))
-
-(defonce system (atom nil))
-(defonce phaser-game (atom nil))
-
-(def active-scenes-xf
-  (comp (filter #(.. % isActive))
-        (map #(.. % -key))))
+   [spec-signature.core :refer-macros [sdef]]
+   [essen.state :refer [system phaser-game scene-states scenes]]))
 
 (defn custom-methods! [methods]
   (swap! essen.obj/custom-methods merge methods))
@@ -55,16 +51,16 @@
               (ig/prep)
               (ig/resume @system [:essen/game]))))
 
-(sdef scenes [] (s/coll-of object?))
-(defn scenes []
-  (if @phaser-game
-    (mapv #(.-scene %) (.. @phaser-game -scene -scenes))
-    []))
+(defn scene [scene-key]
+  (->> (scenes)
+       (filter #(#{scene-key} (.-key %)))
+       (first)))
 
-(sdef scene-keys [] (s/coll-of :scene/key))
-(defn scene-keys []
-  (mapv #(.-key %) (scenes)))
+(defn scene-change
+  ([scene1 scene2]
+   (scene-change scene1 scene2 {}))
+  ([scene1 scene2 opts]
+   (.start (scene (name scene1)) (name scene2) opts)))
 
-(sdef active-scenes [] (s/coll-of :scene/key))
-(defn active-scenes []
-  (transduce active-scenes-xf conj (scenes)))
+(defn scene-state [scene-key]
+  @(get @scene-states scene-key))

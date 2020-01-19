@@ -13,16 +13,16 @@
      [:essen.scene/state :game/adventurer]
      (ig/ref :adventurer/sprite)
 
-     [:essen.scene/state :attack/timer]
-     (ig/ref :attack/timer-def)
+     ;; [:essen.scene/state :attack/timer]
+     ;; (ig/ref :attack/timer-def)
 
      [:essen.scene/run :my/run]
      {}
 
-     [:essen.obj/time :attack/timer-def]
-     [[:add-event {:delay 2000 :loop true :callback (ig/ref :adventurer/timer)}]]
+     ;; [:essen.obj/time :attack/timer-def]
+     ;; [[:add-event {:delay 2000 :loop true :callback (ig/ref :adventurer/timer)}]]
 
-     :adventurer/timer {:adventurer (ig/ref :adventurer/sprite)}
+     ;; :adventurer/timer {:adventurer (ig/ref :adventurer/sprite)}
 
      [:essen.obj/add :adventurer/sprite]
      [[:debug (ig/ref :adventurer.frames/idle)]

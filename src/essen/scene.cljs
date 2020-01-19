@@ -1,8 +1,9 @@
 (ns essen.scene
   (:require
-   [integrant.core :as ig]))
-
-(defonce scene-states (atom {}))
+   [integrant.core :as ig]
+   [re-frame.core :as re-frame]
+   [essen.state :refer [scene-states]]
+   [essen.events.scene]))
 
 (defn scene-state [k]
   (get @scene-states k))
@@ -31,6 +32,7 @@
           :essen/init (ig/ref :essen/init)}))
 
 (defmethod ig/init-key :essen/init [_ opts]
+  (re-frame/dispatch [:essen.events.scene/set-active-scenes])
   opts)
 
 (defmethod ig/init-key :essen.scene/config [_ opts]

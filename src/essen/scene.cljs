@@ -32,7 +32,6 @@
           :essen/init (ig/ref :essen/init)}))
 
 (defmethod ig/init-key :essen/init [_ opts]
-  (re-frame/dispatch [:essen.events.scene/set-active-scenes])
   opts)
 
 (defmethod ig/init-key :essen.scene/config [_ opts]
@@ -56,6 +55,7 @@
 
 (defn scene-init [k]
   (fn [data]
+    (re-frame/dispatch [:essen.events.scene/set-active-scenes])
     (swap! (scene-state k) assoc :essen/init data)))
 
 (defn scene-preload [opts]

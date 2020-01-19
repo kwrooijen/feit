@@ -64,3 +64,7 @@
 
 (defn scene-state [scene-key]
   @(get @scene-states scene-key))
+
+(defn emit! [scene-key event]
+  (swap! (get @scene-states scene-key)
+         #(update % :essen/queue conj event)))

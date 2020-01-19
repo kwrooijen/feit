@@ -1,13 +1,7 @@
 (ns cardo.views
   (:require
    [essen.re-frame :refer [active-scenes]]
-   [essen.core :refer [scene-change scene-state]]))
-
-(defn attack []
-  (-> (scene-state :scene/battle)
-      :game/adventurer
-      (.play "adventurer/attack")
-      (.. -anims (chain "adventurer/idle"))))
+   [essen.core :refer [scene-change scene-state emit!]]))
 
 (defn view-boot []
   [:div "Boot"])
@@ -20,7 +14,7 @@
 
 (defn view-battle []
   [:div#attack.button
-   {:on-click attack}
+   {:on-click #(emit! :scene/battle {:event :attack})}
    "Attack"])
 
 (defn main-panel []
@@ -29,4 +23,4 @@
       (scene-active? "boot")   [view-boot]
       (scene-active? "town")   [view-town]
       (scene-active? "battle") [view-battle]
-      :else [:div "Loading"])))
+      :else [view-boot])))

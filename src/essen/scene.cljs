@@ -80,15 +80,24 @@
       (ig/init)
       (:essen.scene.update/list)))
 
+(defn apply-updaters [scene-state updaters this time delta]
+  (reduce #(%2 %1 this time delta) scene-state updaters))
+
+(defn empty-queue [scene-state]
+  (assoc scene-state :essen/queue []))
+
 (defn scene-update [opts k]
   (let [updaters (scene-updaters opts)
         state (scene-state k)]
     (fn [time delta]
       (this-as this
-        (reset! state (reduce #(%2 %1 this time delta) @state updaters))))))
+        (swap! state (fn [scene-state]
+                       (-> scene-state
+                           (apply-updaters updaters this time delta)
+                           (empty-queue))))))))
 
 (defmethod ig/init-key :essen/scene [[_ k] opts]
-  (swap! scene-states assoc k (atom {}))
+  (swap! scene-states assoc k (atom {:essen/queue []}))
   (-> (merge {:key (name k)}
              (:essen.scene/config opts))
       (assoc :init (scene-init k))

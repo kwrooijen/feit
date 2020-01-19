@@ -49,5 +49,5 @@
 
     :essen.scene/update
     {:essen.scene.update/list
-     [(ig/ref :my/updater)]
-     :my/updater {}}}})
+     [(ig/ref :handle/attack)]
+     :handle/attack {}}}})

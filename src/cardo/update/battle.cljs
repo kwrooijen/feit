@@ -2,7 +2,7 @@
   (:require
    [integrant.core :as ig]))
 
-(defn attack-event3? [queue]
+(defn attack-event? [queue]
   (some (comp #{:attack} :event) queue))
 
 (defn attack-threshold? [{:game/keys [last-attack]} time]

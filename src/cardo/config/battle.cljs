@@ -6,17 +6,7 @@
 
 (def config
   {[:essen/scene :scene/battle]
-   {:essen.scene/config
-    {:active true}
-
-    :essen.scene/preload
-    {[:essen.obj/load :load/assets]
-     [[:image "bg" "images/bg.jpg"]]
-
-     [:essen.obj/load]
-     [[:multiatlas "atlas" "images/adventure/spritesheet/adventure.json" "images/adventure/spritesheet/"]]}
-
-    :essen.scene/create
+   {:essen.scene/create
     {[:essen.scene/state :game/cursor]
      (ig/ref :battle/cursor)
 
@@ -26,6 +16,8 @@
      [:essen.scene/state :attack/timer]
      (ig/ref :attack/timer-def)
 
+     [:essen.scene/run :my/run]
+     {}
 
      [:essen.obj/time :attack/timer-def]
      [[:add-event {:delay 2000 :loop true :callback (ig/ref :adventurer/timer)}]]
@@ -58,6 +50,4 @@
     :essen.scene/update
     {:essen.scene.update/list
      [(ig/ref :my/updater)]
-
-     :my/updater {}}}}
-  )
+     :my/updater {}}}})

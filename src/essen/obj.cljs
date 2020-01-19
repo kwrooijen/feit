@@ -9,6 +9,7 @@
 (def method-collection
   {[:add 2]                      #(.add %1 %2)
    [:debug 2]                    #(do (println "DEBUG:" %2) %1)
+   [:start 3]                    #(.start %1 %2 %3)
    [:create 2]                   #(.create %1 (clj->js %2))
    [:create 3]                   #(.create %1 %2 %3)
    [:create 4]                   #(.create %1 %2 %3 %4)
@@ -48,6 +49,7 @@
    :physics.add    #(.. % -physics -add)
    :anims          #(.. % -anims)
    :time           #(.. % -time)
+   :scene          #(.. % -scene)
    :physics.world  #(.. % -physics -world)})
 
 (doall
@@ -96,9 +98,9 @@
   (try
     (apply method (cons obj-acc args))
     (catch js/Error e
-      (println "Object Type:" (.-type obj-acc))
-      (println "Method: " (get-failing-method method))
-      (println "Args: " args)
+      (println "[ERROR] Object Type:" (.-type obj-acc))
+      (println "[ERROR] Method: " (get-failing-method method))
+      (println "[ERROR] Args: " args)
       (js/throw e))))
 
 (defn apply-fargs [obj fargs]

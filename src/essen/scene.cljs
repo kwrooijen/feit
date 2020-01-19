@@ -25,6 +25,14 @@
 ;; Scene
 ;;
 
+(defmethod ig/prep-key :essen.scene/run [_ opts]
+  (merge opts
+         {:essen/this (ig/ref :essen/this)
+          :essen/init (ig/ref :essen/init)}))
+
+(defmethod ig/init-key :essen/init [_ opts]
+  opts)
+
 (defmethod ig/init-key :essen.scene/config [_ opts]
   opts)
 
@@ -44,6 +52,10 @@
       (update :essen.scene/create (fn [create] (fn [] create)))
       (update :essen.scene/update (fn [update] (fn [] update)))))
 
+(defn scene-init [k]
+  (fn [data]
+    (swap! (scene-state k) assoc :essen/init data)))
+
 (defn scene-preload [opts]
   #(this-as this
      (-> ((:essen.scene/preload opts))
@@ -56,6 +68,7 @@
      (-> ((:essen.scene/create opts))
          (assoc :essen/this this)
          (assoc :essen.scene.state/atom (scene-state k))
+         (assoc :essen/init (:essen/init @(scene-state k)))
          (ig/prep)
          (ig/init))))
 
@@ -76,6 +89,7 @@
   (swap! scene-states assoc k (atom {}))
   (-> (merge {:key (name k)}
              (:essen.scene/config opts))
+      (assoc :init (scene-init k))
       (cond->
           ((:essen.scene/preload opts))
           (assoc :preload (scene-preload opts)))

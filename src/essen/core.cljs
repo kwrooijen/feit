@@ -3,10 +3,31 @@
    [integrant.core :as ig]
    [essen.scene]
    [essen.obj]
-   [phaser]))
+   [phaser]
+   [essen.spec.scene]
+   [clojure.spec.alpha :as s]
+   [spec-signature.core :refer-macros [sdef]]))
 
 (defonce system (atom nil))
 (defonce phaser-game (atom nil))
+
+(defonce active-scenes-xf
+  (comp (filter #(.. % isActive))
+        (map #(.. % -key))))
+
+(sdef scenes [] (s/coll-of object?))
+(defn scenes []
+  (if @phaser-game
+    (mapv #(.-scene %) (.. @phaser-game -scene -scenes))
+    []))
+
+(sdef scene-keys [] (s/coll-of :scene/key))
+(defn scene-keys []
+  (mapv #(.-key %) (scenes)))
+
+(sdef active-scenes [] (s/coll-of :scene/key))
+(defn active-scenes []
+  (transduce active-scenes-xf conj (scenes)))
 
 (defn custom-methods! [methods]
   (swap! essen.obj/custom-methods merge methods))

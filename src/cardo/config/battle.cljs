@@ -7,8 +7,9 @@
 (def config
   {[:essen/scene :scene/battle]
    {:essen.scene/create
-    {[:essen.scene/state :game/cursor]
-     (ig/ref :battle/cursor)
+    {
+     ;; [:essen.scene/state :game/cursor]
+     ;; (ig/ref :battle/cursor)
 
      [:essen.scene/state :game/adventurer]
      (ig/ref :adventurer/sprite)
@@ -27,7 +28,7 @@
      [:essen.obj/add :adventurer/sprite]
      [[:debug (ig/ref :adventurer.frames/idle)]
       [:debug (ig/ref :adventurer.frames/attack)]
-      [:sprite 500 400 "atlas"]
+      [:sprite 200 200 "atlas"]
       [:set-scale 5]
       [:set-depth 1]
       [:play "adventurer/idle"]]
@@ -45,7 +46,8 @@
 
      [:essen.obj/physics.world :battle/world] [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]]
 
-     [:essen.obj/input.keyboard :battle/cursor] [[:create-cursor-keys]]}
+     ;; [:essen.obj/input.keyboard :battle/cursor] [[:create-cursor-keys]]
+     }
 
     :essen.scene/update
     {:essen.scene.update/list

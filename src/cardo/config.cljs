@@ -14,6 +14,8 @@
   (merge
    {:essen/game
     {:type js/Phaser.AUTO
+     :width 400
+     :height 400
      :backgroundColor 0xecf0f1
      :physics {:default :arcade}
      :tweenSpeed 2000

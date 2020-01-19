@@ -13,9 +13,11 @@
     "To battle"]])
 
 (defn view-battle []
-  [:div#attack.button
-   {:on-click #(emit! :scene/battle {:event :attack})}
-   "Attack"])
+  [:div
+   [:input {:type :text}]
+   [:div#attack.button
+    {:on-click #(emit! :scene/battle {:event :attack})}
+    "Attack"]])
 
 (defn main-panel []
   (let [scene-active? (set (active-scenes))]

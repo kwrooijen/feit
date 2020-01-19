@@ -15,4 +15,4 @@
 
     :essen.scene/create
     {[:essen.obj/scene :boot/to-battle]
-     [[:start "battle" {}]]}}})
+     [[:start "town" {}]]}}})

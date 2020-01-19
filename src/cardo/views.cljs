@@ -9,16 +9,24 @@
       (.play "adventurer/attack")
       (.. -anims (chain "adventurer/idle"))))
 
-(defn scenes-view []
-  [:<>
-   (let [scenes (active-scenes)]
-     (for [scene scenes]
-       [:div scene]))])
+(defn view-boot []
+  [:div "Boot"])
+
+(defn view-town []
+  [:div
+   [:div.button
+    {:on-click #(scene-change :scene/town :scene/battle {})}
+    "To battle"]])
+
+(defn view-battle []
+  [:div#attack.button
+   {:on-click attack}
+   "Attack"])
 
 (defn main-panel []
-  [:div {:style {:height "100%" :width "100%" :position :relative}}
-   [:div {:style {:width "100%" :height "40px" :position :relative :bottom 0 :background-color "#aaaaff"}}]
-   [scenes-view]
-   [:div#attack.button
-    {:on-click attack}
-    "Attack"]])
+  (let [scene-active? (set (active-scenes))]
+    (cond
+      (scene-active? "boot")   [view-boot]
+      (scene-active? "town")   [view-town]
+      (scene-active? "battle") [view-battle]
+      :else [:div "Loading"])))

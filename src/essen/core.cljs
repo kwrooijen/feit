@@ -11,7 +11,7 @@
 (defonce system (atom nil))
 (defonce phaser-game (atom nil))
 
-(defonce active-scenes-xf
+(def active-scenes-xf
   (comp (filter #(.. % isActive))
         (map #(.. % -key))))
 

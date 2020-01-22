@@ -65,6 +65,20 @@
 (defn scene-state [scene-key]
   @(get @scene-states scene-key))
 
-(defn emit! [scene-key event]
-  (swap! (get @scene-states scene-key)
-         #(update % :essen/queue conj event)))
+(defn- push-queue [queue event]
+  (swap! queue update :essen/queue conj event))
+
+(defn emit!
+  ([event]
+   (doseq [[_ scene-state] @scene-states]
+     (push-queue scene-state event)))
+  ([scene-key event]
+   (-> @scene-states
+       (get scene-key)
+       (push-queue event))))
+
+(defn emit-keydown! [event]
+  (emit! {:event/key-down event}))
+
+(defn emit-keyup! [event]
+  (emit! {:event/key-up event}))

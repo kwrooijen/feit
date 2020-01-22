@@ -1,6 +1,6 @@
 (ns cardo.core
   (:require
-   [essen.core]
+   [essen.core :as es]
    [essen.keyboard]
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
@@ -33,7 +33,8 @@
   (dev-setup)
   (mount-root)
   (essen.keyboard/disable-tabbing!)
-  (essen.keyboard/body-event-listener "keydown" println))
+  (essen.keyboard/body-event-listener "keydown" es/emit-keydown!)
+  (essen.keyboard/body-event-listener "keyup" es/emit-keyup!))
 
 (defn stop []
   (essen.core/suspend!))

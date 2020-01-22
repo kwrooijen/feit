@@ -119,12 +119,13 @@
    163 :key/hash
    164 :key/dollar})
 
-(defn- body-active? []
+(defn- body-active?
   "Check if the user is currently focused on the body. use `identical?` to
   compare memory addresses. This is faster than using `=`.
 
   TODO: Will this still work if the user embeds the game in their website? Or
   should the user be able to choose the focused element? Maybe a different solution?"
+  []
   (identical? (.-body js/document)
               (.-activeElement js/document)))
 

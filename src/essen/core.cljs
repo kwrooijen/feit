@@ -69,6 +69,14 @@
   (swap! queue update :essen/queue conj event))
 
 (defn emit!
+  "Emit an event to a specific scene, or all scenes.
+  Events are pushed into a queue (atom vector) and are all handled in a single
+  update rotation. After the update rotation, all events in the queue are removed.
+
+  TODO: If globally emitted events (e.g. keyboard event) are also pushed to non
+  active scenes (scenes which currently are running an update loop). This is
+  problematic because that means the queue for these sceness will keep growing.
+  "
   ([event]
    (doseq [[_ scene-state] @scene-states]
      (push-queue scene-state event)))
@@ -77,8 +85,14 @@
        (get scene-key)
        (push-queue event))))
 
-(defn emit-keydown! [event]
+(defn emit-keydown!
+  "A standard format for emitting keydown events. This is to keep keyboard
+  events consistent between libraries"
+  [event]
   (emit! {:event/key-down event}))
 
-(defn emit-keyup! [event]
+(defn emit-keyup!
+  "A standard format for emitting keyup events. This is to keep keyboard
+  events consistent between libraries"
+  [event]
   (emit! {:event/key-up event}))

@@ -2,8 +2,10 @@
   (:require
    [integrant.core :as ig]
    [re-frame.core :as re-frame]
-   [essen.state :refer [scene-states]]
+   [essen.state :refer [scene-queues]]
    [essen.events.scene]))
+
+(defonce scene-states (atom {}))
 
 (defn scene-state [k]
   (get @scene-states k))
@@ -12,15 +14,15 @@
 ;; :essen.scene/state
 ;;
 
-(defmethod ig/init-key :essen.scene.state/atom [_ opts]
+(defmethod ig/init-key :essen.scene.state/volatile [_ opts]
   opts)
 
 (defmethod ig/prep-key :essen.scene/state [[_ k] opts]
   {:data opts
-   :state (ig/ref :essen.scene.state/atom)})
+   :state (ig/ref :essen.scene.state/volatile)})
 
 (defmethod ig/init-key :essen.scene/state [[_ k] {:keys [data state]}]
-  (swap! state assoc k data))
+  (vswap! state assoc k data))
 
 ;;
 ;; Scene
@@ -40,7 +42,6 @@
 (defmethod ig/init-key :essen.scene.update/list [_ opts]
   opts)
 
-
 (defmethod ig/prep-key :essen.scene/create [_ opts]
   (assoc opts :essen.scene/create (ig/refset :essen.scene/key)))
 
@@ -56,7 +57,7 @@
 (defn scene-init [k]
   (fn [data]
     (re-frame/dispatch [:essen.events.scene/set-active-scenes])
-    (swap! (scene-state k) assoc :essen/init data)))
+    (vswap! (scene-state k) assoc :essen/init data)))
 
 (defn scene-preload [opts]
   #(this-as this
@@ -69,7 +70,7 @@
   #(this-as this
      (-> ((:essen.scene/create opts))
          (assoc :essen/this this)
-         (assoc :essen.scene.state/atom (scene-state k))
+         (assoc :essen.scene.state/volatile (scene-state k))
          (assoc :essen/init (:essen/init @(scene-state k)))
          (ig/prep)
          (ig/init))))
@@ -83,21 +84,28 @@
 (defn apply-updaters [scene-state updaters this time delta]
   (reduce #(%2 %1 this time delta) scene-state updaters))
 
-(defn empty-queue [scene-state]
-  (assoc scene-state :essen/queue []))
+(defn empty-queue [k]
+  (swap! scene-queues assoc k []))
+
+(defn scene-queue
+  [scene-key]
+  (let [current-queues (get @scene-queues scene-key)]
+    (swap! scene-queues assoc scene-key [])
+    current-queues))
 
 (defn scene-update [opts k]
   (let [updaters (scene-updaters opts)
         state (scene-state k)]
     (fn [time delta]
       (this-as this
-        (swap! state (fn [scene-state]
-                       (-> scene-state
-                           (apply-updaters updaters this time delta)
-                           (empty-queue))))))))
+        (vswap! state assoc :essen/queue (scene-queue k))
+        (vswap! state #(apply-updaters % updaters this time delta))))))
+
+(def initial-state
+  (volatile! {:essen/queue []}))
 
 (defmethod ig/init-key :essen/scene [[_ k] opts]
-  (swap! scene-states assoc k (atom {:essen/queue []}))
+  (swap! scene-states assoc k initial-state)
   (-> (merge {:key (name k)}
              (:essen.scene/config opts))
       (assoc :init (scene-init k))

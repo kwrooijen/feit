@@ -1,7 +1,7 @@
 (ns cardo.views
   (:require
    [essen.re-frame :refer [active-scenes]]
-   [essen.core :refer [scene-change scene-state emit!]]))
+   [essen.core :refer [scene-change emit!]]))
 
 (defn view-boot []
   [:div "Boot"])

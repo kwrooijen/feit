@@ -5,7 +5,7 @@
 
 (defonce system (atom nil))
 (defonce phaser-game (atom nil))
-(defonce scene-states (atom {}))
+(defonce scene-queues (atom {}))
 
 (sdef scenes [] (s/coll-of object?))
 (defn scenes []

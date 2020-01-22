@@ -1,4 +1,5 @@
 (ns essen.core
+  (:require [phaser])
   (:require
    [clojure.spec.alpha :as s]
    [essen.events.scene]
@@ -6,10 +7,9 @@
    [essen.obj]
    [essen.scene]
    [essen.spec.scene]
-   [essen.state :refer [system phaser-game scene-states scenes]]
+   [essen.state :refer [system phaser-game scene-queues scenes]]
    [essen.subs.scene]
    [integrant.core :as ig]
-   [phaser]
    [spec-signature.core :refer-macros [sdef]]))
 
 (defn custom-methods! [methods]
@@ -63,12 +63,6 @@
   ([scene1 scene2 opts]
    (.start (scene (name scene1)) (name scene2) opts)))
 
-(defn scene-state [scene-key]
-  @(get @scene-states scene-key))
-
-(defn- push-queue [queue event]
-  (swap! queue update :essen/queue conj event))
-
 (defn emit!
   "Emit an event to a specific scene, or all scenes.
   Events are pushed into a queue (atom vector) and are all handled in a single
@@ -79,12 +73,11 @@
   problematic because that means the queue for these sceness will keep growing.
   "
   ([event]
-   (doseq [[_ scene-state] @scene-states]
-     (push-queue scene-state event)))
+   (swap! scene-queues
+          #(reduce-kv (fn [m k v] (assoc m k (conj v event))) {} %)))
   ([scene-key event]
-   (-> @scene-states
-       (get scene-key)
-       (push-queue event))))
+   (swap! scene-queues
+          #(update % scene-key conj event) )))
 
 (defn emit-keydown!
   "A standard format for emitting keydown events. This is to keep keyboard

@@ -7,11 +7,7 @@
 (def config
   {[:essen/scene :scene/battle]
    {:essen.scene/create
-    {
-     ;; [:essen.scene/state :game/cursor]
-     ;; (ig/ref :battle/cursor)
-
-     [:essen.scene/state :game/adventurer]
+    {[:essen.scene/state :game/adventurer]
      (ig/ref :adventurer/sprite)
 
      ;; [:essen.scene/state :attack/timer]
@@ -44,10 +40,7 @@
      [:essen.obj/add :add/bg3] [[:set-bg 0 1080 false true]]
      [:essen.obj/add :add/bg4] [[:set-bg 1920 1080 true true]]
 
-     [:essen.obj/physics.world :battle/world] [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]]
-
-     ;; [:essen.obj/input.keyboard :battle/cursor] [[:create-cursor-keys]]
-     }
+     [:essen.obj/physics.world :battle/world] [[:set-bounds 0 0 (* 1920 2) (* 1080 2)]]}
 
     :essen.scene/update
     {:essen.scene.update/list

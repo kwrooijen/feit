@@ -159,10 +159,9 @@
                         (callback %))))
 
 (defn disable-tabbing!
-  "This disables the tabbing of HTML elements. We need this to ensure that the
-  user can't accidentally tab focus away from the body. Otherwise we can't
-  listen to key events. We listen only to the body so that input keys don't
-  trigger events."
+  "This disables the tabbing of HTML elements. This ensures that the user can't
+  accidentally tab focus away from the body, which we use to listen to key
+  events. We only listen to the body so that input fields don't trigger events."
   []
   (let [tab-key 9]
     (set! (.-onkeydown js/document)

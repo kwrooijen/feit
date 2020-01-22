@@ -137,7 +137,9 @@
   (get event-keys (.-keyCode event) (.-keyCode event)))
 
 (defn body-event-listener
-  "Add an event listener to the body. This is useful for checking keydown / keyup
+  "Add an event listener to the body. Listen to `trigger` and execute `callback`.
+
+  This is useful for checking keydown / keyup
   events, while ignoring these event within input fields. This can be used in
   conjunction with `emit-keydown!` and emit-keyup!`
 
@@ -154,7 +156,7 @@
   [trigger callback]
   (.addEventListener (js/document.querySelector "body") trigger
                      #(when (valid-event? %)
-                        (callback (get-key %)))))
+                        (callback %))))
 
 (defn disable-tabbing!
   "This disables the tabbing of HTML elements. We need this to ensure that the

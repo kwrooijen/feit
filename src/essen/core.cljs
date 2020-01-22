@@ -1,15 +1,16 @@
 (ns essen.core
   (:require
-   [phaser]
+   [clojure.spec.alpha :as s]
    [essen.events.scene]
+   [essen.keyboard]
+   [essen.obj]
+   [essen.scene]
+   [essen.spec.scene]
+   [essen.state :refer [system phaser-game scene-states scenes]]
    [essen.subs.scene]
    [integrant.core :as ig]
-   [essen.scene]
-   [essen.obj]
-   [essen.spec.scene]
-   [clojure.spec.alpha :as s]
-   [spec-signature.core :refer-macros [sdef]]
-   [essen.state :refer [system phaser-game scene-states scenes]]))
+   [phaser]
+   [spec-signature.core :refer-macros [sdef]]))
 
 (defn custom-methods! [methods]
   (swap! essen.obj/custom-methods merge methods))
@@ -89,10 +90,10 @@
   "A standard format for emitting keydown events. This is to keep keyboard
   events consistent between libraries"
   [event]
-  (emit! {:event/key-down event}))
+  (emit! {:event/key-down (essen.keyboard/get-key event)}))
 
 (defn emit-keyup!
   "A standard format for emitting keyup events. This is to keep keyboard
   events consistent between libraries"
   [event]
-  (emit! {:event/key-up event}))
+  (emit! {:event/key-up (essen.keyboard/get-key event)}))

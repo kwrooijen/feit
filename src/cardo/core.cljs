@@ -26,12 +26,19 @@
   (reagent/render [views/main-panel]
     (.getElementById js/document "interface")))
 
-(defn body-event-listener [trigger what-do]
+(defn body-active? []
+  (= (.-body js/document)
+     (.-activeElement js/document)))
+
+(defn valid-event? [event]
+  (and (body-active?)
+       (not (.-repeat event))))
+
+(defn body-event-listener [trigger callback]
   (.addEventListener (js/document.querySelector "body") trigger
                      (fn [event]
-                       (when (= (.-body js/document)
-                                (.-activeElement js/document))
-                         (what-do event)))))
+                       (when (valid-event? event)
+                         (callback event)))))
 
 (defn disable-tabbing
   "This disables the tabbing of HTML elements. We need this to ensure that the

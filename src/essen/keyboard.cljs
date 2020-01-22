@@ -136,10 +136,25 @@
 (defn- get-key [event]
   (get event-keys (.-keyCode event) (.-keyCode event)))
 
-(defn body-event-listener [trigger callback]
+(defn body-event-listener
+  "Add an event listener to the body. This is useful for checking keydown / keyup
+  events, while ignoring these event within input fields. This can be used in
+  conjunction with `emit-keydown!` and emit-keyup!`
+
+  Example:
+
+  ```clojure
+  (essen.keyboard/body-event-listener \"keydown\" es/emit-keydown!)
+  (essen.keyboard/body-event-listener \"keyup\" es/emit-keyup!)
+  ```
+
+  TODO: when keydown is triggered, and body loses focus, keyup is never emitted.
+  Is this an issue, and if so, how do we fix it?
+  "
+  [trigger callback]
   (.addEventListener (js/document.querySelector "body") trigger
                      #(when (valid-event? %)
-                         (callback (get-key %)))))
+                        (callback (get-key %)))))
 
 (defn disable-tabbing!
   "This disables the tabbing of HTML elements. We need this to ensure that the

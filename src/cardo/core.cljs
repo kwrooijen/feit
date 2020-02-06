@@ -4,10 +4,8 @@
    [essen.keyboard]
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
-   [integrant.core :as ig]
    [cardo.views :as views]
    [cardo.db :as db]
-
    [cardo.methods]
    [cardo.config :as config]
    [cardo.create]

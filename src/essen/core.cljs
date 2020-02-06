@@ -52,7 +52,9 @@
               (ig/prep)
               (ig/resume @system [:essen/game]))))
 
-(defn scene [scene-key]
+(defn scene
+  "Get the scene Phaser Object by key"
+  [scene-key]
   (->> (scenes)
        (filter #(#{scene-key} (.-key %)))
        (first)))
@@ -70,8 +72,7 @@
 
   TODO: If globally emitted events (e.g. keyboard event) are also pushed to non
   active scenes (scenes which currently are running an update loop). This is
-  problematic because that means the queue for these sceness will keep growing.
-  "
+  problematic because that means the queue for these scenes will keep growing."
   ([event]
    (swap! scene-queues
           #(reduce-kv (fn [m k v] (assoc m k (conj v event))) {} %)))

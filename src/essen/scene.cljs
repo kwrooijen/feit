@@ -42,6 +42,9 @@
 (defmethod ig/init-key :essen.scene.update/list [_ opts]
   opts)
 
+(defmethod ig/init-key :essen.scene.update/emitters [_ opts]
+  opts)
+
 (defmethod ig/prep-key :essen.scene/create [_ opts]
   (assoc opts :essen.scene/create (ig/refset :essen.scene/key)))
 
@@ -75,11 +78,15 @@
          (ig/prep)
          (ig/init))))
 
-(defn scene-updaters [opts]
+(defn init-update-scene [opts]
   (-> ((:essen.scene/update opts))
       (ig/prep)
-      (ig/init)
-      (:essen.scene.update/list)))
+      (ig/init)))
+
+(defn apply-emitters [scene-state emitters this time delta]
+  (->> emitters
+       (mapv #(%1 scene-state this time delta))
+       (flatten)))
 
 (defn apply-updaters [scene-state updaters this time delta]
   (reduce #(%2 %1 this time delta) scene-state updaters))
@@ -94,11 +101,15 @@
     current-queues))
 
 (defn scene-update [opts k]
-  (let [updaters (scene-updaters opts)
+  (let [init-scene (init-update-scene opts)
+        updaters (:essen.scene.update/list init-scene)
+        emitters (:essen.scene.update/emitters init-scene)
         state (scene-state k)]
     (fn [time delta]
       (this-as this
         (vswap! state assoc :essen/queue (scene-queue k))
+        (vswap! state update :essen/queue
+                concat (apply-emitters @state emitters this time delta))
         (vswap! state #(apply-updaters % updaters this time delta))))))
 
 (def initial-state

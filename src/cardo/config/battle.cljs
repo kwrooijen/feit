@@ -1,8 +1,7 @@
 (ns cardo.config.battle
   (:require
-   [reagent.core :as r]
-   [re-frame.core :as re-frame]
-   [integrant.core :as ig]))
+   [integrant.core :as ig]
+   [cardo.emitter.battle]))
 
 (def config
   {[:essen/scene :scene/battle]
@@ -36,4 +35,8 @@
     :essen.scene/update
     {:essen.scene.update/list
      [(ig/ref :handle/attack)]
-     :handle/attack {}}}})
+     :handle/attack {}
+
+     :essen.scene.update/emitters
+     [(ig/ref :emitter.battle/attack)]
+     :emitter.battle/attack {}}}})

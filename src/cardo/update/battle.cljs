@@ -3,8 +3,7 @@
    [integrant.core :as ig]))
 
 (defn attack-event? [queue]
-  (or (some (comp #{:key/spacebar} :event/key-down) queue)
-      (some (comp #{:attack} :event) queue)))
+  (some (comp #{:attack} :event) queue))
 
 (defn attack-threshold? [{:game/keys [last-attack]} time]
   (> (- time last-attack) 1000))

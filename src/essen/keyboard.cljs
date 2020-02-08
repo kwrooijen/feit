@@ -133,7 +133,7 @@
   (and (body-active?)
        (not (.-repeat event))))
 
-(defn- get-key [event]
+(defn get-key [event]
   (get event-keys (.-keyCode event) (.-keyCode event)))
 
 (defn body-event-listener

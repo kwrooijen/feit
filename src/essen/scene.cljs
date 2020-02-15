@@ -5,24 +5,76 @@
    [essen.state :refer [scene-queues]]
    [essen.events.scene]))
 
+(defn normalize-key [k]
+  (if (vector? k) (ig/composite-keyword k) k))
+
+(defmulti rule-prep
+  (fn [key _ _]
+    (normalize-key key)))
+
+(defmethod ig/init-key :ir/force-resolve [_ opts]
+  opts)
+
+(defmethod rule-prep :ir/rule [[_ k] opts state]
+  (swap! state assoc-in [:subs k] (:subs opts))
+  opts)
+
+(defmethod rule-prep :default [_ opts state]
+  opts)
+
+(defmulti rule-init
+  (fn [key _ _] (normalize-key key)))
+
+(defmethod rule-init :ir/rule [[_ k] opts state]
+  (doseq [sub (get-in @state [:subs k])]
+    (swap! state update-in [:rule sub] conj opts))
+  opts)
+
+(defmethod rule-init :ir/state [[_ k] opts state]
+  opts)
+
+(defmethod rule-init :default [_ opts state]
+  opts)
+
+(defn setup-rule
+  ([system state]
+   (setup-rule system state (keys system)))
+  ([system state keys]
+   (ig/build system keys (fn [key opts] (rule-init key opts state)))))
+
+(defn new-state! [k opts state]
+  (if-let [entity-state (k @state)]
+    entity-state
+    (let [entity-state (atom opts)]
+      (swap! state assoc k entity-state)
+      (add-watch entity-state k
+                 (fn [_key _atom _old-state _new-state]
+                   (doseq [f (get-in @state [:rule k])] (f))))
+      entity-state)))
+
+(defn setup
+  ([config]
+   (setup config (atom {})))
+  ([config state]
+   (doseq [[k v] config]
+     (rule-prep k v state))
+   ;; Shouldn't be a problem in CLJS, since we don't have multiple
+   ;; threads. In Clojure this could be a problem.
+   (defmethod ig/resolve-key :ir/state [[_ k] opts]
+     (new-state! k opts state))
+   {:state state
+    :system (-> config
+                (ig/prep)
+                (ig/init)
+                (setup-rule state))}))
+
+(defmethod ig/init-key :essen/delta [_ opts] opts)
+(defmethod ig/init-key :essen/time [_ opts] opts)
+
 (defonce scene-states (atom {}))
 
 (defn scene-state [k]
   (get @scene-states k))
-
-;;
-;; :essen.scene/state
-;;
-
-(defmethod ig/init-key :essen.scene.state/volatile [_ opts]
-  opts)
-
-(defmethod ig/prep-key :essen.scene/state [[_ k] opts]
-  {:data opts
-   :state (ig/ref :essen.scene.state/volatile)})
-
-(defmethod ig/init-key :essen.scene/state [[_ k] {:keys [data state]}]
-  (vswap! state assoc k data))
 
 ;;
 ;; Scene
@@ -60,7 +112,7 @@
 (defn scene-init [k]
   (fn [data]
     (re-frame/dispatch [:essen.events.scene/set-active-scenes])
-    (vswap! (scene-state k) assoc :essen/init data)))
+    (swap! (scene-state k) assoc :essen/init data)))
 
 (defn scene-preload [opts]
   #(this-as this
@@ -73,10 +125,13 @@
   #(this-as this
      (-> ((:essen.scene/create opts))
          (assoc :essen/this this)
-         (assoc :essen.scene.state/volatile (scene-state k))
+         (assoc [:ir/state :essen/delta] 0)
+         (assoc [:ir/state :essen/time] 0)
+         (assoc :ir/force-resolve
+                {:time (ig/ref :essen/time)
+                 :delta (ig/ref :essen/delta)})
          (assoc :essen/init (:essen/init @(scene-state k)))
-         (ig/prep)
-         (ig/init))))
+         (setup (scene-state k)))))
 
 (defn init-update-scene [opts]
   (-> ((:essen.scene/update opts))
@@ -101,19 +156,14 @@
     current-queues))
 
 (defn scene-update [opts k]
-  (let [init-scene (init-update-scene opts)
-        updaters (:essen.scene.update/list init-scene)
-        emitters (:essen.scene.update/emitters init-scene)
-        state (scene-state k)]
+  (let [state (scene-state k)]
     (fn [time delta]
       (this-as this
-        (vswap! state assoc :essen/queue (scene-queue k))
-        (vswap! state update :essen/queue
-                concat (apply-emitters @state emitters this time delta))
-        (vswap! state #(apply-updaters % updaters this time delta))))))
+        (reset! (:essen/time @state) time)
+        (reset! (:essen/delta @state) delta)))))
 
 (def initial-state
-  (volatile! {:essen/queue []}))
+  (atom {:essen/queue []}))
 
 (defmethod ig/init-key :essen/scene [[_ k] opts]
   (swap! scene-states assoc k initial-state)
@@ -122,121 +172,48 @@
       (assoc :init (scene-init k))
       (cond->
           ((:essen.scene/preload opts))
-          (assoc :preload (scene-preload opts)))
+        (assoc :preload (scene-preload opts)))
       (cond->
           ((:essen.scene/create opts))
-          (assoc :create (scene-create opts k)))
+        (assoc :create (scene-create opts k)))
       (cond->
           ((:essen.scene/update opts))
-          (assoc :update (scene-update opts k)))))
+        (assoc :update (scene-update opts k)))))
 
 ;; TODO reset scene?
 ;; Preserve state of the atom
-(defmethod ig/suspend-key! :essen/scene [_ opts])
 
+(defmethod ig/suspend-key! :essen/scene [_ opts])
 (defmethod ig/resume-key :essen/scene [k opts old-opts old-impl]
   (ig/init-key k opts))
 
-;; Rule Engine
+;;
+;; Impl
+;;
+
+(defmethod ig/init-key :game/player [_ opts] opts)
+
+(defmethod ig/init-key :rule/damage
+  [_ {:state/keys [player ]}]
+  (let [last-hp (atom (:hp @player))]
+    #(when (> @last-hp (:hp @player))
+       (-> (:sprite @player)
+           (.play "adventurer/attack")
+           (.. -anims (chain "adventurer/idle")))
+       (println "TOOK DAMAGE"))))
+
+(defmethod ig/init-key :rule/poisoned
+  [_ {:state/keys [player time this]}]
+  (let [last-time (atom nil)
+        delay 1000]
+    #(cond
+       (nil? @last-time)
+       (reset! last-time @time)
+
+       (> (- @time @last-time) delay)
+       (do (swap! player update :hp dec)
+         (reset! last-time (- (* 2 @time) delay @last-time))))))
+
 (comment
-  (do
-    (defn normalize-key [k]
-      (if (vector? k) (ig/composite-keyword k) k))
-
-    (defmulti rule-prep
-      (fn [key _ _]
-        (normalize-key key)))
-
-    (defmethod rule-prep :my/rule [[_ k] opts state]
-      (swap! state assoc-in [:subs k] (:subs opts))
-      opts)
-
-    (defmethod rule-prep :default [_ opts state]
-      opts)
-
-    (defmulti rule-init
-      (fn [key _ _] (normalize-key key)))
-
-    (defmethod rule-init :my/rule [[_ k] opts state]
-      (doseq [sub (get-in @state [:subs k])]
-        (swap! state update-in [:rule sub] conj opts))
-      opts)
-
-    (defmethod rule-init :my/state [[_ k] opts state]
-      opts)
-
-    (defmethod rule-init :default [_ opts state]
-      opts)
-
-    (defn setup-rule
-      ([system state]
-       (setup-rule system state (keys system)))
-      ([system state keys]
-       (ig/build system keys (fn [key opts] (rule-init key opts state)))))
-
-    (defn new-state! [k opts state]
-      (if-let [a (k @state)]
-        a
-        (let [a (atom opts)]
-          (swap! state assoc k a)
-          (add-watch a k
-                     (fn [_key _atom _old-state _new-state]
-                       (doseq [f (get-in @state [:rule k])] (f))))
-          a)))
-
-    (defn setup [config]
-      (let [state (atom {})
-            _ (doseq [[k v] config]
-                (rule-prep k v state))
-            ;; Shouldn't be a problem in CLJS, since we don't have multiple
-            ;; threads. In Clojure this could be a problem.
-            _ (defmethod ig/resolve-key :my/state [[_ k] opts]
-                (new-state! k opts state))
-            system (-> config
-                       (ig/prep)
-                       (ig/init)
-                       (setup-rule state))]
-        {:system system :state state}))
-
-    ;;
-    ;; USAGE
-    ;;
-
-    (def my-c
-      {[:my/state :my/kevin]
-       {:name "kevin"
-        :hp 3
-        :alive? true}
-
-       [:my/rule :rule/alive?]
-       {:subs [:my/kevin]
-        :state/kevin (ig/ref :my/kevin)}
-
-       [:my/rule :rule/dead?]
-       {:subs [:my/kevin]
-        :state/kevin (ig/ref :my/kevin)}})
-
-    (defmethod ig/init-key :rule/dead?
-      [_ {:state/keys [kevin]}]
-      #(when (and (:alive? @kevin)
-                  (<= (:hp @kevin) 0))
-         (swap! kevin assoc :alive? false)
-         (println "You died")))
-
-    (defmethod ig/init-key :rule/alive?
-      [_ {:state/keys [kevin]}]
-      #(when (and (:alive? @kevin)
-                  (> (:hp @kevin) 0))
-         (println "Still alive!")))
-
-    (defmethod ig/init-key :my/kevin [_ opts]
-      opts)
-
-    (let [{:keys [state]} (setup my-c)]
-      (swap! (:my/kevin @state) update :hp dec)
-      (swap! (:my/kevin @state) update :hp dec)
-      (swap! (:my/kevin @state) update :hp dec)
-      (swap! (:my/kevin @state) update :hp dec)
-      ))
-  ;;
-  )
+  (swap! (:game/player @(scene-state :scene/battle)) update :hp dec)
+   @(scene-state :scene/battle) )

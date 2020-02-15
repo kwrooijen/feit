@@ -6,8 +6,20 @@
 (def config
   {[:essen/scene :scene/battle]
    {:essen.scene/create
-    {[:essen.scene/state :game/adventurer]
-     (ig/ref :adventurer/sprite)
+    {[:ir/state :game/player]
+     {:hp 3
+      :name "Kevin"
+      :sprite (ig/ref :adventurer/sprite)}
+
+     [:ir/rule :rule/poisoned]
+     {:subs [:essen/time]
+      :state/time (ig/ref :essen/time)
+      :state/player (ig/ref :game/player)}
+
+     [:ir/rule :rule/damage]
+     {:subs [:game/player]
+      :state/player (ig/ref :game/player)}
+
 
      [:essen.scene/run :my/run] {}
 

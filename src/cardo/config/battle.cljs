@@ -20,6 +20,9 @@
      {:subs [:game/player]
       :state/player (ig/ref :game/player)}
 
+     [:ir/rule :rule/dead]
+     {:subs [:game/player]
+      :state/player (ig/ref :game/player)}
 
      [:essen.scene/run :my/run] {}
 

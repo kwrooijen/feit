@@ -48,8 +48,23 @@
     (let [entity-state (atom opts)]
       (swap! state assoc k entity-state)
       (add-watch entity-state k
-                 (fn [_key _atom _old-state _new-state]
-                   (doseq [f (get-in @state [:rule k])] (f))))
+                 (fn [_key _atom _old-state new-state]
+                   (if (nil? new-state)
+                     (do
+                       (remove-watch entity-state k)
+                       (swap! state assoc-in [:rule k] []))
+                     (reduce
+                      (fn [_ f]
+                        ;; Whenever a rule changes the state of specific atom,
+                        ;; we need to short-circuit this loop, because
+                        ;; changing the atom will have triggered a new watch
+                        ;; event. Rendering this loop useless.
+                        (if (identical? @entity-state
+                                        new-state)
+                          (f)
+                          (reduced nil)))
+                      nil
+                      (get-in @state [:rule k])))))
       entity-state)))
 
 (defn setup
@@ -193,14 +208,19 @@
 
 (defmethod ig/init-key :game/player [_ opts] opts)
 
+(defmethod ig/init-key :rule/dead
+  [_ {:state/keys [player]}]
+  #(when (zero? (:hp @player))
+     (.destroy (:sprite @player))
+     (reset! player nil)))
+
 (defmethod ig/init-key :rule/damage
-  [_ {:state/keys [player ]}]
+  [_ {:state/keys [player]}]
   (let [last-hp (atom (:hp @player))]
     #(when (> @last-hp (:hp @player))
        (-> (:sprite @player)
            (.play "adventurer/attack")
-           (.. -anims (chain "adventurer/idle")))
-       (println "TOOK DAMAGE"))))
+           (.. -anims (chain "adventurer/idle"))))))
 
 (defmethod ig/init-key :rule/poisoned
   [_ {:state/keys [player time this]}]
@@ -212,8 +232,8 @@
 
        (> (- @time @last-time) delay)
        (do (swap! player update :hp dec)
-         (reset! last-time (- (* 2 @time) delay @last-time))))))
+           (reset! last-time @time)))))
 
 (comment
   (swap! (:game/player @(scene-state :scene/battle)) update :hp dec)
-   @(scene-state :scene/battle) )
+  @(scene-state :scene/battle))

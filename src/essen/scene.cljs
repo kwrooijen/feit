@@ -136,3 +136,107 @@
 
 (defmethod ig/resume-key :essen/scene [k opts old-opts old-impl]
   (ig/init-key k opts))
+
+;; Rule Engine
+(comment
+  (do
+    (defn normalize-key [k]
+      (if (vector? k) (ig/composite-keyword k) k))
+
+    (defmulti rule-prep
+      (fn [key _ _]
+        (normalize-key key)))
+
+    (defmethod rule-prep :my/rule [[_ k] opts state]
+      (swap! state assoc-in [:subs k] (:subs opts))
+      opts)
+
+    (defmethod rule-prep :default [_ opts state]
+      opts)
+
+    (defmulti rule-init
+      (fn [key _ _] (normalize-key key)))
+
+    (defmethod rule-init :my/rule [[_ k] opts state]
+      (doseq [sub (get-in @state [:subs k])]
+        (swap! state update-in [:rule sub] conj opts))
+      opts)
+
+    (defmethod rule-init :my/state [[_ k] opts state]
+      opts)
+
+    (defmethod rule-init :default [_ opts state]
+      opts)
+
+    (defn setup-rule
+      ([system state]
+       (setup-rule system state (keys system)))
+      ([system state keys]
+       (ig/build system keys (fn [key opts] (rule-init key opts state)))))
+
+    (defn new-state! [k opts state]
+      (if-let [a (k @state)]
+        a
+        (let [a (atom opts)]
+          (swap! state assoc k a)
+          (add-watch a k
+                     (fn [_key _atom _old-state _new-state]
+                       (doseq [f (get-in @state [:rule k])] (f))))
+          a)))
+
+    (defn setup [config]
+      (let [state (atom {})
+            _ (doseq [[k v] config]
+                (rule-prep k v state))
+            ;; Shouldn't be a problem in CLJS, since we don't have multiple
+            ;; threads. In Clojure this could be a problem.
+            _ (defmethod ig/resolve-key :my/state [[_ k] opts]
+                (new-state! k opts state))
+            system (-> config
+                       (ig/prep)
+                       (ig/init)
+                       (setup-rule state))]
+        {:system system :state state}))
+
+    ;;
+    ;; USAGE
+    ;;
+
+    (def my-c
+      {[:my/state :my/kevin]
+       {:name "kevin"
+        :hp 3
+        :alive? true}
+
+       [:my/rule :rule/alive?]
+       {:subs [:my/kevin]
+        :state/kevin (ig/ref :my/kevin)}
+
+       [:my/rule :rule/dead?]
+       {:subs [:my/kevin]
+        :state/kevin (ig/ref :my/kevin)}})
+
+    (defmethod ig/init-key :rule/dead?
+      [_ {:state/keys [kevin]}]
+      #(when (and (:alive? @kevin)
+                  (<= (:hp @kevin) 0))
+         (swap! kevin assoc :alive? false)
+         (println "You died")))
+
+    (defmethod ig/init-key :rule/alive?
+      [_ {:state/keys [kevin]}]
+      #(when (and (:alive? @kevin)
+                  (> (:hp @kevin) 0))
+         (println "Still alive!")))
+
+    (defmethod ig/init-key :my/kevin [_ opts]
+      opts)
+
+    (let [{:keys [state]} (setup my-c)]
+      (swap! (:my/kevin @state) update :hp dec)
+      (swap! (:my/kevin @state) update :hp dec)
+      (swap! (:my/kevin @state) update :hp dec)
+      (swap! (:my/kevin @state) update :hp dec)
+      ))
+  ;;
+  )

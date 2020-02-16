@@ -36,29 +36,34 @@
   ([system state keys]
    (ig/build system keys (fn [key opts] (rule-init key opts state)))))
 
+(defn run-rules
+  "Whenever a rule changes the state of specific atom,
+   we need to short-circuit this loop, because
+   changing the atom will have triggered a new watch
+   event. Rendering this loop useless."
+  [rules entity-state new-state]
+  (reduce
+   #(if (identical? @entity-state new-state)
+      (%2)
+      (reduced nil))
+   nil
+   rules))
+
+(defn remove-entity [k state entity-state]
+  (remove-watch entity-state k)
+  (swap! state assoc-in [:rule k] []))
+
+(defn rule-handler [state k entity-state _old-state new-state]
+  (if (nil? new-state)
+    (remove-entity k state entity-state)
+    (run-rules (get-in @state [:rule k]) entity-state new-state)))
+
 (defn new-state! [k opts state]
   (if-let [entity-state (k @state)]
     entity-state
     (let [entity-state (atom opts)]
       (swap! state assoc k entity-state)
-      (add-watch entity-state k
-                 (fn [_key _atom _old-state new-state]
-                   (if (nil? new-state)
-                     (do
-                       (remove-watch entity-state k)
-                       (swap! state assoc-in [:rule k] []))
-                     (reduce
-                      (fn [_ f]
-                        ;; Whenever a rule changes the state of specific atom,
-                        ;; we need to short-circuit this loop, because
-                        ;; changing the atom will have triggered a new watch
-                        ;; event. Rendering this loop useless.
-                        (if (identical? @entity-state
-                                        new-state)
-                          (f)
-                          (reduced nil)))
-                      nil
-                      (get-in @state [:rule k])))))
+      (add-watch entity-state k (partial rule-handler state))
       entity-state)))
 
 (defn setup

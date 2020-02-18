@@ -143,22 +143,31 @@
 (defmethod ig/init-key :rule/damage
   [_ {:state/keys [player]}]
   (let [last-hp (atom (:hp @player))]
-    #(when (> @last-hp (:hp @player))
-       (-> (:sprite @player)
-           (.play "adventurer/attack")
-           (.. -anims (chain "adventurer/idle"))))))
+    (fn []
+      (println "Damaged ")
+      (swap! player assoc :damaged true)
+      (when (> @last-hp (:hp @player))
+         (-> (:sprite @player)
+             (.play "adventurer/attack")
+             (.. -anims (chain "adventurer/idle")))))))
 
 (defmethod ig/init-key :rule/poisoned
   [_ {:state/keys [player time this]}]
   (let [last-time (atom nil)
+        n (atom 8)
         delay 1000]
     #(cond
        (nil? @last-time)
        (reset! last-time @time)
 
        (> (- @time @last-time) delay)
-       (do (swap! player update :hp dec)
-           (reset! last-time @time)))))
+       (do
+         (swap! player update :hp dec)
+         (reset! last-time @time)
+         (swap! n dec)
+         (when (= @n 0)
+           (println "EXITING")
+           :exit)))))
 
 (comment
   (swap! (:game/player @(scene-state :scene/battle)) update :hp dec)

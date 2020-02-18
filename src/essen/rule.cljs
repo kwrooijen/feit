@@ -21,7 +21,7 @@
 
 (defmethod rule-init :ir/rule [[_ k] opts state]
   (doseq [sub (get-in @state [:subs k])]
-    (swap! state update-in [:rule sub] conj opts))
+    (swap! state update-in [:rule sub] conj {:fn opts :key k}))
   opts)
 
 (defmethod rule-init :ir/state [[_ k] opts state]
@@ -41,29 +41,34 @@
    we need to short-circuit this loop, because
    changing the atom will have triggered a new watch
    event. Rendering this loop useless."
-  [rules entity-state new-state]
+  [k state watcher-locked? entity-state]
+  (reset! watcher-locked? true)
   (reduce
-   #(if (identical? @entity-state new-state)
-      (%2)
+   #(if @entity-state
+      (when (= ((:fn %2)) :exit)
+        (swap! state update-in [:rule k] (fn [rules] (remove #{%2} rules)))
+        (reduced nil))
       (reduced nil))
    nil
-   rules))
+   (get-in @state [:rule k]))
+  (reset! watcher-locked? false))
 
 (defn remove-entity [k state entity-state]
   (remove-watch entity-state k)
   (swap! state assoc-in [:rule k] []))
 
-(defn rule-handler [state k entity-state _old-state new-state]
-  (if (nil? new-state)
+(defn rule-handler [state watcher-locked? k entity-state old-state new-state]
+  (if (and (some? old-state) (nil? new-state))
     (remove-entity k state entity-state)
-    (run-rules (get-in @state [:rule k]) entity-state new-state)))
+    (when-not @watcher-locked?
+      (run-rules k state watcher-locked? entity-state))))
 
 (defn new-state! [k opts state]
   (if-let [entity-state (k @state)]
     entity-state
     (let [entity-state (atom opts)]
       (swap! state assoc k entity-state)
-      (add-watch entity-state k (partial rule-handler state))
+      (add-watch entity-state k (partial rule-handler state (atom false)))
       entity-state)))
 
 (defn setup

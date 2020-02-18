@@ -7,7 +7,7 @@
   {[:essen/scene :scene/battle]
    {:essen.scene/create
     {[:ir/state :game/player]
-     {:hp 3
+     {:hp 6
       :name "Kevin"
       :sprite (ig/ref :adventurer/sprite)}
 

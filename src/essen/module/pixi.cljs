@@ -49,18 +49,15 @@
            (.-innerWidth js/window)
            (.-innerHeight js/window)))
 
-(defn animate [stage-state stage-key time-atom delta]
-  (reset! time-atom (.now js/Date))
-  (swap! stage-state essen.loop/run delta @time-atom)
+(defn animate [stage-state stage-key delta]
+  (swap! stage-state essen.loop/run delta (.now js/Date))
   (.render (renderer) (container stage-key)))
 
 (defn start-loop [stage-key]
-  (let [delta (atom 0)
-        time (atom (.now js/Date))
-        scene-state (essen.entity/get-scene stage-key)]
+  (let [scene-state (essen.entity/get-scene stage-key)]
     (-> @state
         (get-in [:pixi :pixi/stage stage-key :stage/ticker])
-        (.add (partial animate scene-state stage-key delta time))
+        (.add (partial animate scene-state stage-key))
         (.start))))
 
 (defn stop-loop []

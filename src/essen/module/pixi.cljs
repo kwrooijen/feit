@@ -50,6 +50,7 @@
            (.-innerHeight js/window)))
 
 (defn animate [stage-state stage-key delta]
+  ;; TODO handle swapping within essen.loop/run, and only pass in the key
   (swap! stage-state essen.loop/run delta (.now js/Date))
   (.render (renderer) (container stage-key)))
 

@@ -1,5 +1,6 @@
 (ns essen.loop
   (:require
+   [essen.core :as essen]
    [essen.entity :as entity]
    [essen.state :refer [messages]]))
 
@@ -11,7 +12,6 @@
   (get-in component [:component/handlers route :handler/middleware]))
 
 ;; TODO maybe we can use meta tags instead of this.
-;; TODO ADD SCENE
 (defn- get-context [scene component message]
   {:context/scene scene
    :context/entity (:message/entity message)
@@ -49,20 +49,21 @@
       (run-reactors! context event old-state new-state (:component/reactors component)))
     new-scene))
 
-(defn- apply-tickers [entities delta time]
+(defn- apply-tickers [{:scene/keys [key entities]} delta time]
   (doall
    (for [[entity-key {:entity/keys [components]}] entities
          [component-key {:component/keys [tickers state]}] components
          [_ticker-key ticker-v] tickers]
-     (let [context {:context/entity entity-key
+     (let [context {:context/scene key
+                    :context/entity entity-key
                     :context/component component-key}]
        ((:ticker/fn ticker-v) context delta time state)))))
 
-(defn run [{:scene/keys [key entities] :as initial-scene} delta time]
+(defn run [{:scene/keys [key] :as initial-scene} delta time]
   ;; TODO Add keyboard events BEFORE loop
   ;; HINT make separate message queue for keyboard
-  (apply-tickers entities delta time)
-  (loop [scene initial-scene
+  (apply-tickers initial-scene delta time)
+  (loop [scene @(essen/get-scene key)
          todo-messages @(get @messages key)
          threshold 30]
     (if (zero? threshold)

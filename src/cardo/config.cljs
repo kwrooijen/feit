@@ -49,10 +49,10 @@
         last-time (atom (.now js/Date))
         poison-event {:event/damage damage
                       :event/damage-type :damage/poison}]
-    (fn [{:context/keys [entity]} _delta time _state]
+    (fn [{:context/keys [entity] :as context}  _delta time _state]
       (cond
-        ;; TODO (remove-ticker! context :ticker.stats/poisoned)
-        (zero? @remaining) nil
+        (zero? @remaining)
+        (essen/remove-ticker! context :ticker.stats/poisoned)
 
         (> (- time @last-time) 1000)
         (do (reset! last-time time)

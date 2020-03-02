@@ -136,7 +136,7 @@
 (defn get-key [event]
   (get event-keys (.-keyCode event) (.-keyCode event)))
 
-(defn body-event-listener
+(defn add-event-listener
   "Add an event listener to the body. Listen to `trigger` and execute `callback`.
 
   This is useful for checking keydown / keyup
@@ -146,8 +146,8 @@
   Example:
 
   ```clojure
-  (essen.keyboard/body-event-listener \"keydown\" es/emit-keydown!)
-  (essen.keyboard/body-event-listener \"keyup\" es/emit-keyup!)
+  (essen.keyboard/add-event-listener \"keydown\" es/emit-keydown!)
+  (essen.keyboard/add-event-listener \"keyup\" es/emit-keyup!)
   ```
 
   TODO: when keydown is triggered, and body loses focus, keyup is never emitted.

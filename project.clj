@@ -4,8 +4,7 @@
                   :exclusions [com.google.javascript/closure-compiler-unshaded
                                org.clojure/google-closure-library
                                org.clojure/google-closure-library-third-party]]
-                 [reagent "0.8.1"] ;; FIXME: go to 0.9.0 when available to possibly fix componentWillMount warning
-                 [re-frame "0.10.9"]
+                 [reagent "0.8.1"]
                  [spec-signature "0.2.0"]
                  [integrant "0.8.0"]]
 
@@ -17,10 +16,11 @@
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
+  :resource-paths ["resources"]
+
   :profiles
   {:dev
    {:dependencies [[binaryage/devtools "0.9.10"]
                    [thheller/shadow-cljs "2.8.39"]
-                   [re-frisk "0.5.4.1"]
                    [com.cemerick/pomegranate "1.1.0"]]}
    :prod {}})

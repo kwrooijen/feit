@@ -1,5 +1,6 @@
 (ns essen.loop
   (:require
+   [essen.entity :as entity]
    [essen.state :refer [messages]]))
 
 (defn- get-component [scene {:message/keys [entity route]}]
@@ -11,8 +12,9 @@
 
 ;; TODO maybe we can use meta tags instead of this.
 ;; TODO ADD SCENE
-(defn- get-context [component message]
-  {:context/entity (:message/entity message)
+(defn- get-context [scene component message]
+  {:context/scene scene
+   :context/entity (:message/entity message)
    :context/component (:component/key component)})
 
 (defn- apply-middleware
@@ -31,12 +33,12 @@
 
 (defn- update-scene [scene entity component handler context event]
   (update-in scene
-             [:scene/entities entity :entity/components (:component/key component) :component/state]
+             (entity/path-state entity component)
              (partial (:handler/fn handler) context event (:component/state component))))
 
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
   (let [component (get-component scene message)
-        context (get-context component message)
+        context (get-context (:scene/key scene) component message)
         middleware (get-middleware component route)
         old-state (:component/state component)
         event (preprocess-event middleware context old-state content)
@@ -47,17 +49,19 @@
       (run-reactors! context event old-state new-state (:component/reactors component)))
     new-scene))
 
-(defn run [{:scene/keys [key entities] :as initial-scene} delta time]
-  ;; TODO Add delta / time ticker and keyboard events BEFORE loop
-  ;; HINT make separate message queue for keyboard
-  ;; LETS DO THIS
+(defn- apply-tickers [entities delta time]
   (doall
    (for [[entity-key {:entity/keys [components]}] entities
          [component-key {:component/keys [tickers state]}] components
          [_ticker-key ticker-v] tickers]
      (let [context {:context/entity entity-key
                     :context/component component-key}]
-       ((:ticker/fn ticker-v) context delta time state))))
+       ((:ticker/fn ticker-v) context delta time state)))))
+
+(defn run [{:scene/keys [key entities] :as initial-scene} delta time]
+  ;; TODO Add keyboard events BEFORE loop
+  ;; HINT make separate message queue for keyboard
+  (apply-tickers entities delta time)
   (loop [scene initial-scene
          todo-messages @(get @messages key)
          threshold 30]

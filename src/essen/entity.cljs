@@ -4,6 +4,12 @@
    [essen.state :refer [state]]
    [essen.util :refer [vec->map]]))
 
+(defn path-state
+  [entity component]
+  [:scene/entities entity
+   :entity/components (:component/key component)
+   :component/state])
+
 (defn path-ticker
   ([entity component]
    [:scene/entities entity

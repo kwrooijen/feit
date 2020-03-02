@@ -16,7 +16,7 @@
    :context/component (:component/key component)})
 
 (defn- apply-middleware
-  [context state event middleware]
+  [context state event [_ middleware]]
   ((:middleware/fn middleware) context event state))
 
 (defn- preprocess-event

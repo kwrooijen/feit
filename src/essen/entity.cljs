@@ -60,9 +60,10 @@
       (update :component/handlers vec->map :handler/key)))
 
 (defn- init-process-handler [k opts]
-  (assoc opts
-         :handler/key (last k)
-         :handler/fn (ig/init-key k opts)))
+  (-> opts
+      (assoc :handler/key (last k)
+             :handler/fn (ig/init-key k opts))
+      (update :handler/middleware vec->map :middleware/key)))
 
 (defn- init-process-middleware [k opts]
   (assoc opts

@@ -36,7 +36,6 @@
         @input-messages)))
 
 (defn emit! [scene entity route content]
-  ;; TODO scene only events
   (swap! (get @messages scene) conj {:message/entity entity
                                      :message/route route
                                      :message/content content}))
@@ -62,20 +61,18 @@
          (entity/path-ticker entity component)
          dissoc ticker))
 
+(defn start-middleware! [scene entity component handler middleware opts]
+  (swap! (get-scene scene)
+         assoc-in
+         (entity/path-middleware entity component handler middleware)
+         {:middleware/key middleware
+          :middleware/fn (ig/init-key middleware opts)}))
+
 (defn remove-middleware! [scene entity component handler middleware]
   (swap! (get-scene scene)
          update-in
          (entity/path-middleware entity component handler)
-         (partial remove #(keyword-identical? (:middleware/key %) middleware))))
-
-(defn start-middleware! [scene entity component handler middleware opts]
-  (remove-middleware! scene entity component handler middleware)
-  (swap! (get-scene scene)
-         update-in
-         (entity/path-middleware entity component handler)
-         conj
-         {:middleware/key middleware
-          :middleware/fn (ig/init-key middleware opts)}))
+         dissoc middleware))
 
 (comment
   (remove-ticker! :scene/start

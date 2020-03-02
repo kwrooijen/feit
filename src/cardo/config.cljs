@@ -13,8 +13,7 @@
                    :renderer/resolution (.-devicePixelRatio js/window)
                    :renderer/autoDencity true}
 
-   [:essen/middleware :middleware.stats/invincible]
-   {:middleware/active? false}
+   [:essen/middleware :middleware.stats/invincible] {}
 
    [:essen/reactor :reactor.stats/dead?] {}
 
@@ -32,7 +31,7 @@
     :component/reactors
     [(ig/ref :reactor.stats/dead?)]
     :component/tickers
-    [(ig/ref :ticker.stats/poisoned)]}
+    []}
 
    [:essen/entity :entity/player]
    {:entity/components

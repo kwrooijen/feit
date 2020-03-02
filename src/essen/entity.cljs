@@ -4,6 +4,28 @@
    [essen.state :refer [state]]
    [essen.util :refer [vec->map]]))
 
+(defn path-ticker
+  ([entity component]
+   [:scene/entities entity
+    :entity/components component
+    :component/tickers])
+  ([entity component ticker]
+   [:scene/entities entity
+    :entity/components component
+    :component/tickers ticker]))
+
+(defn path-middleware
+  ([entity component handler]
+   [:scene/entities entity
+    :entity/components component
+    :component/handlers handler
+    :handler/middleware])
+  ([entity component handler middleware]
+   [:scene/entities entity
+    :entity/components component
+    :component/handlers handler
+    :handler/middleware middleware]))
+
 (defn- routes [{:entity/keys [components]}]
   (->>
    (for [{:component/keys [key handlers]} components
@@ -110,6 +132,3 @@
    (let [system (init-scene-system config scene additions)]
      (swap! state assoc-in [:essen/scenes scene] (atom system))
      system)))
-
-(defn get-scene [scene-key]
-  (get-in @state [:essen/scenes scene-key]))

@@ -1,0 +1,16 @@
+Done:
+    Entity == [Component]
+    Component == [Message Handler] | [Reactor]
+
+    Messages are sent to Entities, and passed to Components (e.g. [:entity/player :event.stats/damage {:amount 40 :type :physical}] {:component/stats {...}})
+    You can add middleware to components {:middleware.stats/defense (fn [entity event] (update event :defense #(- % (-> entity :component/equipment :defense)))) }
+    Reactors react when an entity changes (:reactor.stats/dead? (when (zero? (:hp stats)) "dead"))
+       Reactors can also be attached to a component, but listen to delta / time (Or should that be something completely different?)
+
+* TODO Add, Remove middleware
+
+Should we be able to add / remove middleware? Or should it always be pre-defined
+and the component state should decide whether or not it's activated?
+* TODO Add, Remove tickers
+Add tickers. These are "handlers" that reacto to delta/time
+* TODO

@@ -34,6 +34,7 @@
   (-> opts
       (assoc :component/key (last k)
              :component/state (ig/init-key k opts))
+      (update :component/tickers vec->map :ticker/key)
       (update :component/handlers vec->map :handler/key)))
 
 (defn- init-process-handler [k opts]
@@ -50,6 +51,11 @@
   (assoc opts
          :reactor/key (last k)
          :reactor/fn (ig/init-key k opts)))
+
+(defn- init-process-ticker [k opts]
+  (assoc opts
+         :ticker/key (last k)
+         :ticker/fn (ig/init-key k opts)))
 
 (defn- essen-init-key [k opts]
   (cond
@@ -70,6 +76,9 @@
 
     (ig/derived-from? k :essen/reactor)
     (init-process-reactor k opts)
+
+    (ig/derived-from? k :essen/ticker)
+    (init-process-ticker k opts)
 
     :else
     (ig/init-key k opts)))

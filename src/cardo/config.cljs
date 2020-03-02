@@ -22,11 +22,17 @@
    {:handler/middleware
     [(ig/ref :middleware.stats/invincible)]}
 
+   [:essen/ticker :ticker.stats/poisoned]
+   {:ticker/ticks 4
+    :ticker/damage 3}
+
    [:essen/component :component/stats]
    {:component/handlers
     [(ig/ref :handler.stats/attack)]
     :component/reactors
-    [(ig/ref :reactor.stats/dead?)]}
+    [(ig/ref :reactor.stats/dead?)]
+    :component/tickers
+    [(ig/ref :ticker.stats/poisoned)]}
 
    [:essen/entity :entity/player]
    {:entity/components
@@ -37,6 +43,22 @@
 
 (defmethod ig/init-key :component/stats [_ opts]
   {:stats/hp 10})
+
+(defmethod ig/init-key :ticker.stats/poisoned
+  [_ {:ticker/keys [ticks damage]}]
+  (let [remaining (atom ticks)
+        last-time (atom (.now js/Date))
+        poison-event {:event/damage damage
+                      :event/damage-type :damage/poison}]
+    (fn [{:context/keys [entity]} _delta time _state]
+      (cond
+        ;; TODO (remove-ticker! context :ticker.stats/poisoned)
+        (zero? @remaining) nil
+
+        (> (- time @last-time) 1000)
+        (do (reset! last-time time)
+            (swap! remaining dec)
+            (emit! :scene/start entity :handler.stats/attack poison-event))))))
 
 (defmethod ig/init-key :middleware.stats/invincible [_ _opts]
   (fn [_context event _state]

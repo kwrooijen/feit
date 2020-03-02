@@ -1,5 +1,4 @@
 (ns essen.module.pixi
-  (:refer-clojure :exclude [time])
   (:require
    [essen.state :refer [state]]
    [essen.entity]

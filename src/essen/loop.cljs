@@ -10,6 +10,7 @@
   (get-in component [:component/handlers route :handler/middleware]))
 
 ;; TODO maybe we can use meta tags instead of this.
+;; TODO ADD SCENE
 (defn- get-context [component message]
   {:context/entity (:message/entity message)
    :context/component (:component/key component)})
@@ -48,9 +49,17 @@
       (run-reactors! context event old-state new-state (:component/reactors component)))
     new-scene))
 
-(defn run [{:scene/keys [key] :as initial-scene} delta time]
+(defn run [{:scene/keys [key entities] :as initial-scene} delta time]
   ;; TODO Add delta / time ticker and keyboard events BEFORE loop
   ;; HINT make separate message queue for keyboard
+  ;; LETS DO THIS
+  (doall
+   (for [[entity-key {:entity/keys [components]}] entities
+         [component-key {:component/keys [tickers state]}] components
+         [_ticker-key ticker-v] tickers]
+     (let [context {:context/entity entity-key
+                    :context/component component-key}]
+       ((:ticker/fn ticker-v) context delta time state))))
   (loop [scene initial-scene
          todo-messages @(get @messages key)
          threshold 30]

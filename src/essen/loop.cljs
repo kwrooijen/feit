@@ -48,19 +48,20 @@
       (run-reactors! context event old-state new-state (:component/reactors component)))
     new-scene))
 
-(defn run [initial-scene delta time]
+(defn run [{:scene/keys [key] :as initial-scene} delta time]
   ;; TODO Add delta / time ticker and keyboard events BEFORE loop
   ;; HINT make separate message queue for keyboard
   (loop [scene initial-scene
-         todo-messages @messages
+         todo-messages @(get @messages key)
          threshold 30]
     (if (zero? threshold)
       (do
         (println "THRESHOLD REACHED")
         :threshold-reached) ;; add debugging info
       (do
-        (reset! messages [])
-        (let [new-scene (reduce apply-message scene todo-messages)]
-          (if (empty? @messages)
+        (reset! (get @messages key) [])
+        (let [new-scene (reduce apply-message scene todo-messages)
+              new-messages @(get @messages key)]
+          (if (empty? new-messages)
             new-scene
-            (recur new-scene @messages (dec threshold))))))))
+            (recur new-scene new-messages (dec threshold))))))))

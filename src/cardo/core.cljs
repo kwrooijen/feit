@@ -29,7 +29,7 @@
   (essen.keyboard/add-event-listener "keydown" essen/emit-keydown!)
   (essen.keyboard/add-event-listener "keyup"   essen/emit-keyup!)
   (essen/start-scene :scene/start)
-  (emit! :entity/player :handler.stats/attack {:event/damage 2})
+  (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2})
   (comment
     ;; (pixi/stage-stop :stage/loading)
     ))

@@ -58,17 +58,12 @@
   (fn [_context
        {:event/keys [damage invincible?] :as _event}
        {:stats/keys [hp] :as state}]
-    (when (and (> hp 0) (not invincible?))
-      (emit! :entity/player :handler.stats/attack {:event/damage 2}))
+    (if invincible?
+      (println "I was attacked, but I am invincible!")
+      (println "Attacked for " damage))
     (assoc state :stats/hp (max 0 (- hp damage)))))
 
 ;; (comment
-;;   (let [scene (atom {:entity/player (init-entity config :entity/player)})]
-;;     ;; (emit! :entity/player :handler.stats/attack {:event/damage 5})
-;;     (reset! messages [])
-;;     (emit! :entity/player :handler.stats/attack {:event/damage 5})
-;;     (swap! scene run-messages))
-
 ;;   ;; TODO: Entity collection?
 ;;   ;;       OR derived keys?
 ;;   ;; Entity     - [Component]

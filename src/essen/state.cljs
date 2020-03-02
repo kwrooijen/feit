@@ -4,5 +4,9 @@
    [spec-signature.core :refer-macros [sdef]]))
 
 (defonce state (atom {}))
+
 (defonce game (atom {}))
-(defonce messages (atom []))
+
+(defonce messages (atom {}))
+
+(defonce input-messages (atom {}))

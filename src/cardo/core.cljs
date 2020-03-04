@@ -2,6 +2,8 @@
   (:require
    [essen.core :as essen :refer [emit!]]
    [essen.keyboard]
+   [essen.ticker :as ticker]
+   [essen.middleware :as middleware]
    [reagent.core :as reagent]
    [cardo.views :as views]
    [essen.module.pixi :as pixi]
@@ -43,3 +45,30 @@
   )
 
 
+
+
+(comment
+  (ticker/remove! :scene/start
+                  :entity/player
+                  :component/stats
+                  :ticker.stats/poisoned)
+
+  (ticker/add! :scene/start
+                 :entity/player
+                 :component/stats
+                 :ticker.stats/poisoned
+                 {:ticker/ticks 2
+                  :ticker/damage 30})
+
+  (middleware/add! :scene/start
+                     :entity/player
+                     :component/stats
+                     :handler.stats/attack
+                     :middleware.stats/invincible
+                     {})
+
+  (middleware/remove! :scene/start
+                      :entity/player
+                      :component/stats
+                      :handler.stats/attack
+                      :middleware.stats/invincible))

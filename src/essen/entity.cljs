@@ -10,28 +10,6 @@
    :entity/components (:component/key component)
    :component/state])
 
-(defn path-ticker
-  ([entity component]
-   [:scene/entities entity
-    :entity/components component
-    :component/tickers])
-  ([entity component ticker]
-   [:scene/entities entity
-    :entity/components component
-    :component/tickers ticker]))
-
-(defn path-middleware
-  ([entity component handler]
-   [:scene/entities entity
-    :entity/components component
-    :component/handlers handler
-    :handler/middleware])
-  ([entity component handler middleware]
-   [:scene/entities entity
-    :entity/components component
-    :component/handlers handler
-    :handler/middleware middleware]))
-
 (defn- routes [{:entity/keys [components]}]
   (->>
    (for [{:component/keys [key handlers]} components
@@ -59,6 +37,7 @@
       (->> (merge (ig/init-key k opts)))))
 
 (defn- init-process-component [k opts]
+  ;; TODO Can we add context here?
   (-> opts
       (assoc :component/key (last k)
              :component/state (ig/init-key k opts))

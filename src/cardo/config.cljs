@@ -1,6 +1,7 @@
 (ns cardo.config
   (:require
    [essen.core :as essen :refer [emit!]]
+   [essen.ticker :as ticker]
    [integrant.core :as ig]))
 
 (def debug?
@@ -52,7 +53,7 @@
     (fn [{:context/keys [entity] :as context}  _delta time _state]
       (cond
         (zero? @remaining)
-        (essen/remove-ticker! context :ticker.stats/poisoned)
+        (ticker/remove! context :ticker.stats/poisoned)
 
         (> (- time @last-time) 1000)
         (do (reset! last-time time)

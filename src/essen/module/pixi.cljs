@@ -1,7 +1,6 @@
 (ns essen.module.pixi
   (:require
-   [essen.state :refer [state]]
-   [essen.core :as essen]
+   [essen.state :refer [state get-scene]]
    [essen.entity]
    [essen.loop]
    [integrant.core :as ig]
@@ -55,7 +54,7 @@
   (.render (renderer) (container stage-key)))
 
 (defn start-loop [stage-key]
-  (let [scene-state (essen/get-scene stage-key)]
+  (let [scene-state (get-scene stage-key)]
     (-> @state
         (get-in [:pixi :pixi/stage stage-key :stage/ticker])
         (.add (partial animate scene-state stage-key))

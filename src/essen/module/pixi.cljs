@@ -6,16 +6,16 @@
    ["pixi.js" :as PIXI :refer [Renderer Texture Container Sprite Ticker]]))
 
 (defn renderer []
-  (-> @state :pixi :pixi/renderer))
+  (:pixi/renderer @state))
 
 (defn path-container [stage-key]
-  [:pixi :pixi/stage stage-key :stage/container])
+  [:pixi/stage stage-key :stage/container])
 
 (defn container [stage-key]
   (get-in @state (path-container stage-key)))
 
 (defn path-ticker [stage-key]
-  [:pixi :pixi/stage stage-key :stage/ticker])
+  [:pixi/stage stage-key :stage/ticker])
 
 (defn ticker [stage-key]
   (get-in @state (path-ticker stage-key)))
@@ -27,7 +27,7 @@
          height      (.-innerHeight js/window)
          resolution  (.-devicePixelRatio js/window)
          auto-dencity true}}]
-  (swap! state assoc-in [:pixi :pixi/renderer]
+  (swap! state assoc :pixi/renderer
          (Renderer.
           #js{:view        (js/document.getElementById view)
               :width       width
@@ -37,9 +37,9 @@
               :autoDencity auto-dencity})))
 
 (defn setup-stage [stage-key]
-  (swap! state assoc-in [:pixi :pixi/stage stage-key :stage/container]
+  (swap! state assoc-in (path-container stage-key)
          (Container.))
-  (swap! state assoc-in [:pixi :pixi/stage stage-key :stage/ticker]
+  (swap! state assoc-in (path-ticker stage-key)
          (Ticker.)))
 
 (defn handler-resize []
@@ -52,33 +52,31 @@
   (.render (renderer) (container stage-key)))
 
 (defn start-loop [stage-key]
-  (-> @state
-      (get-in [:pixi :pixi/stage stage-key :stage/ticker])
+  (-> (ticker stage-key)
       (.add (partial animate stage-key))
       (.start)))
 
 (defn stop-loop [stage-key]
-  (-> @state
-      (get-in [:pixi :pixi/stage stage-key :stage/ticker])
+  (-> (ticker stage-key)
       (.remove (partial animate))
       (.stop)))
 
 (defn setup [{:game/keys [renderer stages]}]
   (.addEventListener js/window "resize" handler-resize)
   (setup-renderer renderer)
-  (swap! state assoc-in [:pixi :pixi/stage-config] stages)
-  (swap! state assoc-in [:pixi :pixi/running-stages] #{}))
+  (swap! state assoc-in [:pixi/stage-config] stages)
+  (swap! state assoc-in [:pixi/running-stages] #{}))
 
 (defmethod ig/init-key :stage/name [_ opts] opts)
 
 (defn stage-start [config stage-key]
   (setup-stage stage-key)
-  (swap! state update-in [:pixi :pixi/running-stages] conj stage-key)
+  (swap! state update-in [:pixi/running-stages] conj stage-key)
   (start-loop stage-key))
 
 (defn stage-stop [stage-key]
   (.destroy (ticker stage-key))
   (.destroy (container stage-key))
   (.clear (renderer))
-  (swap! state update-in [:pixi :pixi/stage] dissoc stage-key)
-  (swap! state update-in [:pixi :pixi/running-stages] disj stage-key))
+  (swap! state update-in [:pixi/stage] dissoc stage-key)
+  (swap! state update-in [:pixi/running-stages] disj stage-key))

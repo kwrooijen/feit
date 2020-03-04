@@ -1,7 +1,6 @@
 (ns essen.module.pixi
   (:require
-   [essen.state :refer [state get-scene]]
-   [essen.entity]
+   [essen.module.pixi.state :refer [state]]
    [essen.loop]
    [integrant.core :as ig]
    ["pixi.js" :as PIXI :refer [Renderer Texture Container Sprite Ticker]]))
@@ -48,20 +47,19 @@
            (.-innerWidth js/window)
            (.-innerHeight js/window)))
 
-(defn animate [stage-state stage-key delta]
-  ;; TODO handle swapping within essen.loop/run, and only pass in the key
-  (swap! stage-state essen.loop/run delta (.now js/Date))
+(defn animate [stage-key delta]
+  (essen.loop/run stage-key delta (.now js/Date))
   (.render (renderer) (container stage-key)))
 
 (defn start-loop [stage-key]
-  (let [scene-state (get-scene stage-key)]
-    (-> @state
-        (get-in [:pixi :pixi/stage stage-key :stage/ticker])
-        (.add (partial animate scene-state stage-key))
-        (.start))))
+  (-> @state
+      (get-in [:pixi :pixi/stage stage-key :stage/ticker])
+      (.add (partial animate stage-key))
+      (.start)))
 
-(defn stop-loop []
-  (-> (:ticker @state)
+(defn stop-loop [stage-key]
+  (-> @state
+      (get-in [:pixi :pixi/stage stage-key :stage/ticker])
       (.remove (partial animate))
       (.stop)))
 
@@ -74,14 +72,7 @@
 (defmethod ig/init-key :stage/name [_ opts] opts)
 
 (defn stage-start [config stage-key]
-  ;; (when (get-in @state [:essen/scenes stage-key])
-  ;;   (throw (js/Error. (str "Stage: " stage-key " is already running."))))
-
-  ;; (when-not (get-in @state [:pixi :pixi/stage-config stage-key])
-  ;;   (throw (js/Error. (str "Stage: " stage-key " does not exist."))))
-
   (setup-stage stage-key)
-  (essen.entity/init-scene config stage-key)
   (swap! state update-in [:pixi :pixi/running-stages] conj stage-key)
   (start-loop stage-key))
 

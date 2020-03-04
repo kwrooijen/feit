@@ -65,20 +65,20 @@
   ;; TODO add debugging info
   :threshold-reached)
 
-(defn run [{:scene/keys [key] :as initial-scene} delta time]
+(defn run [key delta time]
   ;; TODO Add keyboard events BEFORE loop
   ;; HINT make separate message queue for keyboard
-  ;; TODO @(get @state/messages key) only needs to be dereffed once (performance)
-  (apply-tickers initial-scene delta time)
-  (loop [scene @(get-scene key)
-         todo-messages @(get @state/messages key)
-         threshold 30]
-    (if (zero? threshold)
-      (threshold-reached key)
-      (do
-        (reset! (get @state/messages key) [])
-        (let [new-scene (reduce apply-message scene todo-messages)
-              new-messages @(get @state/messages key)]
-          (if (empty? new-messages)
-            new-scene
-            (recur new-scene new-messages (dec threshold))))))))
+  (let [scene (get-scene key)
+        messages (get @state/messages key)]
+    (apply-tickers @scene delta time)
+    (loop [scene @scene
+           todo-messages @messages
+           threshold 30]
+      (if (zero? threshold)
+        (threshold-reached key)
+        (do
+          (reset! messages [])
+          (let [new-scene (reduce apply-message scene todo-messages)]
+            (if (empty? @messages)
+              new-scene
+              (recur new-scene @messages (dec threshold)))))))))

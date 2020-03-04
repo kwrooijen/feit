@@ -37,5 +37,6 @@
 (defn start-scene [scene-key]
   (swap! messages assoc scene-key (atom []))
   (swap! input-messages assoc scene-key (atom []))
+  (essen.entity/init-scene (:essen/config @game) scene-key)
   ((:essen/stage-start @game) (:essen/config @game) scene-key))
 

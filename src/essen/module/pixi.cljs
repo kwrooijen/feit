@@ -80,3 +80,8 @@
   (.clear (renderer))
   (swap! state update-in [:pixi/stage] dissoc stage-key)
   (swap! state update-in [:pixi/running-stages] disj stage-key))
+
+(def module
+  {:essen/setup setup
+   :essen/stage-start stage-start
+   :essen/stage-stop stage-stop})

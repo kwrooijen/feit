@@ -7,8 +7,7 @@
    [reagent.core :as reagent]
    [cardo.views :as views]
    [essen.module.pixi :as pixi]
-   [cardo.config :as config]
-   [integrant.core :as ig]))
+   [cardo.config :as config]))
 
 (defn dev-setup []
   (when config/debug?
@@ -22,9 +21,7 @@
   (dev-setup)
   (mount-root)
   (essen/setup
-   {:essen/setup pixi/setup
-    :essen/stage-start pixi/stage-start
-    :essen/stage-stop pixi/stage-stop
+   {:essen.module/render pixi/module
     :essen/config config/config})
 
   (essen.keyboard/disable-tabbing!)

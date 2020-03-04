@@ -9,9 +9,9 @@
 
 (defmethod ig/init-key :essen/const [_ opts] opts)
 
-(defn setup [{:essen/keys [setup config] :as game-config}]
+(defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
   (reset! game game-config)
-  (setup config))
+  ((:essen/setup render) config))
 
 (defn emit-keydown! [event]
   (doseq [[_ scene] @input-messages]
@@ -38,5 +38,4 @@
   (swap! messages assoc scene-key (atom []))
   (swap! input-messages assoc scene-key (atom []))
   (essen.entity/init-scene (:essen/config @game) scene-key)
-  ((:essen/stage-start @game) (:essen/config @game) scene-key))
-
+  ((-> @game :essen.module/render :essen/stage-start) (:essen/config @game) scene-key))

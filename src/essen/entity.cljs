@@ -133,16 +133,6 @@
       (essen-init {:context/scene scene} [scene])
       (get [:essen/scene scene])))
 
-;; TODO Maybe add metadata to enities / components, to specifiy for exmaple
-;; that state is persistent. You want to keep certain state globally. e.g.
-;; player equipment should never disappear.
-;;
-;; ^{:persistent true}
-;; [:essen/component :component/equipment] {:equipment/armor {...}}
-;;
-;; This would for example make sure that whenever a new scene refers this
-;; component, the state will be shared. And not deleted of scenes are deleted.
-;;
 ;; TODO Add a way to group entities (possibly through deriving / hierarchy?)
 ;; TODO Add a way to have some sort of "entity creator". You don't want to use
 ;; ig/init-key everytime you spawn a bullet.

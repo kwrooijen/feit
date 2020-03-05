@@ -121,6 +121,10 @@
 ;;
 ;; This would for example make sure that whenever a new scene refers this
 ;; component, the state will be shared. And not deleted of scenes are deleted.
+;;
+;; TODO Add a way to group entities (possibly through deriving / hierarchy?)
+;; TODO Add a way to have some sort of "entity creator". You don't want to use
+;; ig/init-key everytime you spawn a bullet.
 (defn init-scene
   ([config scene] (init-scene config scene {}))
   ([config scene additions]

@@ -11,5 +11,7 @@
 
 (defonce input-messages (atom {}))
 
+(defonce persistent-entities (atom {}))
+
 (defn get-scene [scene-key]
   (get-in @state [:essen/scenes scene-key]))

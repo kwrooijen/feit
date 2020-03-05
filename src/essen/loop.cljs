@@ -1,7 +1,7 @@
 (ns essen.loop
   (:require
    [essen.entity :as entity]
-   [essen.state :as state :refer [get-scene]]
+   [essen.state :as state :refer [get-scene persistent-entities]]
    [essen.component :as component]))
 
 (defn- get-component [scene {:message/keys [entity route]}]
@@ -33,6 +33,11 @@
              (entity/path-state entity component)
              (partial (:handler/fn handler) context event state)))
 
+(defn- save-entity! [scene entity-key]
+  (let [entity (get-in scene [:scene/entities entity-key])]
+    (when (:entity/persistent entity)
+      (swap! persistent-entities assoc entity-key entity))))
+
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
   (let [component (get-component scene message)
         old-state (:component/state component)
@@ -41,7 +46,8 @@
         new-scene (update-scene scene entity component handler event)
         new-state (:component/state (get-component new-scene message))]
     (when-not (identical? old-state new-state)
-      (apply-reactors! component event old-state new-state))
+      (apply-reactors! component event old-state new-state)
+      (save-entity! new-scene entity))
     new-scene))
 
 (defn- apply-tickers [{:scene/keys [key entities]} delta time]

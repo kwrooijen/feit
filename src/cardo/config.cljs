@@ -34,6 +34,7 @@
     :component/tickers
     []}
 
+   ^:persistent
    [:essen/entity :entity/player]
    {:entity/components
     [(ig/ref :component/stats)]}

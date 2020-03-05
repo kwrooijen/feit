@@ -1,7 +1,7 @@
 (ns essen.entity
   (:require
    [integrant.core :as ig]
-   [essen.state :refer [state]]
+   [essen.state :refer [state persistent-entities]]
    [essen.util :refer [vec->map]]))
 
 (defn path-state
@@ -33,7 +33,8 @@
   (-> opts
       (update :entity/components vec->map :component/key)
       (assoc :entity/routes (routes opts)
-             :entity/key (last k))
+             :entity/key (last k)
+             :entity/persistent (:persistent (meta k)))
       (->> (merge (ig/init-key k opts)))))
 
 (defn- init-process-component [context k opts]
@@ -96,14 +97,26 @@
   ([config context keys]
    (ig/build config keys (partial essen-init-key context))))
 
+(defn persistent? [config entity]
+  (-> config
+      (find [:essen/entity entity])
+      (first)
+      (meta)
+      :persistent))
+
+(defn get-persistent-entity [config entity]
+  (and (persistent? config entity)
+       (get @persistent-entities entity)))
+
 (defn init-entity
   ([config scene entity] (init-entity config scene entity {}))
   ([config scene entity additions]
-   (-> config
-       (merge additions)
-       (ig/prep [entity])
-       (essen-init {:context/scene scene :context/entity entity} [entity])
-       (get [:essen/entity entity]))))
+   (or (get-persistent-entity config entity)
+       (-> config
+           (merge additions)
+           (ig/prep [entity])
+           (essen-init {:context/scene scene :context/entity entity} [entity])
+           (get [:essen/entity entity])))))
 
 (defn resolve-entity [config scene entity]
   (init-entity config scene (:key entity)))

@@ -112,6 +112,15 @@
       (essen-init [scene])
       (get [:essen/scene scene])))
 
+;; TODO Maybe add metadata to enities / components, to specifiy for exmaple
+;; that state is persistent. You want to keep certain state globally. e.g.
+;; player equipment should never disappear.
+;;
+;; ^{:persistent true}
+;; [:essen/component :component/equipment] {:equipment/armor {...}}
+;;
+;; This would for example make sure that whenever a new scene refers this
+;; component, the state will be shared. And not deleted of scenes are deleted.
 (defn init-scene
   ([config scene] (init-scene config scene {}))
   ([config scene additions]

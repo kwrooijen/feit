@@ -12,43 +12,36 @@
 (defn- get-middleware [component route]
   (get-in component [:component/handlers route :handler/middleware]))
 
-;; TODO ~maybe we can use meta tags instead of this.~
-;; Probably to pre-process this, and put it in :component/context key
-(defn- get-context [scene component message]
-  {:context/scene scene
-   :context/entity (:message/entity message)
-   :context/component (:component/key component)})
-
 (defn- apply-middleware
   [context state event [_ middleware]]
   ((:middleware/fn middleware) context event state))
 
 (defn- preprocess-event
-  [middleware context state content]
-  (reduce (partial apply-middleware context state) content middleware))
+  [{:component/keys [context state] :as component} route content]
+  (reduce (partial apply-middleware context state)
+          content
+          (get-middleware component route)))
 
 (defn- apply-reactors!
-  [context event old-state new-state reactors]
+  [{:component/keys [reactors context]} event old-state new-state]
   (doseq [reactor reactors]
     ((:reactor/fn reactor) context event old-state new-state)))
 
 (defn- update-scene
-  [scene entity {:component/keys [state] :as component} handler context event]
+  [scene entity {:component/keys [state context] :as component} handler event]
   (update-in scene
              (entity/path-state entity component)
              (partial (:handler/fn handler) context event state)))
 
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
   (let [component (get-component scene message)
-        context (get-context (:scene/key scene) component message)
-        middleware (get-middleware component route)
         old-state (:component/state component)
-        event (preprocess-event middleware context old-state content)
+        event (preprocess-event component route content)
         handler (get-in component [:component/handlers route])
-        new-scene (update-scene scene entity component handler context event)
+        new-scene (update-scene scene entity component handler event)
         new-state (:component/state (get-component new-scene message))]
     (when-not (identical? old-state new-state)
-      (apply-reactors! context event old-state new-state (:component/reactors component)))
+      (apply-reactors! component event old-state new-state))
     new-scene))
 
 (defn- apply-tickers [{:scene/keys [key entities]} delta time]

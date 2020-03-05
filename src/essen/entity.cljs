@@ -36,11 +36,11 @@
              :entity/key (last k))
       (->> (merge (ig/init-key k opts)))))
 
-(defn- init-process-component [k opts]
-  ;; TODO Can we add context here?
+(defn- init-process-component [context k opts]
   (-> opts
       (assoc :component/key (last k)
-             :component/state (ig/init-key k opts))
+             :component/state (ig/init-key k opts)
+             :component/context (assoc context :context/component (last k)))
       (update :component/tickers vec->map :ticker/key)
       (update :component/handlers vec->map :handler/key)))
 
@@ -65,7 +65,7 @@
          :ticker/key (last k)
          :ticker/fn (ig/init-key k opts)))
 
-(defn- essen-init-key [k opts]
+(defn- essen-init-key [context k opts]
   (cond
     (ig/derived-from? k :essen/scene)
     (init-process-scene k opts)
@@ -74,7 +74,7 @@
     (init-process-entity k opts)
 
     (ig/derived-from? k :essen/component)
-    (init-process-component k opts)
+    (init-process-component context k opts)
 
     (ig/derived-from? k :essen/handler)
     (init-process-handler k opts)
@@ -92,24 +92,32 @@
     (ig/init-key k opts)))
 
 (defn essen-init
-  ([config] (essen-init config (keys config)))
-  ([config keys]
-   (ig/build config keys essen-init-key)))
+  ([config context] (essen-init config context (keys config)))
+  ([config context keys]
+   (ig/build config keys (partial essen-init-key context))))
 
 (defn init-entity
-  ([config entity] (init-entity config entity {}))
-  ([config entity additions]
+  ([config scene entity] (init-entity config scene entity {}))
+  ([config scene entity additions]
    (-> config
        (merge additions)
        (ig/prep [entity])
-       (essen-init [entity])
+       (essen-init {:context/scene scene :context/entity entity} [entity])
        (get [:essen/entity entity]))))
+
+(defn resolve-entity [config scene entity]
+  (init-entity config scene (:key entity)))
+
+(defn init-scene-entities [config scene]
+  (update-in config [[:essen/scene scene] :scene/entities]
+             (partial map (partial resolve-entity config scene))))
 
 (defn init-scene-system [config scene additions]
   (-> config
+      (init-scene-entities scene)
       (merge additions)
       (ig/prep [scene])
-      (essen-init [scene])
+      (essen-init {:context/scene scene} [scene])
       (get [:essen/scene scene])))
 
 ;; TODO Maybe add metadata to enities / components, to specifiy for exmaple

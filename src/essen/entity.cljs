@@ -30,12 +30,16 @@
       (->> (merge (ig/init-key k opts)))))
 
 (defn- init-process-entity [k opts]
-  (-> opts
-      (update :entity/components vec->map :component/key)
-      (assoc :entity/routes (routes opts)
-             :entity/key (last k)
-             :entity/persistent (:persistent (meta k)))
-      (->> (merge (ig/init-key k opts)))))
+  (let [top-key (last k)]
+    (doseq [parent k]
+      (when-not (keyword-identical? parent top-key)
+        (derive top-key parent)))
+    (-> opts
+        (update :entity/components vec->map :component/key)
+        (assoc :entity/routes (routes opts)
+               :entity/key top-key
+               :entity/persistent (:persistent (meta k)))
+        (->> (merge (ig/init-key k opts))))))
 
 (defn- init-process-component [context k opts]
   (-> opts
@@ -116,7 +120,8 @@
            (merge additions)
            (ig/prep [entity])
            (essen-init {:context/scene scene :context/entity entity} [entity])
-           (get [:essen/entity entity])))))
+           (ig/find-derived-1 entity)
+           last))))
 
 (defn resolve-entity [config scene entity]
   (init-entity config scene (:key entity)))
@@ -131,7 +136,8 @@
       (merge additions)
       (ig/prep [scene])
       (essen-init {:context/scene scene} [scene])
-      (get [:essen/scene scene])))
+      (ig/find-derived-1 scene)
+      last))
 
 ;; TODO Add a way to group entities (possibly through deriving / hierarchy?)
 ;; TODO Add a way to have some sort of "entity creator". You don't want to use

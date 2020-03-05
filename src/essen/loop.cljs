@@ -1,8 +1,28 @@
 (ns essen.loop
   (:require
+   [integrant.core :as ig]
    [essen.entity :as entity]
    [essen.state :as state :refer [get-scene persistent-entities]]
    [essen.component :as component]))
+
+(defn subs-structure [scene entity]
+  (-> scene :scene/entities entity :entity/subs))
+
+(defn- add-component
+  [components acc component]
+  (assoc acc component (get-in components [component :component/state])))
+
+(defn subs-states [{:scene/keys [entities] :as scene} entity]
+  (apply merge
+         (for [[key components] (subs-structure scene entity)
+               [derived-key opts] (ig/find-derived entities key)]
+           (->> components
+                (reduce (partial add-component (:entity/components opts)) {})
+                (assoc {} derived-key)))))
+
+(defn add-context-subs [component entity scene]
+  (assoc-in component [:component/context :context/subs]
+            (subs-states scene entity)))
 
 (defn- get-component [scene {:message/keys [entity route]}]
   (->> (get-in scene [:scene/entities entity :entity/routes route])
@@ -39,7 +59,8 @@
       (swap! persistent-entities assoc entity-key entity))))
 
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
-  (let [component (get-component scene message)
+  (let [component (-> (get-component scene message)
+                      (add-context-subs entity scene))
         old-state (:component/state component)
         event (preprocess-event component route content)
         handler (get-in component [:component/handlers route])

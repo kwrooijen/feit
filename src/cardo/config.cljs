@@ -34,19 +34,39 @@
     :component/tickers
     []}
 
-   ^:persistent
-   [:essen/entity :entity/player]
+   [:essen/component :component/equipment]
+   {:component/handlers []
+    :component/reactors []
+    :component/tickers []}
+
+   [:essen/entity :entity/monster :entity/yeti]
    {:entity/components
     [(ig/ref :component/stats)]}
 
+   [:essen/entity :entity/monster :entity/skeleton]
+   {:entity/components
+    [(ig/ref :component/stats)
+     (ig/ref :component/equipment)]}
+
+   ^:persistent
+   [:essen/entity :entity/player]
+   {:entity/components
+    [(ig/ref :component/stats)]
+    :entity/subs {:entity/monster [:component/stats :component/equipment]}}
+
    [:essen/scene :scene/start]
-   {:scene/entities [(ig/ref :entity/player)]}})
+   {:scene/entities [(ig/ref :entity/player)
+                     (ig/ref :entity/yeti)
+                     (ig/ref :entity/skeleton)]}})
 
 (defmethod ig/init-key :component/stats [_ opts]
   {:stats/hp 10})
 
+(defmethod ig/init-key :component/equipment [_ opts]
+  {:equipment/armor :cool})
+
 (defmethod ig/init-key :ticker.stats/poisoned
-  [_ {:ticker/keys [ticks damage]}]
+  [_context {:ticker/keys [ticks damage]}]
   (let [remaining (atom ticks)
         last-time (atom (.now js/Date))
         poison-event {:event/damage damage

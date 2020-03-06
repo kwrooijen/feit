@@ -1,16 +1,17 @@
 (ns essen.core
   (:require
-   [integrant-tools.core :as it]
-   [essen.system.ticker :as ticker]
-   [essen.system.scene :as scene]
-   [essen.system.component :as component]
-   [essen.system.handler :as handler]
-   [essen.system.middleware :as middleware]
-   [essen.system.reactor :as reactor]
    [clojure.spec.alpha :as s]
    [essen.keyboard]
-   [essen.entity :as entity]
    [essen.state :refer [input-messages messages game state]]
+   [essen.system]
+   [essen.system.component]
+   [essen.system.entity]
+   [essen.system.handler]
+   [essen.system.middleware]
+   [essen.system.reactor]
+   [essen.system.scene]
+   [essen.system.ticker]
+   [integrant-tools.core :as it]
    [integrant.core :as ig]
    [spec-signature.core :refer-macros [sdef]]))
 
@@ -41,43 +42,12 @@
                 :message/route route
                 :message/content content})))
 
-(defn- essen-init-key [k opts]
-  (cond
-    (ig/derived-from? k :essen/scene)
-    (scene/init-process k opts)
-
-    (ig/derived-from? k :essen/entity)
-    (entity/init-process k opts)
-
-    (ig/derived-from? k :essen/component)
-    (component/init-process k opts)
-
-    (ig/derived-from? k :essen/handler)
-    (handler/init-process k opts)
-
-    (ig/derived-from? k :essen/middleware)
-    (middleware/init-process k opts)
-
-    (ig/derived-from? k :essen/reactor)
-    (reactor/init-process k opts)
-
-    (ig/derived-from? k :essen/ticker)
-    (ticker/init-process k opts)
-
-    :else
-    (ig/init-key k opts)))
-
-(defn init
-  ([config] (init config (keys config)))
-  ([config keys]
-   (ig/build config keys (partial essen-init-key))))
-
 (defn start-scene [scene-key]
   (swap! messages assoc scene-key (atom []))
   (swap! input-messages assoc scene-key (atom []))
   (-> (:essen/config @game)
       (ig/prep [scene-key])
-      (init [scene-key])
+      (ig/build [scene-key] essen.system/init-key)
       (it/find-derived-value scene-key)
       (atom)
       (->> (swap! state assoc-in [:essen/scenes scene-key])))

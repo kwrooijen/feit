@@ -1,7 +1,7 @@
 (ns cardo.config
   (:require
    [essen.core :as essen :refer [emit!]]
-   [essen.ticker :as ticker]
+   [essen.system.ticker :as ticker]
    [integrant.core :as ig]))
 
 (def debug?

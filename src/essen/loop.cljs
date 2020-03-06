@@ -1,9 +1,9 @@
 (ns essen.loop
   (:require
    [integrant.core :as ig]
-   [essen.entity :as entity]
+   [essen.system.entity :as entity]
    [essen.state :as state :refer [get-scene persistent-entities]]
-   [essen.component :as component]))
+   [essen.system.component :as component]))
 
 (defn subs-structure [scene entity]
   (-> scene :scene/entities entity :entity/subs))

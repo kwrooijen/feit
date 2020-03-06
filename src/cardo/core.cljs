@@ -2,8 +2,8 @@
   (:require
    [essen.core :as essen :refer [emit!]]
    [essen.keyboard]
-   [essen.ticker :as ticker]
-   [essen.middleware :as middleware]
+   [essen.system.ticker :as ticker]
+   [essen.system.middleware :as middleware]
    [reagent.core :as reagent]
    [cardo.views :as views]
    [essen.module.pixi :as pixi]

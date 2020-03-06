@@ -1,5 +1,6 @@
 (ns essen.system.entity
   (:require
+   [essen.system :as es]
    [integrant-tools.core :as it]
    [essen.state :refer [state persistent-entities]]
    [essen.util :refer [vec->map]]
@@ -23,7 +24,7 @@
 (defmethod ig/init-key :essen/scene [_ entity]
   entity)
 
-(defn init-process [k opts]
+(defmethod es/init-key :essen/entity [k opts]
   (let [top-key (last k)]
     ;; This is to be able to subscribe to entity groups
     (it/derive-composite k)

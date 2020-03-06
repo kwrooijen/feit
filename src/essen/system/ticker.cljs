@@ -1,5 +1,6 @@
 (ns essen.system.ticker
   (:require
+   [essen.system :as es]
    [essen.state :refer [get-scene]]
    [integrant.core :as ig]))
 
@@ -32,7 +33,7 @@
           (path entity component)
          dissoc ticker)))
 
-(defn init-process [k opts]
+(defmethod es/init-key :essen/ticker [k opts]
   (assoc opts
          :ticker/key (last k)
          :ticker/fn (ig/init-key k opts)))

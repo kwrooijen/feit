@@ -1,4 +1,4 @@
-(ns essen.entity
+(ns essen.system.entity
   (:require
    [integrant-tools.core :as it]
    [essen.state :refer [state persistent-entities]]

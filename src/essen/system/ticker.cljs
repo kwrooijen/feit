@@ -1,4 +1,4 @@
-(ns essen.ticker
+(ns essen.system.ticker
   (:require
    [essen.state :refer [get-scene]]
    [integrant.core :as ig]))

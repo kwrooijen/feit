@@ -1,4 +1,4 @@
-(ns essen.reactor
+(ns essen.system.reactor
   (:require
    [integrant.core :as ig]))
 

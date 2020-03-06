@@ -1,4 +1,4 @@
-(ns essen.middleware
+(ns essen.system.middleware
   (:require
    [essen.state :refer [get-scene]]
    [integrant.core :as ig]))

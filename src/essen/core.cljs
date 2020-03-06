@@ -1,12 +1,12 @@
 (ns essen.core
   (:require
    [integrant-tools.core :as it]
-   [essen.ticker :as ticker]
-   [essen.scene :as scene]
-   [essen.component :as component]
-   [essen.handler :as handler]
-   [essen.middleware :as middleware]
-   [essen.reactor :as reactor]
+   [essen.system.ticker :as ticker]
+   [essen.system.scene :as scene]
+   [essen.system.component :as component]
+   [essen.system.handler :as handler]
+   [essen.system.middleware :as middleware]
+   [essen.system.reactor :as reactor]
    [clojure.spec.alpha :as s]
    [essen.keyboard]
    [essen.entity :as entity]

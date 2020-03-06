@@ -1,4 +1,4 @@
-(ns essen.scene
+(ns essen.system.scene
   (:require
    [integrant.core :as ig]
    [essen.util :refer [vec->map]]))

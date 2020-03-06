@@ -1,4 +1,4 @@
-(ns essen.handler
+(ns essen.system.handler
   (:require
    [integrant.core :as ig]
    [essen.util :refer [vec->map]]))

@@ -20,11 +20,11 @@
                 (reduce (partial add-component (:entity/components opts)) {})
                 (assoc {} derived-key)))))
 
-(defn add-context-subs [component entity scene]
+(defn- add-context-subs [component entity scene]
   (assoc-in component [:component/context :context/subs]
             (subs-states scene entity)))
 
-(defn add-context [component entity scene]
+(defn- add-context [component entity scene]
   (-> component
       (add-context-subs entity scene)
       ;; TODO OPTIMIZE Post init do a walk to add contexts to components.
@@ -89,7 +89,7 @@
                    :context/component component-key}]
       ((:ticker/fn ticker-v) context delta time state))))
 
-(defn threshold-reached [key]
+(defn- threshold-reached [key]
   (println "THRESHOLD REACHED")
   ;; TODO add debugging info
   :threshold-reached)

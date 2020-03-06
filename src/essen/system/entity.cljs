@@ -2,7 +2,7 @@
   (:require
    [essen.system :as es]
    [integrant-tools.core :as it]
-   [essen.state :refer [state persistent-entities]]
+   [essen.state :refer [game persistent-entities]]
    [essen.util :refer [vec->map]]
    [integrant.core :as ig]))
 
@@ -25,26 +25,16 @@
   entity)
 
 (defmethod es/init-key :essen/entity [k opts]
-  (let [top-key (last k)]
-    ;; This is to be able to subscribe to entity groups
-    (it/derive-composite k)
-    (-> opts
-        (update :entity/components vec->map :component/key)
-        (assoc :entity/routes (routes opts)
-               :entity/key top-key
-               :entity/persistent (:persistent (meta k)))
-        (->> (merge (ig/init-key k opts))))))
-
-(defn persistent? [config entity]
-  (-> config
-      (find [:essen/entity entity])
-      (first)
-      (meta)
-      :persistent))
-
-(defn get-persistent-entity [config entity]
-  (and (persistent? config entity)
-       (get @persistent-entities entity)))
+  (or (get @persistent-entities k)
+      (let [top-key (last k)]
+        ;; This is to be able to subscribe to entity groups
+        (it/derive-composite k)
+        (-> opts
+            (update :entity/components vec->map :component/key)
+            (assoc :entity/routes (routes opts)
+                   :entity/key top-key
+                   :entity/persistent (:persistent (meta k)))
+            (->> (merge (ig/init-key k opts)))))))
 
 ;; TODO Add a way to group entities (possibly through deriving / hierarchy?)
 ;; TODO Add a way to have some sort of "entity creator". You don't want to use

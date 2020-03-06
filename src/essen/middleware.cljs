@@ -33,3 +33,8 @@
           update-in
           (path entity component handler)
           dissoc middleware)))
+
+(defn init-process [k opts]
+  (assoc opts
+         :middleware/key (last k)
+         :middleware/fn (ig/init-key k opts)))

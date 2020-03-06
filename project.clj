@@ -6,7 +6,8 @@
                                org.clojure/google-closure-library-third-party]]
                  [reagent "0.8.1"]
                  [spec-signature "0.2.0"]
-                 [integrant "0.8.0"]]
+                 [integrant "0.8.0"]
+                 [integrant-tools "0.3.1"]]
 
   :plugins []
 

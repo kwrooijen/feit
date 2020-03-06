@@ -31,3 +31,8 @@
           update-in
           (path entity component)
          dissoc ticker)))
+
+(defn init-process [k opts]
+  (assoc opts
+         :ticker/key (last k)
+         :ticker/fn (ig/init-key k opts)))

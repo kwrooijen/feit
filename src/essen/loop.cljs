@@ -24,6 +24,15 @@
   (assoc-in component [:component/context :context/subs]
             (subs-states scene entity)))
 
+(defn add-context [component entity scene]
+  (-> component
+      (add-context-subs entity scene)
+      ;; TODO OPTIMIZE Post init do a walk to add contexts to components.
+      (update :component/context assoc
+              :context/entity    entity
+              :context/scene     (:scene/key scene)
+              :context/component (:component/key component))))
+
 (defn- get-component [scene {:message/keys [entity route]}]
   (->> (get-in scene [:scene/entities entity :entity/routes route])
        (component/path entity)
@@ -60,7 +69,7 @@
 
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
   (let [component (-> (get-component scene message)
-                      (add-context-subs entity scene))
+                      (add-context entity scene))
         old-state (:component/state component)
         event (preprocess-event component route content)
         handler (get-in component [:component/handlers route])

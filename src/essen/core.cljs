@@ -16,6 +16,22 @@
    [integrant.core :as ig]
    [spec-signature.core :refer-macros [sdef]]))
 
+(defn- save-state! [scene-key]
+  (swap! state assoc-in [:essen/scenes scene-key]
+         (-> (get-in @systems [:essen/scenes scene-key])
+             (it/find-derived-value scene-key)
+             (atom))))
+
+(defn- reset-events! [scene-key]
+  (swap! messages assoc scene-key (atom []))
+  (swap! input-messages assoc scene-key (atom [])))
+
+(defn- save-system! [system scene-key]
+  (swap! systems assoc-in [:essen/scenes scene-key] system))
+
+(defn- render-run [scene-key type]
+  ((-> @game :essen.module/render type) (:essen/config @game) scene-key))
+
 (defmethod ig/init-key :essen/const [_ opts] opts)
 
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
@@ -23,8 +39,6 @@
   ((:essen/setup render) config))
 
 (defn emit!
-;; TODO implement (scene) global emit.
-  ([entity route content] nil)
   ([scene entity route content]
    (swap! (get @messages scene)
           conj {:message/entity entity
@@ -32,33 +46,26 @@
                 :message/content content})))
 
 (defn start-scene [scene-key]
-  (swap! messages assoc scene-key (atom []))
-  (swap! input-messages assoc scene-key (atom []))
-  (let [scene-system (-> (:essen/config @game)
-                         (it/prep [:it/prep-meta :ig/prep] [scene-key])
-                         (it/init [:essen/init] [scene-key]))]
-
-    (swap! state assoc-in [:essen/scenes scene-key]
-           (atom (it/find-derived-value scene-system scene-key)))
-    (swap! systems assoc-in [:essen/scenes scene-key] scene-system))
-
-  ((-> @game :essen.module/render :essen/stage-start) (:essen/config @game) scene-key))
+  (reset-events! scene-key)
+  (-> (:essen/config @game)
+      (it/prep [:it/prep-meta :ig/prep] [scene-key])
+      (it/init [:essen/init] [scene-key])
+      (save-system! scene-key))
+  (save-state! scene-key)
+  (render-run scene-key :essen/stage-start))
 
 (defn resume-scene [scene-key]
-  (swap! messages assoc scene-key (atom []))
-  (swap! input-messages assoc scene-key (atom []))
-  (let [old-system (get-in @systems [:essen/scenes scene-key])
-        scene-system (ig/resume (:essen/config @game) old-system [scene-key])]
-    (swap! state assoc-in [:essen/scenes scene-key]
-           (atom (it/find-derived-value scene-system scene-key)))
-    (swap! systems assoc-in [:essen/scenes scene-key] scene-system))
-
-  ((-> @game :essen.module/render :essen/stage-resume) (:essen/config @game) scene-key))
+  (reset-events! scene-key)
+  (as-> (get-in @systems [:essen/scenes scene-key]) system
+    (ig/resume (:essen/config @game) system [scene-key])
+    (save-system! system scene-key))
+  (save-state! scene-key)
+  (render-run scene-key :essen/stage-resume))
 
 (defn suspend-scene [scene-key]
   (swap! systems update-in [:essen/scenes scene-key]
          #(ig/suspend! % [scene-key]))
-  ((-> @game :essen.module/render :essen/stage-suspend) (:essen/config @game) scene-key))
+  (render-run scene-key :essen/stage-suspend))
 
 (defn scenes []
   (set (keys (:essen/scenes @state))))

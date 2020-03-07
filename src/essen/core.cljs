@@ -1,16 +1,17 @@
 (ns essen.core
   (:require
-   [essen.util :refer [spy]]
    [clojure.spec.alpha :as s]
    [essen.state :refer [input-messages messages game state]]
    [essen.system]
    [essen.system.component]
    [essen.system.entity]
    [essen.system.handler]
+   [essen.system.keyboard]
    [essen.system.middleware]
    [essen.system.reactor]
    [essen.system.scene]
    [essen.system.ticker]
+   [essen.util :refer [spy]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [spec-signature.core :refer-macros [sdef]]))

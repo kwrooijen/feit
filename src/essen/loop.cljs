@@ -5,28 +5,26 @@
    [essen.state :as state :refer [get-scene persistent-entities input-messages]]
    [essen.system.component :as component]))
 
-(defn subs-structure [scene entity]
-  (-> scene :scene/entities entity :entity/subs))
 
 (defn- add-component
   [components acc component]
   (assoc acc component (get-in components [component :component/state])))
 
-(defn subs-states [{:scene/keys [entities] :as scene} entity]
+(defn- subs-states [entities subs]
   (apply merge
-         (for [[key components] (subs-structure scene entity)
+         (for [[key components] subs
                [derived-key opts] (ig/find-derived entities key)]
            (->> components
                 (reduce (partial add-component (:entity/components opts)) {})
                 (assoc {} derived-key)))))
 
-(defn- add-context-subs [component entity scene]
+(defn- add-context-subs [component entity entities]
   (assoc-in component [:component/context :context/subs]
-            (subs-states scene entity)))
+            (subs-states entities (-> entities entity :entity/subs))))
 
-(defn- add-context [component entity scene]
+(defn- add-context [component entity {:scene/keys [entities] :as scene}]
   (-> component
-      (add-context-subs entity scene)
+      (add-context-subs entity entities)
       ;; TODO OPTIMIZE Post init do a walk to add contexts to components.
       (update :component/context assoc
               :context/entity    entity
@@ -89,14 +87,19 @@
                    :context/component component-key}]
       ((:ticker/fn ticker-v) context delta time state))))
 
-(defn- apply-key-event [keyboard {:input-message/keys [tag]}]
-  (when-let [f (get keyboard tag)]
-    (f)))
+(defn keyboard-context [{:scene/keys [key entities]} {:keyboard/keys [subs]}]
+  {:context/scene key
+   :context/subs (subs-states entities subs)})
 
-(defn- apply-key-events [{:scene/keys [key keyboard]}]
+(defn- apply-key-event [scene keyboard {:input-message/keys [tag]}]
+  (let [keyboard (get keyboard tag)]
+    (when-let [f (:keyboard/fn keyboard)]
+      (f (keyboard-context scene keyboard)))))
+
+(defn- apply-key-events [{:scene/keys [key keyboard] :as scene}]
   (swap! (get @input-messages key)
          (fn [events]
-           (doall (map (partial apply-key-event keyboard) events))
+           (doall (map (partial apply-key-event scene keyboard) events))
            [])))
 
 (defn- threshold-reached [key]

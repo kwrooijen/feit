@@ -56,7 +56,10 @@
     [(ig/ref :component/stats)]
     :entity/subs {:entity/monster [:component/stats :component/equipment]}}
 
-   [:essen/keyboard :keyboard/attack] {}
+   [:essen/keyboard :keyboard/attack]
+   {:keyboard/subs {:entity/monster [:component/stats]
+                    :entity/player [:component/stats]}}
+
    [:essen/scene :scene/start]
    {:scene/entities [(ig/ref :entity/player)
                      (it/child-ref :entity/yeti)
@@ -88,7 +91,6 @@
 
 (defmethod ig/init-key :middleware.stats/invincible [_ _opts]
   (fn [_context event _state]
-    (println _context)
     (assoc event
            :event/damage 0
            :event/invincible? true)))
@@ -104,14 +106,15 @@
     state))
 
 (defmethod ig/init-key :handler.stats/attack [_ opts]
-  (fn [_context
+  (fn [{:context/keys [entity subs]}
        {:event/keys [damage invincible?] :as _event}
        {:stats/keys [hp] :as state}]
     (if invincible?
-      (println "I was attacked, but I am invincible!")
+      (println entity "was attacked, but" entity "is invincible!")
       (println "Attacked for " damage))
     (assoc state :stats/hp (max 0 (- hp damage)))))
 
 (defmethod ig/init-key :keyboard/attack [_ opts]
-  (fn [_context]
-    (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2})))
+  (fn [{:context/keys [subs]}]
+    (doseq [[k _] subs]
+      (emit! :scene/start k :handler.stats/attack {:event/damage 2}))))

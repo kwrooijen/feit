@@ -3,17 +3,22 @@
   (:require
    [essen.state :refer [input-messages]]))
 
+;; TODO Maybe we can optimize the creation of the input-message map with memoize
 (defn emit-keydown! [key]
-  (doseq [[_ scene] @input-messages]
-    (swap! scene conj
-           {:input-message/type :key/down
-            :input-message/key key})))
+  (let [tag (keyword "down" (name (or key "unknown")))]
+    (doseq [[_ scene] @input-messages]
+      (swap! scene conj
+             {:input-message/type :key/down
+              :input-message/key key
+              :input-message/tag tag}))))
 
 (defn emit-keyup! [key]
-  (doseq [[_ scene] @input-messages]
-    (swap! scene conj
-           {:input-message/type :key/up
-            :input-message/key key})))
+  (let [tag (keyword "up" (name (or key "unknown")))]
+    (doseq [[_ scene] @input-messages]
+      (swap! scene conj
+             {:input-message/type :key/up
+              :input-message/key key
+              :input-message/tag tag}))))
 
 ;; https://keycode.info/
 ;; TODO complete this list

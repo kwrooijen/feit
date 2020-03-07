@@ -2,7 +2,7 @@
   (:require
    [integrant.core :as ig]
    [essen.system.entity :as entity]
-   [essen.state :as state :refer [get-scene persistent-entities]]
+   [essen.state :as state :refer [get-scene persistent-entities input-messages]]
    [essen.system.component :as component]))
 
 (defn subs-structure [scene entity]
@@ -89,23 +89,32 @@
                    :context/component component-key}]
       ((:ticker/fn ticker-v) context delta time state))))
 
+(defn- apply-key-event [keyboard {:input-message/keys [tag]}]
+  (when-let [f (get keyboard tag)]
+    (f)))
+
+(defn- apply-key-events [{:scene/keys [key keyboard]}]
+  (swap! (get @input-messages key)
+         (fn [events]
+           (doall (map (partial apply-key-event keyboard) events))
+           [])))
+
 (defn- threshold-reached [key]
   (println "THRESHOLD REACHED")
   ;; TODO add debugging info
   :threshold-reached)
 
-(defn run [key delta time]
-  ;; TODO Add keyboard events BEFORE loop
-  ;; HINT make separate message queue for keyboard
-  (swap! (get-scene key)
+(defn run [scene-key delta time]
+  (swap! (get-scene scene-key)
          (fn [scene]
-           (let [messages (get @state/messages key)]
+           (let [messages (get @state/messages scene-key)]
+             (apply-key-events scene)
              (apply-tickers scene delta time)
              (loop [scene scene
                     todo-messages @messages
                     threshold 30]
                (if (zero? threshold)
-                 (threshold-reached key)
+                 (threshold-reached scene-key)
                  (do
                    (reset! messages [])
                    (let [new-scene (reduce apply-message scene todo-messages)]

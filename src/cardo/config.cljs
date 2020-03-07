@@ -56,11 +56,13 @@
     [(ig/ref :component/stats)]
     :entity/subs {:entity/monster [:component/stats :component/equipment]}}
 
+   [:essen/keyboard :keyboard/attack] {}
    [:essen/scene :scene/start]
    {:scene/entities [(ig/ref :entity/player)
                      (it/child-ref :entity/yeti)
                      (it/child-ref :entity/yeti)
-                     (ig/ref :entity/skeleton)]}})
+                     (ig/ref :entity/skeleton)]
+    :scene/keyboard {:down/p (ig/ref :keyboard/attack)}}})
 
 (defmethod ig/init-key :component/stats [_ opts]
   {:stats/hp 10})
@@ -86,6 +88,7 @@
 
 (defmethod ig/init-key :middleware.stats/invincible [_ _opts]
   (fn [_context event _state]
+    (println _context)
     (assoc event
            :event/damage 0
            :event/invincible? true)))
@@ -109,15 +112,6 @@
       (println "Attacked for " damage))
     (assoc state :stats/hp (max 0 (- hp damage)))))
 
-;; (comment
-;;   ;; TODO: Entity collection?
-;;   ;;       OR derived keys?
-;;   ;; Entity     - [Component]
-;;   ;; Component  - [Handler] [Reactor] [Ticker]
-;;   ;; Handler    - fn [Middleware] [Link]
-;;   ;; Link       - fn ; Links can be attached to handlers, to extend "generic"
-;;   ;;                   components for specific needs
-;;   ;; Middleware -
-;;   ;; Reactor    -
-;;   ;; Ticker     -
-;;   )
+(defmethod ig/init-key :keyboard/attack [_ opts]
+  (fn [_context]
+    (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2})))

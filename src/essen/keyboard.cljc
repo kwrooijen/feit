@@ -1,8 +1,23 @@
-(ns essen.keyboard)
+(ns essen.keyboard
+  (:refer-clojure :exclude [keys])
+  (:require
+   [essen.state :refer [input-messages]]))
+
+(defn emit-keydown! [key]
+  (doseq [[_ scene] @input-messages]
+    (swap! scene conj
+           {:input-message/type :key/down
+            :input-message/key key})))
+
+(defn emit-keyup! [key]
+  (doseq [[_ scene] @input-messages]
+    (swap! scene conj
+           {:input-message/type :key/up
+            :input-message/key key})))
 
 ;; https://keycode.info/
 ;; TODO complete this list
-(def event-keys
+(def keys
   {3 :key/break
    8 :key/backspace
    9 :key/tab
@@ -118,51 +133,3 @@
    161 :key/exclamation-mark
    163 :key/hash
    164 :key/dollar})
-
-(defn- body-active?
-  "Check if the user is currently focused on the body. use `identical?` to
-  compare memory addresses. This is faster than using `=`.
-
-  TODO: Will this still work if the user embeds the game in their website? Or
-  should the user be able to choose the focused element? Maybe a different solution?"
-  []
-  (identical? (.-body js/document)
-              (.-activeElement js/document)))
-
-(defn- valid-event? [event]
-  (and (body-active?)
-       (not (.-repeat event))))
-
-(defn get-key [event]
-  (get event-keys (.-keyCode event) (.-keyCode event)))
-
-(defn add-event-listener
-  "Add an event listener to the body. Listen to `trigger` and execute `callback`.
-
-  This is useful for checking keydown / keyup
-  events, while ignoring these event within input fields. This can be used in
-  conjunction with `emit-keydown!` and emit-keyup!`
-
-  Example:
-
-  ```clojure
-  (essen.keyboard/add-event-listener \"keydown\" es/emit-keydown!)
-  (essen.keyboard/add-event-listener \"keyup\" es/emit-keyup!)
-  ```
-
-  TODO: when keydown is triggered, and body loses focus, keyup is never emitted.
-  Is this an issue, and if so, how do we fix it?
-  "
-  [trigger callback]
-  (.addEventListener (js/document.querySelector "body") trigger
-                     #(when (valid-event? %)
-                        (callback %))))
-
-(defn disable-tabbing!
-  "This disables the tabbing of HTML elements. This ensures that the user can't
-  accidentally tab focus away from the body, which we use to listen to key
-  events. We only listen to the body so that input fields don't trigger events."
-  []
-  (let [tab-key 9]
-    (set! (.-onkeydown js/document)
-          #(not= tab-key (.-which %)))))

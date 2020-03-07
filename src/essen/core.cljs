@@ -2,7 +2,6 @@
   (:require
    [essen.util :refer [spy]]
    [clojure.spec.alpha :as s]
-   [essen.keyboard]
    [essen.state :refer [input-messages messages game state]]
    [essen.system]
    [essen.system.component]
@@ -22,17 +21,7 @@
   (reset! game game-config)
   ((:essen/setup render) config))
 
-(defn emit-keydown! [event]
-  (doseq [[_ scene] @input-messages]
-    (swap! scene
-           conj {:input-message/type :key/down
-                 :input-message/key (essen.keyboard/get-key event)})))
 
-(defn emit-keyup! [event]
-(doseq [[_ scene] @input-messages]
-  (swap! scene
-         conj {:input-message/type :key/up
-               :input-message/key (essen.keyboard/get-key event)})))
 
 (defn emit!
 ;; TODO implement (scene) global emit.

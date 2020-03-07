@@ -1,7 +1,7 @@
 (ns cardo.core
   (:require
    [essen.core :as essen :refer [emit!]]
-   [essen.keyboard]
+   [essen.module.cljs.keyboard :as keyboard]
    [essen.system.ticker :as ticker]
    [essen.system.middleware :as middleware]
    [reagent.core :as reagent]
@@ -24,14 +24,11 @@
    {:essen.module/render pixi/module
     :essen/config config/config})
 
-  (essen.keyboard/disable-tabbing!)
-  (essen.keyboard/add-event-listener "keydown" essen/emit-keydown!)
-  (essen.keyboard/add-event-listener "keyup"   essen/emit-keyup!)
+  (keyboard/disable-tabbing!)
+  (keyboard/add-event-listeners!)
+
   (essen/start-scene :scene/start)
-  (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2})
-  (comment
-    ;; (pixi/stage-stop :stage/loading)
-    ))
+  (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2}))
 
 (defn stop []
   ;; (essen.core/suspend!)
@@ -41,9 +38,6 @@
   ;; (essen.core/resume config/config)
   )
 
-
-
-
 (comment
   (ticker/remove! :scene/start
                   :entity/player
@@ -51,21 +45,23 @@
                   :ticker.stats/poisoned)
 
   (ticker/add! :scene/start
-                 :entity/player
-                 :component/stats
-                 :ticker.stats/poisoned
-                 {:ticker/ticks 2
-                  :ticker/damage 30})
+               :entity/player
+               :component/stats
+               :ticker.stats/poisoned
+               {:ticker/ticks 2
+                :ticker/damage 30})
 
   (middleware/add! :scene/start
-                     :entity/player
-                     :component/stats
-                     :handler.stats/attack
-                     :middleware.stats/invincible
-                     {})
+                   :entity/player
+                   :component/stats
+                   :handler.stats/attack
+                   :middleware.stats/invincible
+                   {})
 
   (middleware/remove! :scene/start
-                      :entity/player
+                      :entity/yeti+11
                       :component/stats
                       :handler.stats/attack
-                      :middleware.stats/invincible))
+                      :middleware.stats/invincible)
+  ;;
+  )

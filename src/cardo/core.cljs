@@ -31,12 +31,10 @@
   (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2}))
 
 (defn stop []
-  ;; (essen.core/suspend!)
-  )
+  (essen/suspend!))
 
 (defn start []
-  ;; (essen.core/resume config/config)
-  )
+  (essen/resume config/config))
 
 (comment
   (ticker/remove! :scene/start

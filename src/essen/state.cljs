@@ -2,6 +2,8 @@
 
 (defonce state (atom {}))
 
+(defonce systems (atom {}))
+
 (defonce game (atom {}))
 
 (defonce messages (atom {}))

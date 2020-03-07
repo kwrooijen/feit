@@ -1,6 +1,6 @@
 (ns cardo.config
   (:require
-   [essen.core :as essen :refer [emit! child-ref]]
+   [essen.core :as essen :refer [emit!]]
    [essen.system.ticker :as ticker]
    [integrant-tools.keyword :as it.keyword]
    [integrant-tools.core :as it]
@@ -58,8 +58,8 @@
 
    [:essen/scene :scene/start]
    {:scene/entities [(ig/ref :entity/player)
-                     (child-ref :entity/yeti)
-                     (child-ref :entity/yeti)
+                     (it/child-ref :entity/yeti)
+                     (it/child-ref :entity/yeti)
                      (ig/ref :entity/skeleton)]}})
 
 (defmethod ig/init-key :component/stats [_ opts]

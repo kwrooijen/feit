@@ -2,6 +2,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [essen.state :as state :refer [input-messages messages game systems]]
+   [essen.util :refer [spy]]
    [essen.system]
    [essen.system.component]
    [essen.system.entity]
@@ -32,25 +33,27 @@
                 :message/content content})))
 
 (defn start-scene [scene-key]
-  (state/reset-events! scene-key)
-  (-> (:essen/config @game)
+  (-> (state/config)
       (it/prep [:it/prep-meta :ig/prep] [scene-key])
       (it/init [:essen/init] [scene-key])
       (state/save-system! scene-key))
+  (state/reset-events! scene-key)
   (state/save-state! scene-key)
   (render-run scene-key :essen/stage-start))
 
 (defn resume-scene [scene-key]
+  ;; FIXME This doesn't work
+  ;; Would be nice to keep the state, but replacee the :*/fn functions.
+  (-> (state/config)
+      (it/prep [:it/prep-meta :ig/prep] [scene-key])
+      (ig/resume (state/system scene-key) [scene-key])
+      (state/save-system!  scene-key))
   (state/reset-events! scene-key)
-  (as-> (get-in @systems [:essen/scenes scene-key]) system
-    (ig/resume (:essen/config @game) system [scene-key])
-    (state/save-system! system scene-key))
   (state/save-state! scene-key)
   (render-run scene-key :essen/stage-resume))
 
 (defn suspend-scene [scene-key]
-  (swap! systems update-in [:essen/scenes scene-key]
-         #(ig/suspend! % [scene-key]))
+  (ig/suspend! (get-in @systems [:essen/scenes scene-key]) [scene-key])
   (render-run scene-key :essen/stage-suspend))
 
 (defn scenes []
@@ -63,4 +66,5 @@
 (defn resume [config]
   (swap! game assoc :essen/config config)
   (doseq [scene (scenes)]
+    ;; FIXME `resume-scene` needs to eb fixed, and should be called here
     (start-scene scene)))

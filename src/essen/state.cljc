@@ -35,3 +35,9 @@
 
 (defn save-system! [system scene-key]
   (swap! systems assoc-in [:essen/scenes scene-key] system))
+
+(defn system [scene-key]
+  (get-in @systems [:essen/scenes scene-key]))
+
+(defn config []
+  (:essen/config @game))

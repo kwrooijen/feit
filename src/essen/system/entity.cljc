@@ -25,7 +25,7 @@
   entity)
 
 (defmethod es/init-key :essen/entity [k opts]
-  (or (get @persistent-entities k)
+  (or (get @persistent-entities (last k))
       (let [top-key (last k)]
         ;; This is to be able to subscribe to entity groups
         (it/derive-composite k)

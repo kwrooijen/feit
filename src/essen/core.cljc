@@ -26,6 +26,8 @@
   ((:essen/setup render) config))
 
 (defn emit!
+  ([{:context/keys [scene entity]} route content]
+   (emit! scene entity route content))
   ([scene entity route content]
    (swap! (get @messages scene)
           conj {:message/entity entity
@@ -74,3 +76,13 @@
   (doseq [scene (scenes)]
     ;; FIXME `resume-scene` needs to eb fixed, and should be called here
     (start-scene scene)))
+
+;; TODO Maybe use Specter to clean this logic up
+(defn entities [scene-key entity-key]
+  (->> (ig/find-derived (:scene/entities @(state/get-scene scene-key)) entity-key)
+       (map (fn [[k v]] [k (:entity/components v)]))
+       (map (fn [[k v]] [k (into {} (map (fn [[kk vv]] [kk (:component/state vv)]) v))]))
+       (into {})))
+
+(defn entity [scene-key entity-key]
+  (get (entities scene-key entity-key) entity-key))

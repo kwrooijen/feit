@@ -28,6 +28,8 @@
   (or (get @persistent-entities (last k))
       (let [top-key (last k)]
         ;; This is to be able to subscribe to entity groups
+        ;; TODO Maybe we want a scene hierarchy? That way we don't polute the
+        ;; global keyword hierarchy
         (it/derive-composite k)
         (-> opts
             (update :entity/components vec->map :component/key)

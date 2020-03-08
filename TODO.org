@@ -15,3 +15,8 @@ and the component state should decide whether or not it's activated?
 Add tickers. These are "handlers" that reacto to delta/time
 * TODO Link - fn ; Links can be attached to handlers, to extend "generic"
 Do we really need this?
+* TODO How do we make components more modular between entities?
+Currently in order to re-use a component, we need to re-define it for each
+entity, and define all its handlers, reactors, and tickers, even if there are
+default handlers. Also if you have a collection of monsters (group), they will
+reuse the same component.

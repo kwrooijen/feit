@@ -22,7 +22,8 @@
 
    [:essen/handler :handler.stats/attack]
    {:handler/middleware
-    [(ig/ref :middleware.stats/invincible)]}
+    [;; (ig/ref :middleware.stats/invincible)
+     ]}
 
    [:essen/ticker :ticker.stats/poisoned]
    {:ticker/ticks 4
@@ -61,6 +62,10 @@
                     :entity/player [:component/stats]}}
 
    [:essen/scene :scene/start]
+   {:scene/entities [(ig/ref :entity/player)]
+
+    :scene/keyboard {:down/p (ig/ref :keyboard/attack)}}
+   [:essen/scene :scene/battle]
    {:scene/entities [(ig/ref :entity/player)
                      (it/child-ref :entity/yeti)
                      (it/child-ref :entity/yeti)
@@ -79,15 +84,14 @@
         last-time (atom (.now js/Date))
         poison-event {:event/damage damage
                       :event/damage-type :damage/poison}]
-    (fn [{:context/keys [entity] :as context}  _delta time _state]
+    (fn [context _delta time _state]
       (cond
         (zero? @remaining)
         (ticker/remove! context :ticker.stats/poisoned)
-
         (> (- time @last-time) 1000)
         (do (reset! last-time time)
             (swap! remaining dec)
-            (emit! :scene/start entity :handler.stats/attack poison-event))))))
+            (emit! context :handler.stats/attack poison-event))))))
 
 (defmethod ig/init-key :middleware.stats/invincible [_ _opts]
   (fn [_context event _state]
@@ -115,6 +119,6 @@
     (assoc state :stats/hp (max 0 (- hp damage)))))
 
 (defmethod ig/init-key :keyboard/attack [_ opts]
-  (fn [{:context/keys [subs]}]
+  (fn [{:context/keys [scene subs]}]
     (doseq [[k _] subs]
-      (emit! :scene/start k :handler.stats/attack {:event/damage 2}))))
+      (emit! scene k :handler.stats/attack {:event/damage 2}))))

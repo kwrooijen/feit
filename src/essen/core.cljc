@@ -1,7 +1,7 @@
 (ns essen.core
   (:require
    [clojure.spec.alpha :as s]
-   [essen.state :refer [input-messages messages game state systems]]
+   [essen.state :as state :refer [input-messages messages game systems]]
    [essen.system]
    [essen.system.component]
    [essen.system.entity]
@@ -11,23 +11,9 @@
    [essen.system.reactor]
    [essen.system.scene]
    [essen.system.ticker]
-   [essen.util :refer [spy]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [spec-signature.core :refer-macros [sdef]]))
-
-(defn- save-state! [scene-key]
-  (swap! state assoc-in [:essen/scenes scene-key]
-         (-> (get-in @systems [:essen/scenes scene-key])
-             (it/find-derived-value scene-key)
-             (atom))))
-
-(defn- reset-events! [scene-key]
-  (swap! messages assoc scene-key (atom []))
-  (swap! input-messages assoc scene-key (atom [])))
-
-(defn- save-system! [system scene-key]
-  (swap! systems assoc-in [:essen/scenes scene-key] system))
 
 (defn- render-run [scene-key type]
   ((-> @game :essen.module/render type) (:essen/config @game) scene-key))
@@ -46,20 +32,20 @@
                 :message/content content})))
 
 (defn start-scene [scene-key]
-  (reset-events! scene-key)
+  (state/reset-events! scene-key)
   (-> (:essen/config @game)
       (it/prep [:it/prep-meta :ig/prep] [scene-key])
       (it/init [:essen/init] [scene-key])
-      (save-system! scene-key))
-  (save-state! scene-key)
+      (state/save-system! scene-key))
+  (state/save-state! scene-key)
   (render-run scene-key :essen/stage-start))
 
 (defn resume-scene [scene-key]
-  (reset-events! scene-key)
+  (state/reset-events! scene-key)
   (as-> (get-in @systems [:essen/scenes scene-key]) system
     (ig/resume (:essen/config @game) system [scene-key])
-    (save-system! system scene-key))
-  (save-state! scene-key)
+    (state/save-system! system scene-key))
+  (state/save-state! scene-key)
   (render-run scene-key :essen/stage-resume))
 
 (defn suspend-scene [scene-key]
@@ -68,7 +54,7 @@
   (render-run scene-key :essen/stage-suspend))
 
 (defn scenes []
-  (set (keys (:essen/scenes @state))))
+  (set (keys (:essen/scenes @state/state))))
 
 (defn suspend! []
   (doseq [scene (scenes)]

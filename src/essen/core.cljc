@@ -41,6 +41,12 @@
   (state/save-state! scene-key)
   (render-run scene-key :essen/stage-start))
 
+(defn stop-scene [scene-key]
+  (render-run scene-key :essen/stage-stop)
+  (ig/halt! (state/system scene-key))
+  (state/reset-events! scene-key)
+  (state/reset-state! scene-key))
+
 (defn resume-scene [scene-key]
   ;; FIXME This doesn't work
   ;; Would be nice to keep the state, but replacee the :*/fn functions.

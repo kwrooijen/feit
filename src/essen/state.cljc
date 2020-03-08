@@ -33,6 +33,9 @@
              (it/find-derived-value scene-key)
              (atom))))
 
+(defn reset-state! [scene-key]
+  (swap! state update :essen/scenes dissoc scene-key))
+
 (defn save-system! [system scene-key]
   (swap! systems assoc-in [:essen/scenes scene-key] system))
 

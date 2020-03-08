@@ -74,7 +74,7 @@
   (swap! state update-in [:pixi/running-stages] conj stage-key)
   (start-loop stage-key))
 
-(defn stage-stop [stage-key]
+(defn stage-stop [_config stage-key]
   (.destroy (ticker stage-key))
   (.destroy (container stage-key))
   (.clear (renderer))

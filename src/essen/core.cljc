@@ -23,7 +23,7 @@
 (defmethod ig/init-key :essen/const [_ opts] opts)
 
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
-  (reset! game game-config)
+  (reset! game (update game-config :essen/config ig/prep))
   ((:essen/setup render) config))
 
 (defn emit!
@@ -41,9 +41,7 @@
         v (it/find-derived-value config key)
         key (if dynamic? (conj ig-key (it.keyword/make-child key)) key)
         config (if dynamic? (assoc config key v) config)
-        system (-> config
-                   (it/prep [:it/prep-meta :ig/prep] [key])
-                   (it/init [:essen/init] [key]))]
+        system (it/init config [:essen/init] [key])]
     (with-meta
       (it/find-derived-value system key)
       {:system system})))

@@ -5,5 +5,5 @@
    [essen.util :refer [vec->map]]))
 
 (defmethod es/init-key :essen/scene [k opts]
-  (-> opts
+  (-> (ig/init-key k opts)
       (assoc :scene/key (last k))))

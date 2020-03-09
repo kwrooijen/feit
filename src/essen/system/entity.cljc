@@ -21,9 +21,6 @@
 (defmethod ig/init-key :essen/entity [_ entity]
   entity)
 
-(defmethod ig/init-key :essen/scene [_ entity]
-  entity)
-
 (defmethod es/init-key :essen/entity [k opts]
   (or (get @persistent-entities (last k))
       (let [top-key (last k)]

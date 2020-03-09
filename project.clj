@@ -7,6 +7,7 @@
                  [reagent "0.8.1"]
                  [spec-signature "0.2.0"]
                  [integrant "0.8.0"]
+                 [meta-merge "1.0.0"]
                  [integrant-tools "0.3.2"]]
 
   :plugins []

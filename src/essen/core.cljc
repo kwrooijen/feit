@@ -22,7 +22,14 @@
 
 (defmethod ig/init-key :essen/const [_ opts] opts)
 
+(defn derive-components
+  "Globally derive all components in `config` to make them available"
+  [config]
+  (doseq [k (it/find-derived-keys config :essen/component)]
+    (it/derive-composite k)))
+
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
+  (derive-components config)
   (reset! game (update game-config :essen/config ig/prep))
   ((:essen/setup render) config))
 
@@ -41,7 +48,7 @@
         v (it/find-derived-value config key)
         key (if dynamic? (conj ig-key (it.keyword/make-child key)) key)
         config (if dynamic? (assoc config key v) config)
-        system (it/init config [:essen/init] [key])]
+        system (it/init config [:essen/init] [key :essen/component])]
     (with-meta
       (it/find-derived-value system key)
       {:system system})))
@@ -81,7 +88,6 @@
   (render-run scene-key :essen/stage-resume))
 
 (defn suspend-scene [scene-key]
-  (ig/suspend! (get-in @systems [:essen/scenes scene-key]) [scene-key])
   (render-run scene-key :essen/stage-suspend))
 
 (defn scenes []
@@ -92,7 +98,7 @@
     (suspend-scene scene)))
 
 (defn resume [config]
-  (swap! game assoc :essen/config config)
+  (swap! game assoc :essen/config (ig/prep config))
   (doseq [scene (scenes)]
     ;; FIXME `resume-scene` needs to eb fixed, and should be called here
     (start-scene scene)))

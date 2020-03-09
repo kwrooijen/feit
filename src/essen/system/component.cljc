@@ -14,6 +14,7 @@
 
 (defmethod es/init-key :essen/component [k opts]
   (-> opts
+      (select-keys [:component/tickers :component/handlers])
       (assoc :component/key (last k)
              :component/state (ig/init-key k opts))
       (update :component/tickers vec->map :ticker/key)

@@ -2,7 +2,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [essen.state :as state :refer [input-messages messages game systems]]
-   [essen.util :refer [spy]]
+   [essen.util :refer [vec->map spy]]
    [essen.system]
    [essen.system.component]
    [essen.system.entity]
@@ -13,6 +13,7 @@
    [essen.system.scene]
    [essen.system.ticker]
    [integrant-tools.core :as it]
+   [integrant-tools.keyword :as it.keyword]
    [integrant.core :as ig]
    [spec-signature.core :refer-macros [sdef]]))
 
@@ -34,18 +35,39 @@
                 :message/route route
                 :message/content content})))
 
+(defn start-entity [config key]
+  (let [ig-key (it/find-derived-key config key)
+        dynamic?  (:dynamic (meta ig-key))
+        v (it/find-derived-value config key)
+        key (if dynamic? (conj ig-key (it.keyword/make-child key)) key)
+        config (if dynamic? (assoc config key v) config)
+        system (-> config
+                   (it/prep [:it/prep-meta :ig/prep] [key])
+                   (it/init [:essen/init] [key]))]
+    (with-meta
+      (it/find-derived-value system key)
+      {:system system})))
+
+(defn halt-entity! [entity]
+  (ig/halt! (:system (meta entity))))
+
+(defn entities-fn [entities]
+  (-> (map (partial start-entity (state/config)) (flatten entities))
+      (vec->map :entity/key)))
+
 (defn start-scene [scene-key]
   (-> (state/config)
-      (it/prep [:it/prep-meta :ig/prep] [scene-key])
       (it/init [:essen/init] [scene-key])
-      (state/save-system! scene-key))
+      (it/find-derived-value scene-key)
+      (update :scene/entities entities-fn)
+      (state/save-scene!))
   (state/reset-events! scene-key)
-  (state/save-state! scene-key)
   (render-run scene-key :essen/stage-start))
 
 (defn stop-scene [scene-key]
   (render-run scene-key :essen/stage-stop)
-  (ig/halt! (state/system scene-key))
+  (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
+    (halt-entity! entity))
   (state/reset-events! scene-key)
   (state/reset-state! scene-key))
 

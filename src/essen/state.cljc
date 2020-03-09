@@ -27,6 +27,9 @@
   (swap! messages assoc scene-key (atom []))
   (swap! input-messages assoc scene-key (atom [])))
 
+(defn save-scene! [scene]
+  (swap! state assoc-in [:essen/scenes (:scene/key scene)] (atom scene)))
+
 (defn save-state! [scene-key]
   (swap! state assoc-in [:essen/scenes scene-key]
          (-> (get-in @systems [:essen/scenes scene-key])

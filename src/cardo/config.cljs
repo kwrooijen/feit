@@ -42,10 +42,12 @@
     :component/reactors []
     :component/tickers []}
 
+   ^:dynamic
    [:essen/entity :entity/monster :entity/yeti]
    {:entity/components
     [(ig/ref :component/stats)]}
 
+   ^:dynamic
    [:essen/entity :entity/monster :entity/skeleton]
    {:entity/components
     [(ig/ref :component/stats)
@@ -62,14 +64,14 @@
                     :entity/player [:component/stats]}}
 
    [:essen/scene :scene/start]
-   {:scene/entities [(ig/ref :entity/player)]
+   {:scene/entities [:entity/player
+                     :entity/yeti]}
 
-    :scene/keyboard {:down/p (ig/ref :keyboard/attack)}}
    [:essen/scene :scene/battle]
-   {:scene/entities [(ig/ref :entity/player)
-                     (it/child-ref :entity/yeti)
-                     (it/child-ref :entity/yeti)
-                     (ig/ref :entity/skeleton)]
+   {:scene/entities [:entity/player
+                     :entity/yeti
+                     [:entity/yeti]
+                     :entity/skeleton]
     :scene/keyboard {:down/p (ig/ref :keyboard/attack)}}})
 
 (defmethod ig/init-key :component/stats [_ opts]

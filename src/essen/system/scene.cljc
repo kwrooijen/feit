@@ -6,6 +6,4 @@
 
 (defmethod es/init-key :essen/scene [k opts]
   (-> opts
-      (update :scene/entities vec->map :entity/key)
-      (assoc :scene/key (last k))
-      (->> (merge (ig/init-key k opts)))))
+      (assoc :scene/key (last k))))

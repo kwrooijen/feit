@@ -10,7 +10,7 @@
    [:div "Starting..."]
    [:div (str (entity :scene/start :entity/player))]
    [:div {:on-click #(do (stop-scene :scene/start)
-                         (start-scene :scene/battle))}
+                         (start-scene :scene/battle {:enemies 10}))}
     "To battle!"]])
 
 (defn view-battle []

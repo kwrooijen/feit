@@ -28,9 +28,23 @@
   (doseq [k (it/find-derived-keys config :essen/component)]
     (it/derive-composite k)))
 
+(defn add-scene-opts-ref
+  "This scene ref is used to give a scene arguments. For example, if you go
+  into a 'battle' scene, you can set a level, scaling all enemies in that level.
+  Or you can set the amount of enemies in a scene."
+  [acc k v]
+  (assoc acc k
+         (cond-> v
+           (map? v) (assoc :scene/opts (ig/ref :scene/opts)))))
+
+(defn setup-essen-config [config]
+  (->> config
+       (reduce-kv add-scene-opts-ref {})
+       (ig/prep)))
+
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
   (derive-components config)
-  (reset! game (update game-config :essen/config ig/prep))
+  (reset! game (update game-config :essen/config setup-essen-config))
   ((:essen/setup render) config))
 
 (defn emit!
@@ -56,18 +70,21 @@
 (defn halt-entity! [entity]
   (ig/halt! (:system (meta entity))))
 
-(defn entities-fn [entities]
-  (-> (map (partial start-entity (state/config)) (flatten entities))
+(defn entities-fn [config entities]
+  (-> (map (partial start-entity config) (flatten entities))
       (vec->map :entity/key)))
 
-(defn start-scene [scene-key]
-  (-> (state/config)
-      (it/init [:essen/init] [scene-key])
-      (it/find-derived-value scene-key)
-      (update :scene/entities entities-fn)
-      (state/save-scene!))
-  (state/reset-events! scene-key)
-  (render-run scene-key :essen/stage-start))
+(defn start-scene
+  ([scene-key] (start-scene scene-key {}))
+  ([scene-key opts]
+   (let [config (assoc (state/config) [:it/const :scene/opts] opts)]
+     (->  config
+          (it/init [:essen/init] [scene-key])
+          (it/find-derived-value scene-key)
+          (update :scene/entities (partial entities-fn config))
+          (state/save-scene!)))
+   (state/reset-events! scene-key)
+   (render-run scene-key :essen/stage-start)))
 
 (defn stop-scene [scene-key]
   (render-run scene-key :essen/stage-stop)
@@ -100,6 +117,9 @@
 (defn resume [config]
   (swap! game assoc :essen/config (ig/prep config))
   (doseq [scene (scenes)]
+    ;; TODO scene/opts get lost after `resume`..
+    ;; Does that actually matter once we implement a proper resume?
+    ;; Right now it should be fixed though
     ;; FIXME `resume-scene` needs to eb fixed, and should be called here
     (start-scene scene)))
 

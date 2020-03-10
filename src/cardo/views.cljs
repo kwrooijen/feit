@@ -22,7 +22,9 @@
                           (scene/start! :scene/start))}
     "Retreat!"]
    [:div
-    {:on-click #(attack! :entity/player 3)
+    {;; :on-click #(attack! :entity/player 3)
+     :on-click #(emit! :scene/battle :entity/player :handler.pixi.sprite/play {})
+
      :style {:width "30px"
              :height "30px"
              :position :absolute

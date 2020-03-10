@@ -21,12 +21,12 @@
 (defmethod ig/init-key :component/stats [_ {:stats/keys [hp]}]
   {:stats/hp (* 2.3 hp)})
 
+(derive :component/stats :essen/component)
+
 (def config
   {[:essen/handler :handler.stats/attack]
    {:handler/middleware []}
-   [:essen/component :component/stats] {}
 
    [:essen/ticker :ticker.stats/poisoned] {}
-   ;; (ig/ref :middleware.stats/invincible)
 
    [:essen/reactor :reactor.stats/dead?] {}})

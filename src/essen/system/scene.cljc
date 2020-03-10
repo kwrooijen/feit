@@ -19,14 +19,15 @@
 (defn start!
   ([scene-key] (start! scene-key {}))
   ([scene-key opts]
-   (let [config (assoc (state/config) [:it/const :scene/opts] opts)]
+   (essen.render/run scene-key :essen/stage-start)
+   (let [config (assoc (state/config) [:it/const :scene/opts] (assoc opts :scene/key scene-key)
+                       [:it/const :entity/opts] nil)]
      (->  config
           (it/init [:essen/init] [scene-key])
           (it/find-derived-value scene-key)
           (update :scene/entities (partial entities-fn config))
           (state/save-scene!)))
-   (state/reset-events! scene-key)
-   (essen.render/run scene-key :essen/stage-start)))
+   (state/reset-events! scene-key)))
 
 (defn stop! [scene-key]
   (essen.render/run scene-key :essen/stage-stop)

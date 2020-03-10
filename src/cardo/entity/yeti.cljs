@@ -2,6 +2,9 @@
   (:require
    [integrant.core :as ig]))
 
+(defmethod ig/init-key :entity/yeti [_ opts]
+  opts)
+
 (def config
   {[:component/stats :component.yeti/stats]
    {:stats/hp 60}

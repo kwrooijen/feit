@@ -29,8 +29,7 @@
   (keyboard/disable-tabbing!)
   (keyboard/add-event-listeners!)
 
-  (scene/start! :scene/start)
-  (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2}))
+  (scene/start! :scene/load))
 
 (defn stop []
   (essen.dev/suspend!))

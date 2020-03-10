@@ -19,9 +19,6 @@
                k (keys handlers)]
            {k key})))
 
-(defmethod ig/init-key :essen/entity [_ entity]
-  entity)
-
 (defmethod es/init-key :essen/entity [k opts]
   (or (get @persistent-entities (last k))
       (let [top-key (last k)]
@@ -42,7 +39,8 @@
         v (it/find-derived-value config key)
         key (if dynamic? (conj ig-key (it.keyword/make-child key)) key)
         config (if dynamic? (assoc config key v) config)
-        system (it/init config [:essen/init] [key :essen/component])]
+        config (assoc config [:it/const :entity/opts] {:entity/key key})
+        system (it/init config [:essen/init] [key])]
     (with-meta
       (it/find-derived-value system key)
       {:system system})))

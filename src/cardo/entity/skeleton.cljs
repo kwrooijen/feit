@@ -2,6 +2,9 @@
   (:require
    [integrant.core :as ig]))
 
+(defmethod ig/init-key :entity/skeleton [_ opts]
+  opts)
+
 (def config
   {[:component/stats :component.skeleton/stats]
    {:stats/hp 23}

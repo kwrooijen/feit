@@ -31,7 +31,8 @@
   [acc k v]
   (assoc acc k
          (cond-> v
-           (map? v) (assoc :scene/opts (ig/ref :scene/opts)))))
+           (map? v) (assoc :scene/opts (ig/ref :scene/opts)
+                           :entity/opts (ig/ref :entity/opts)))))
 
 (defn setup-essen-config [config]
   (->> config
@@ -39,9 +40,9 @@
        (ig/prep)))
 
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
+  ((:essen/setup render) config)
   (derive-components config)
-  (reset! game (update game-config :essen/config setup-essen-config))
-  ((:essen/setup render) config))
+  (reset! game (update game-config :essen/config setup-essen-config)))
 
 (defn emit!
   ([{:context/keys [scene entity]} route content]

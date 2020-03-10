@@ -1,6 +1,7 @@
 (ns cardo.views
   (:require
-   [essen.core :refer [emit! scenes stop-scene start-scene entity entities]]))
+   [essen.system.scene :as scene]
+   [essen.core :refer [emit! scenes entity entities]]))
 
 (defn attack! [entity damage]
   (emit! :scene/battle entity :handler.stats/attack {:event/damage damage}))
@@ -9,16 +10,16 @@
   [:div {:style {:color :white}}
    [:div "Starting..."]
    [:div (str (entity :scene/start :entity/player))]
-   [:div {:on-click #(do (stop-scene :scene/start)
-                         (start-scene :scene/battle {:enemies 10}))}
+   [:div {:on-click #(do (scene/stop! :scene/start)
+                         (scene/start! :scene/battle {:enemies 10}))}
     "To battle!"]])
 
 (defn view-battle []
   [:div {:style {:color :white}}
    [:div "Battle!"]
    [:div (str (entities :scene/battle :essen/entity))]
-   [:div {:on-click  #(do (stop-scene :scene/battle)
-                          (start-scene :scene/start))}
+   [:div {:on-click  #(do (scene/stop! :scene/battle)
+                          (scene/start! :scene/start))}
     "Retreat!"]
    [:div
     {:on-click #(attack! :entity/player 3)

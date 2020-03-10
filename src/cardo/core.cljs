@@ -1,13 +1,15 @@
 (ns cardo.core
   (:require
-   [essen.core :as essen :refer [emit!]]
-   [essen.module.cljs.keyboard :as keyboard]
-   [essen.system.ticker :as ticker]
-   [essen.system.middleware :as middleware]
-   [reagent.core :as reagent]
+   [cardo.config :as config]
    [cardo.views :as views]
+   [essen.core :as essen :refer [emit!]]
+   [essen.dev]
+   [essen.module.cljs.keyboard :as keyboard]
    [essen.module.pixi :as pixi]
-   [cardo.config :as config]))
+   [essen.system.middleware :as middleware]
+   [essen.system.scene :as scene]
+   [essen.system.ticker :as ticker]
+   [reagent.core :as reagent]))
 
 (defn dev-setup []
   (when config/debug?
@@ -27,14 +29,14 @@
   (keyboard/disable-tabbing!)
   (keyboard/add-event-listeners!)
 
-  (essen/start-scene :scene/start)
+  (scene/start! :scene/start)
   (emit! :scene/start :entity/player :handler.stats/attack {:event/damage 2}))
 
 (defn stop []
-  (essen/suspend!))
+  (essen.dev/suspend!))
 
 (defn start []
-  (essen/resume config/config))
+  (essen.dev/resume config/config))
 
 (comment
   (ticker/remove! :scene/start

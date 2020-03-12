@@ -1,6 +1,6 @@
 (ns essen.module.pixi
   (:require
-   ["pixi.js" :as PIXI :refer [extras]]
+   ["pixi.js" :as PIXI]
    [clojure.spec.alpha :as s]
    [integrant.core :as ig]
    [essen.system.scene :as scene]

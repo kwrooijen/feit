@@ -51,7 +51,7 @@
 
 (defn- apply-reactors!
   [{:component/keys [reactors context]} event old-state new-state]
-  (doseq [reactor reactors]
+  (doseq [[_k reactor] reactors]
     ((:reactor/fn reactor) context event old-state new-state)))
 
 (defn- update-scene

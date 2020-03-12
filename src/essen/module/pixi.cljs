@@ -33,21 +33,6 @@
       (.add spritesheet)
       (.load (partial spritesheet-loaded opts))))
 
-(defmethod ig/init-key ::add-sprite [_ {::keys [sprite scene] :as opts}]
-  (let [container (-> @state :pixi/stage scene :stage/container)
-        sprite (PIXI/Sprite. (get-in @textures sprite))]
-    (.addChild container sprite)))
-
-(defmethod ig/init-key ::add-animation [_ {::keys [sprite scene] :as opts}]
-  (let [container (-> @state :pixi/stage scene :stage/container)
-        sprite (PIXI/AnimatedSprite. (clj->js (get-in @animations sprite)))]
-
-    (set! (.-animationSpeed sprite) 0.167)
-    (set! (.-x sprite) 100)
-    (set! (.-y sprite) 100)
-    (.play sprite)
-    (.addChild container sprite)))
-
 (def config
   (merge
    component.sprite/config))

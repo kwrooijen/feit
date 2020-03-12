@@ -21,7 +21,7 @@
         sprite (PIXI/AnimatedSprite. (clj->js (get-in @animations sprite)))]
     (set! (.-animationSpeed sprite) 0.167)
     (set! (.-x sprite) (:x pos))
-    (set! (.-y sprite) (:x pos))
+    (set! (.-y sprite) (:y pos))
     (.play sprite)
     (.addChild container sprite)
 

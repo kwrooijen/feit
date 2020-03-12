@@ -10,6 +10,7 @@
 
    [cardo.component.stats :as component.stats]
    [cardo.component.equipment :as component.equipment]
+   [cardo.component.position :as component.position]
 
    [essen.module.pixi]))
 
@@ -36,5 +37,6 @@
 
    component.stats/config
    component.equipment/config
+   component.position/config
 
    essen.module.pixi/config))

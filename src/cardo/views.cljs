@@ -4,7 +4,8 @@
    [essen.core :refer [emit! scenes entity entities]]))
 
 (defn attack! [entity damage]
-  (emit! :scene/battle entity :handler.stats/attack {:event/damage damage}))
+  (emit! :scene/battle entity :handler.stats/attack {:event/damage damage})
+  (emit! :scene/battle entity :handler.position/move {:event/x 10 :event/y 10}))
 
 (defn view-start []
   [:div {:style {:color :white}}
@@ -22,8 +23,8 @@
                           (scene/start! :scene/start))}
     "Retreat!"]
    [:div
-    {;; :on-click #(attack! :entity/player 3)
-     :on-click #(emit! :scene/battle :entity/player :handler.pixi.sprite/play {})
+    {:on-click #(attack! :entity/player 3)
+     ; :on-click #(emit! :scene/battle :entity/player :handler.pixi.sprite/play {})
 
      :style {:width "30px"
              :height "30px"

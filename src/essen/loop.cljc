@@ -2,7 +2,11 @@
   (:require
    [integrant.core :as ig]
    [essen.system.entity :as entity]
-   [essen.state :as state :refer [get-scene persistent-entities input-messages]]
+   [essen.state :as state :refer
+    [get-scene
+     persistent-entities
+     persistent-components
+     input-messages]]
    [essen.system.component :as component]))
 
 
@@ -65,6 +69,11 @@
     (when (:entity/persistent entity)
       (swap! persistent-entities assoc entity-key entity))))
 
+(defn- save-component! [scene entity-key component-key]
+  (let [component (get-in scene (component/path entity-key component-key))]
+    (when (:component/persistent component)
+      (swap! persistent-components assoc component-key component))))
+
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
   (let [component (-> (get-component scene message)
                       (add-context entity scene))
@@ -75,7 +84,7 @@
         new-state (:component/state (get-component new-scene message))]
     (when-not (identical? old-state new-state)
       (apply-reactors! component event old-state new-state)
-      (save-entity! new-scene entity))
+      (save-component! new-scene entity (:component/key component)))
     new-scene))
 
 (defn- apply-tickers [{:scene/keys [key entities]} delta time]

@@ -20,7 +20,6 @@
            {k key})))
 
 (defmethod es/init-key :essen/entity [k opts]
-  (or (get @persistent-entities (last k))
       (let [top-key (last k)]
         ;; This is to be able to subscribe to entity groups
         ;; TODO Maybe we want a scene hierarchy? That way we don't polute the
@@ -29,9 +28,8 @@
         (-> opts
             (update :entity/components vec->map :component/key)
             (assoc :entity/routes (routes opts)
-                   :entity/key top-key
-                   :entity/persistent (:persistent (meta k)))
-            (->> (merge (ig/init-key k opts)))))))
+                   :entity/key top-key)
+            (->> (merge (ig/init-key k opts))))))
 
 (defn start [config key]
   (let [ig-key (it/find-derived-key config key)

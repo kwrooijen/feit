@@ -12,7 +12,8 @@
     (emit! scene entity :handler.pixi.sprite/set-pos {:event/x x :event/y y})))
 
 (def config
-  {[:component/stats :component.player/stats]
+  {^:persistent
+   [:component/stats :component.player/stats]
    {:stats/hp 3}
 
    [:component.pixi/sprite :component.player/pixi.sprite]
@@ -26,7 +27,6 @@
     :position/y 300
     :component/reactors [(ig/ref :reactor.player.position/update-sprite)]}
   
-   ^:persistent
    [:essen/entity :entity/player]
    {:entity/components
     [(ig/ref :component.player/stats)

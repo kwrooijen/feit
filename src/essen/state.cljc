@@ -20,6 +20,8 @@
 
 (defonce persistent-entities (atom {}))
 
+(defonce persistent-components (atom {}))
+
 (defn get-scene [scene-key]
   (get-in @state [:essen/scenes scene-key]))
 

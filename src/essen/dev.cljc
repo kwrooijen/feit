@@ -32,4 +32,4 @@
     ;; Does that actually matter once we implement a proper resume?
     ;; Right now it should be fixed though
     ;; FIXME `resume-scene` needs to eb fixed, and should be called here
-    (scene/start! scene)))
+    (scene/start! scene {} {:dev true})))

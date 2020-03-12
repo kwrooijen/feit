@@ -17,9 +17,11 @@
       (assoc :scene/key (last k))))
 
 (defn start!
-  ([scene-key] (start! scene-key {}))
-  ([scene-key opts]
-   (essen.render/run scene-key :essen/stage-start)
+  ([scene-key] (start! scene-key {} {}))
+  ([scene-key opts] (start! scene-key opts {}))
+  ([scene-key opts extra]
+   (when-not (:dev extra)
+     (essen.render/run scene-key :essen/stage-start))
    (let [config (assoc (state/config) [:it/const :scene/opts] (assoc opts :scene/key scene-key)
                        [:it/const :entity/opts] nil)]
      (->  config

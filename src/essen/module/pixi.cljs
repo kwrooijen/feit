@@ -8,7 +8,8 @@
    [essen.module.pixi.render :as render]
    [essen.module.pixi.component.sprite :as component.sprite]))
 
-(defn- spritesheet-loaded [{::keys [spritesheet name scene-from scene-to]}]
+(defn- spritesheet-loaded
+  [{::keys [spritesheet name transition] :as opts}]
   (let [sheet
         (-> (.-shared PIXI/Loader)
             (.-resources)
@@ -19,14 +20,13 @@
     (swap! textures assoc name (js->clj (.-textures sheet)))
     (swap! animations assoc name (js->clj (.-animations (.-spritesheet sheet)))))
 
-  (scene/stop! scene-from)
-  (scene/start! scene-to))
+  (scene/stop! (-> opts :scene/opts :scene/key))
+  (scene/start! transition))
 
 (defmethod ig/pre-init-spec ::load-spritesheet [_]
   (s/keys :req [::spritesheet
                 ::name
-                ::scene-from
-                ::scene-to]))
+                ::transition]))
 
 (defmethod ig/init-key ::load-spritesheet [_ {::keys [spritesheet] :as opts}]
   (-> (.-shared PIXI/Loader)

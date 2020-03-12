@@ -10,7 +10,6 @@
    {:pixi (ig/ref :essen.module.pixi/load-spritesheet)}
 
    :essen.module.pixi/load-spritesheet
-   {:essen.module.pixi/scene-to :scene/start
-    :essen.module.pixi/scene-from :scene/load
+   {:essen.module.pixi/transition :scene/start
     :essen.module.pixi/name :spritesheet
     :essen.module.pixi/spritesheet "images/spritesheet.json"}})

@@ -15,8 +15,11 @@
   state)
 
 ;; Custom reactor added to an existing component
-(defmethod ig/init-key :reactor.player.position/update-sprite [_ _opts]
-  (fn [{:context/keys [scene entity]} _event _old-state {:position/keys [x y]}]
+(defmethod ig/init-key :reactor.player.position/update-sprite [k _opts]
+  (fn reactor-player-position-update-sprite
+    [{:context/keys [scene entity]} _event _old-state {:position/keys [x y]}]
+    (emit! scene entity :handler.pixi.sprite/play
+           {:event/animation [:spritesheet "adventurer-run"]})
     (emit! scene entity :handler.pixi.sprite/set-pos {:event/x x :event/y y})))
 
 (def config

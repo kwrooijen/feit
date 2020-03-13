@@ -18,20 +18,31 @@
   [_ {:component/keys [sprite pos] :as opts}]
   (let [scene-key (-> opts :scene/opts :scene/key)
         container (get-in @state [:pixi/stage scene-key :stage/container])
-        sprite (PIXI/AnimatedSprite. (clj->js (get-in @animations sprite)))]
+        textures (clj->js (get-in @animations sprite))
+        sprite (PIXI/AnimatedSprite. textures)]
     (set! (.-animationSpeed sprite) 0.167)
     (set! (.-x sprite) (:x pos))
     (set! (.-y sprite) (:y pos))
     (.play sprite)
     (.addChild container sprite)
-    {:pixi.sprite/sprite sprite}))
+    {:pixi.sprite/sprite sprite
+     :pixi.sprite/initial-textures textures}))
 
 (defmethod ig/suspend-key! :component.pixi/sprite [_ {:component/keys [state]}]
   (.destroy (:pixi.sprite/sprite state)))
 
 (defmethod ig/init-key :handler.pixi.sprite/play [_ opts]
-  (fn [_ _ state]
-    (println "pixi state! " state)
+  (fn handler-pixi-sprite--play
+    [_context
+     {:event/keys [animation]}
+     {:pixi.sprite/keys [sprite initial-textures] :as state}]
+    (set! (.-textures sprite) (clj->js (get-in @animations animation)))
+    (.play sprite)
+    (set! (.-loop sprite) false)
+    (set! (.-onComplete sprite) (fn []
+                                  (set! (.-textures sprite) initial-textures)
+                                  (set! (.-loop sprite) true)
+                                  (.play sprite)))
     state))
 
 (defmethod ig/init-key :handler.pixi.sprite/set-pos [_ opts]

@@ -4,8 +4,8 @@
    [essen.core :refer [emit! scenes entity entities]]))
 
 (defn attack! [entity damage]
-  (emit! :scene/battle entity :handler.stats/attack {:event/damage damage})
-  (emit! :scene/battle entity :handler.position/move {:event/x 10 :event/y 10}))
+  ;; (emit! :scene/battle entity :handler.stats/attack {:event/damage damage})
+  (emit! :scene/battle entity :handler.position/move {:event/x 10 :event/y 0}))
 
 (defn view-start []
   [:div {:style {:color :white}}

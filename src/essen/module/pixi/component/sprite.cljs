@@ -24,8 +24,10 @@
     (set! (.-y sprite) (:y pos))
     (.play sprite)
     (.addChild container sprite)
-
     {:pixi.sprite/sprite sprite}))
+
+(defmethod ig/suspend-key! :component.pixi/sprite [_ {:component/keys [state]}]
+  (.destroy (:pixi.sprite/sprite state)))
 
 (defmethod ig/init-key :handler.pixi.sprite/play [_ opts]
   (fn [_ _ state]

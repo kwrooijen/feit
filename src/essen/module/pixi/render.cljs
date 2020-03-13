@@ -67,8 +67,6 @@
   (swap! state assoc-in [:pixi/stage-config] stages)
   (swap! state assoc-in [:pixi/running-stages] #{}))
 
-(defmethod ig/init-key :stage/name [_ opts] opts)
-
 (defn stage-start [config stage-key]
   (setup-stage stage-key)
   (swap! state update-in [:pixi/running-stages] conj stage-key)
@@ -82,3 +80,4 @@
   (swap! state update-in [:pixi/running-stages] disj stage-key))
 
 (defn stage-suspend [config stage-key])
+(defn stage-resume [config stage-key])

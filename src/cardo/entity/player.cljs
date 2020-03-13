@@ -1,10 +1,18 @@
 (ns cardo.entity.player
   (:require
+   [essen.system.component :as component]
    [essen.core :refer [emit!]]
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :entity/player [_ opts]
   opts)
+
+(defmethod component/persistent-resume :component.player/position
+  [_key opts {:position/keys [x y] :as state}]
+  (emit!  (-> opts :scene/opts :scene/key)
+          (-> opts :entity/opts :entity/key)
+          :handler.pixi.sprite/set-pos {:event/x x :event/y y})
+  state)
 
 ;; Custom reactor added to an existing component
 (defmethod ig/init-key :reactor.player.position/update-sprite [_ _opts]
@@ -22,6 +30,7 @@
 
    [:essen/reactor :reactor.player.position/update-sprite] {}
 
+   ^:persistent
    [:component/position :component.player/position]
    {:position/x 200
     :position/y 300

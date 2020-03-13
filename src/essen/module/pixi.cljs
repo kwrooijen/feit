@@ -41,4 +41,5 @@
   {:essen/setup render/setup
    :essen/stage-start render/stage-start
    :essen/stage-stop render/stage-stop
+   :essen/stage-resume render/stage-resume
    :essen/stage-suspend render/stage-suspend})

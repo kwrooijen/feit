@@ -18,7 +18,7 @@
   [_ {:component/keys [sprite pos] :as opts}]
   (let [scene-key (-> opts :scene/opts :scene/key)
         container (get-in @state [:pixi/stage scene-key :stage/container])
-        textures (clj->js (get-in @animations sprite))
+        textures (get-in @animations sprite)
         sprite (PIXI/AnimatedSprite. textures)]
     (set! (.-animationSpeed sprite) 0.167)
     (set! (.-x sprite) (:x pos))
@@ -36,7 +36,7 @@
     [_context
      {:event/keys [animation]}
      {:pixi.sprite/keys [sprite initial-textures] :as state}]
-    (set! (.-textures sprite) (clj->js (get-in @animations animation)))
+    (set! (.-textures sprite) (get-in @animations animation))
     (.play sprite)
     (set! (.-loop sprite) false)
     (set! (.-onComplete sprite) (fn []

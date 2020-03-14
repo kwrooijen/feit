@@ -4,21 +4,23 @@
    [clojure.spec.alpha :as s]
    [integrant.core :as ig]
    [essen.system.scene :as scene]
-   [essen.module.pixi.state :refer [state sheets textures animations]]
+   [essen.module.pixi.state :refer [sheets textures animations]]
    [essen.module.pixi.render :as render]
-   [essen.module.pixi.component.sprite :as component.sprite]))
+   [essen.module.pixi.component.sprite :as component.sprite]
+   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]))
+
+(defn js-keys->clj-keys [o]
+  (transform [MAP-VALS] clj->js (js->clj o)))
 
 (defn- spritesheet-loaded
   [{::keys [spritesheet name transition] :as opts}]
   (let [sheet
         (-> (.-shared PIXI/Loader)
             (.-resources)
-            (js->clj)
-            (get spritesheet))]
-
+            (aget spritesheet))]
     (swap! sheets assoc name sheet)
-    (swap! textures assoc name (js->clj (.-textures sheet)))
-    (swap! animations assoc name (js->clj (.-animations (.-spritesheet sheet)))))
+    (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
+    (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))
 
   (scene/stop! (-> opts :scene/opts :scene/key))
   (scene/start! transition))

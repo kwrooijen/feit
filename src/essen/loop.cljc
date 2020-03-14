@@ -1,6 +1,7 @@
 (ns essen.loop
   (:require
    [integrant.core :as ig]
+   [essen.module.matterjs :as m]
    [essen.system.entity :as entity]
    [essen.state :as state :refer
     [get-scene
@@ -117,6 +118,8 @@
   :threshold-reached)
 
 (defn run [scene-key delta time]
+  ;; TODO Create physics module
+  (m/run)
   (swap! (get-scene scene-key)
          (fn [scene]
            (let [messages (get @state/messages scene-key)]

@@ -1,5 +1,6 @@
 (ns cardo.entity.player
   (:require
+   [essen.module.matterjs :as m]
    [essen.system.component :as component]
    [essen.core :refer [emit!]]
    [integrant.core :as ig]))
@@ -14,13 +15,13 @@
           :handler.pixi.sprite/set-pos {:event/x x :event/y y})
   state)
 
-;; Custom reactor added to an existing component
-(defmethod ig/init-key :reactor.player.position/update-sprite [k _opts]
-  (fn reactor-player-position-update-sprite
-    [{:context/keys [scene entity]} _event _old-state {:position/keys [x y]}]
-    (emit! scene entity :handler.pixi.sprite/play
-           {:event/animation [:spritesheet "adventurer-run"]})
-    (emit! scene entity :handler.pixi.sprite/set-pos {:event/x x :event/y y})))
+(defmethod ig/init-key :ticker.player/position [_ opts]
+  (fn [context _delta _time _state]
+    (when (.-position @m/box)
+      (let [event {:event/x (.. @m/box -position -x)
+                   :event/y (.. @m/box -position -y)}]
+        (emit! context :handler.pixi.sprite/set-pos event)
+        (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle @m/box)})))))
 
 (def config
   {^:persistent
@@ -31,13 +32,16 @@
    {:component/sprite [:spritesheet "adventurer-idle"]
     :component/pos {:x 200 :y 300}}
 
+   [:essen/ticker :ticker.player/position] {}
+
    [:essen/reactor :reactor.player.position/update-sprite] {}
 
    ^:persistent
    [:component/position :component.player/position]
    {:position/x 200
     :position/y 300
-    :component/reactors [(ig/ref :reactor.player.position/update-sprite)]}
+    :component/tickers [(ig/ref :ticker.player/position)]
+    :component/reactors []}
   
    [:essen/entity :entity/player]
    {:entity/components

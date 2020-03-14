@@ -8,16 +8,17 @@
     },
     "main": "resources/public/main.js",
     "dependencies": {
-        "pixi.js": "^5.2.1",
-        "shadow-cljs": "^2.0.80",
         "create-react-class": "^15.6.2",
+        "electron": "^7.1.9",
         "highlight.js": "9.15.10",
+        "matter-js": "^0.14.2",
+        "path": "^0.12.7",
+        "pixi.js": "^5.2.1",
         "react": "^16.0.0",
         "react-dom": "^16.0.0",
         "react-flip-move": "3.0.3",
         "react-highlight.js": "1.0.7",
-        "electron": "^7.1.9",
-        "path": "^0.12.7",
+        "shadow-cljs": "^2.0.80",
         "source-map-support": "^0.5.16",
         "ws": "^7.2.1"
     }

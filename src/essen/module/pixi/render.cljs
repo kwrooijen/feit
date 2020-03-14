@@ -32,6 +32,7 @@
           #js{:view        (js/document.getElementById view)
               :width       width
               :height      height
+              :transparent true
               ;; For some reason this doubles screen width
               ;; :resolution  resolution
               :autoDencity auto-dencity})))

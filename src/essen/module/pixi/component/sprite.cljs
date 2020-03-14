@@ -12,7 +12,8 @@
 (defmethod ig/prep-key :component.pixi/sprite [_ opts]
   (meta-merge opts
               {:component/handlers [(ig/ref :handler.pixi.sprite/play)
-                                    (ig/ref :handler.pixi.sprite/set-pos)]}))
+                                    (ig/ref :handler.pixi.sprite/set-pos)
+                                    (ig/ref :handler.pixi.sprite/set-rotation)]}))
 
 (defmethod ig/init-key :component.pixi/sprite
   [_ {:component/keys [sprite pos] :as opts}]
@@ -23,6 +24,7 @@
     (set! (.-animationSpeed sprite) 0.167)
     (set! (.-x sprite) (:x pos))
     (set! (.-y sprite) (:y pos))
+    (.set (.-anchor sprite) 0.5)
     (.play sprite)
     (.addChild container sprite)
     {:pixi.sprite/sprite sprite
@@ -53,10 +55,18 @@
     (set! (.-y sprite) y)
     state))
 
+(defmethod ig/init-key :handler.pixi.sprite/set-rotation [_ opts]
+  (fn [_context
+       {:event/keys [rotation]}
+       {:pixi.sprite/keys [sprite] :as state}]
+    (set! (.-rotation sprite) rotation)
+    state))
+
 ;; TODO Modules should get a :module/components key (maybe). which makes sure this
 ;; gets derived. It's probably not logical to define the components here.
 (derive :component.pixi/sprite :essen/component)
 
 (def config
   {[:essen/handler :handler.pixi.sprite/play] {}
-   [:essen/handler :handler.pixi.sprite/set-pos] {}})
+   [:essen/handler :handler.pixi.sprite/set-pos] {}
+   [:essen/handler :handler.pixi.sprite/set-rotation] {}})

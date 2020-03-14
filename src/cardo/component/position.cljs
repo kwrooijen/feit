@@ -7,7 +7,8 @@
 (defmethod ig/prep-key :component/position [_ opts]
   (meta-merge
    opts
-   {:component/handlers [(ig/ref :handler.position/move)]
+   {:component/handlers [(ig/ref :handler.position/move)
+                         (ig/ref :handler.position/set)]
     :component/reactors []
     :component/tickers  []}))
 
@@ -30,7 +31,14 @@
         (update :position/x + x)
         (update :position/y + y))))
 
+(defmethod ig/init-key :handler.position/set [_ _opts]
+  (fn [_context {:event/keys [x y] :as _event} state]
+    (-> state
+        (assoc :position/x x
+               :position/y y))))
+
 (derive :component/position :essen/component)
 
 (def config
-  {[:essen/handler :handler.position/move] {}})
+  {[:essen/handler :handler.position/move] {}
+   [:essen/handler :handler.position/set] {}})

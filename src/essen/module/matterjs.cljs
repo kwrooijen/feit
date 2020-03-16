@@ -13,7 +13,8 @@
 (defonce mouse-constraint (atom nil))
 
 (defn vertex->point [vertex]
-  {:x (.-x vertex) :y (.-y vertex)})
+  {:x (.-x vertex)
+   :y (.-y vertex)})
 
 (defn body->points [body]
   (.map (.-vertices body) vertex->point))
@@ -32,13 +33,15 @@
         engine (.create Engine (clj->js {:render {:canvas canvas
                                                   :width (.-width canvas)
                                                   :height (.-height canvas)}}))
-        boxA (.rectangle Bodies 400 200 20 31)
+        boxA (.rectangle Bodies 400 200 20 31 #js {:restitution 1})
+        circleA (.circle Bodies 400 200 100 #js {:restitution 0.4})
         ground (.rectangle Bodies 400 610 810 60 (clj->js {:isStatic true
                                                            :restitution 1}))
         mouseConstraint (.create MouseConstraint engine
                                  (js->clj {:mouse (.create Mouse canvas)}))]
     (.add World (.-world engine) ground)
     (.add World (.-world engine) boxA)
+    (.add World (.-world engine) circleA)
     (.add World (.-world engine) mouseConstraint)
     (reset! box boxA)
     (reset! engine1 engine)

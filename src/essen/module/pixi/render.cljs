@@ -69,7 +69,6 @@
 (defn stage-stop [_config stage-key]
   (-> (:pixi/ticker @state)
       (.remove (get @tickers stage-key)))
-  (println "STOPPING")
   (.destroy (container stage-key))
   (.clear (renderer))
   (swap! state update-in [:pixi/stage] dissoc stage-key)

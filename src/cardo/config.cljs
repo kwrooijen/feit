@@ -23,9 +23,9 @@
                     :renderer/width (.-innerWidth js/window)
                     :renderer/height (.-innerHeight js/window)
                     :renderer/resolution (.-devicePixelRatio js/window)
-                    :renderer/autoDencity true}}
+                    :renderer/autoDencity true}
 
-
+   :matterjs/start {}}
 
    scene.load/config
    scene.start/config

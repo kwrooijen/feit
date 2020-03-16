@@ -65,11 +65,6 @@
              (entity/path-state entity component)
              (partial (:handler/fn handler) context event state)))
 
-(defn- save-entity! [scene entity-key]
-  (let [entity (get-in scene [:scene/entities entity-key])]
-    (when (:entity/persistent entity)
-      (swap! persistent-entities assoc entity-key entity))))
-
 (defn- save-component! [scene entity-key component-key]
   (let [component (get-in scene (component/path entity-key component-key))]
     (when (:component/persistent component)
@@ -118,8 +113,6 @@
   :threshold-reached)
 
 (defn run [scene-key delta time]
-  ;; TODO Create physics module
-  (m/run)
   (swap! (get-scene scene-key)
          (fn [scene]
            (let [messages (get @state/messages scene-key)]

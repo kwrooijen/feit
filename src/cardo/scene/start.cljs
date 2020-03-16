@@ -8,7 +8,4 @@
 
 (def config
   {[:essen/scene :scene/start]
-   {:scene/entities [:entity/player]
-    :matter (ig/ref :matterjs/start)}
-
-   :matterjs/start {}})
+   {:scene/entities [:entity/player]}})

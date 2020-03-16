@@ -14,7 +14,8 @@
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [essen.render]
-   [spec-signature.core :refer-macros [sdef]]))
+   [spec-signature.core :refer-macros [sdef]]
+   [essen.module.pixi.render :as rr]))
 
 (defmethod ig/init-key :essen/const [_ opts] opts)
 
@@ -39,10 +40,18 @@
        (reduce-kv add-scene-opts-ref {})
        (ig/prep)))
 
+(defn- start-physics [config]
+  (-> config
+      (ig/prep [:matterjs/start])
+      (ig/init [:matterjs/start])
+      (it/find-derived-value :matterjs/start)
+      (rr/add-ticker :essen/physics)))
+
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
   ((:essen/setup render) config)
   (derive-components config)
-  (reset! game (update game-config :essen/config prep)))
+  (reset! game (update game-config :essen/config prep))
+  (start-physics config))
 
 (defn emit!
   ([{:context/keys [scene entity]} route content]

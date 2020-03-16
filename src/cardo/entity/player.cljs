@@ -1,5 +1,6 @@
 (ns cardo.entity.player
   (:require
+   [essen.module.pixi.debug :as pixi.debug]
    [essen.module.matterjs :as m]
    [essen.system.component :as component]
    [essen.core :refer [emit!]]
@@ -16,12 +17,13 @@
   state)
 
 (defmethod ig/init-key :ticker.player/position [_ opts]
-  (fn [context _delta _time _state]
-    (when (.-position @m/box)
+  (fn [{:context/keys [scene] :as context} _delta _time _state]
+    (when @m/box
       (let [event {:event/x (.. @m/box -position -x)
                    :event/y (.. @m/box -position -y)}]
         (emit! context :handler.pixi.sprite/set-pos event)
-        (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle @m/box)})))))
+        (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle @m/box)})
+        (pixi.debug/draw-wireframe @m/points scene)))))
 
 (def config
   {^:persistent

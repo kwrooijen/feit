@@ -4,7 +4,7 @@
    [clojure.spec.alpha :as s]
    [integrant.core :as ig]
    [essen.system.scene :as scene]
-   [essen.module.pixi.state :refer [sheets textures animations]]
+   [essen.module.pixi.state :as state :refer [sheets textures animations]]
    [essen.module.pixi.render :as render]
    [essen.module.pixi.component.sprite :as component.sprite]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]))

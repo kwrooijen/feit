@@ -47,7 +47,11 @@
   (ig/halt! (:system (meta entity))))
 
 (defn suspend! [entity]
-  (ig/suspend! (:system (meta entity))))
+  (try (ig/suspend! (:system (meta entity)))
+       (catch #?(:clj Throwable :cljs :default) t
+         (println "Failed to halt entity" (:entity/key entity)
+                  "because of key" (:key (ex-data t)))
+         (println "Reason: " (:reason (ex-data t))))))
 
 ;; TODO Add a way to have some sort of "entity creator". You don't want to use
 ;; ig/init-key everytime you spawn a bullet.

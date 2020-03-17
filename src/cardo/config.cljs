@@ -13,6 +13,7 @@
    [cardo.component.equipment :as component.equipment]
    [cardo.component.position :as component.position]
 
+   [essen.module.matterjs]
    [essen.module.pixi]))
 
 (def debug?
@@ -41,4 +42,5 @@
    component.equipment/config
    component.position/config
 
+   essen.module.matterjs/config
    essen.module.pixi/config))

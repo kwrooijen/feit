@@ -1,5 +1,6 @@
 (ns cardo.entity.player
   (:require
+   [essen.module.matterjs.component.rectangle]
    [essen.module.matterjs :as m]
    [essen.system.component :as component]
    [essen.core :refer [emit!]]
@@ -28,24 +29,33 @@
    [:component/stats :component.player/stats]
    {:stats/hp 3}
 
-   [:component.pixi/sprite :component.player/pixi.sprite]
-   {:component/sprite [:spritesheet "adventurer-idle"]
-    :component/pos {:x 200 :y 300}}
-
-   [:essen/ticker :ticker.player/position] {}
-
-   [:essen/reactor :reactor.player.position/update-sprite] {}
-
    ^:persistent
    [:component/position :component.player/position]
    {:position/x 200
     :position/y 300
     :component/tickers [(ig/ref :ticker.player/position)]
     :component/reactors []}
-  
+
+   [:component.pixi/sprite :component.player/pixi.sprite]
+   {:component/sprite [:spritesheet "adventurer-idle"]
+    :component/pos {:x 200 :y 300}}
+
+   [:matterjs.component/rectangle :component.player/matter.rectangle]
+   {:component/x 400
+    :component/y 200
+    :component/width 20
+    :component/height 31
+    :component/opts {:restitution 1}
+    :component/pos {:x 200 :y 300}}
+
+   [:essen/ticker :ticker.player/position] {}
+
+   [:essen/reactor :reactor.player.position/update-sprite] {}
+
    [:essen/entity :entity/player]
    {:entity/components
     [(ig/ref :component.player/stats)
      (ig/ref :component.player/pixi.sprite)
-     (ig/ref :component.player/position)]
+     (ig/ref :component.player/position)
+     (ig/ref :component.player/matter.rectangle)]
     :entity/subs {:entity/monster [:component/stats :component/equipment]}}})

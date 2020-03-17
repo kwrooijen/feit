@@ -1,11 +1,13 @@
 (ns essen.module.matterjs
   (:require
    ["matter-js" :as Matter :refer [Engine Render Bodies World Mouse MouseConstraint Composite]]
-   [integrant.core :as ig]))
+   [essen.module.matterjs.component.rectangle]
+   [integrant.core :as ig]
+   [essen.module.matterjs.state :as state]))
+
+(def config {})
 
 (defonce box (atom nil))
-(defonce engine (atom nil))
-(defonce render1 (atom nil))
 
 (defonce mouse-constraint (atom nil))
 
@@ -20,33 +22,33 @@
   (.map (.-bodies (.-world engine)) body->points))
 
 (defn points []
-  (js->clj (engine->points @engine)))
+  (js->clj (engine->points @state/engine)))
 
 (defn run [_delta]
-  (.update Engine @engine (/ 1000 60) 1))
+  (.update Engine @state/engine (/ 1000 60) 1))
 
 (defmethod ig/init-key :matterjs/start [_ opts]
   (let [canvas (.getElementById js/document "game")
-        engine1  (.create Engine (clj->js {:render {:canvas canvas
+        engine  (.create Engine (clj->js {:render {:canvas canvas
                                                     :width (.-width canvas)
                                                     :height (.-height canvas)}}))
         boxA (.rectangle Bodies 400 200 20 31 #js {:restitution 1})
         circleA (.circle Bodies 400 200 100 #js {:restitution 0.4 :label "Some Circle"})
         ground (.rectangle Bodies 400 610 810 60 (clj->js {:isStatic true
                                                            :restitution 1}))
-        mouseConstraint (.create MouseConstraint engine1
+        mouseConstraint (.create MouseConstraint engine
                                  (js->clj {:mouse (.create Mouse canvas)}))
-        world (.-world engine1)]
+        world (.-world engine)]
     (.add World world boxA)
     (.add World world circleA)
     (.add World world ground)
     (.add World world mouseConstraint)
 
-    (.on Matter/Events engine1  "collisionStart"
+    (.on Matter/Events engine  "collisionStart"
          (fn [event]
            (let [bodyA (.-bodyA (aget (.-pairs event) 0))
                  bodyB (.-bodyB (aget (.-pairs event) 0))]
-             (println (.-label bodyA))
+             ;; (println (.-label bodyA))
              (.setVelocity Matter/Body bodyA #js{:x 0 :y -10}))))
 
     ;; constant velocity
@@ -57,5 +59,5 @@
     ;; (set! (.. world -gravity -x) 0)
 
     (reset! box boxA)
-    (reset! engine engine1)
+    (reset! state/engine engine)
     run))

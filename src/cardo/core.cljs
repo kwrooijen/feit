@@ -6,6 +6,7 @@
    [essen.dev]
    [essen.module.cljs.keyboard :as keyboard]
    [essen.module.pixi :as pixi]
+   [essen.module.matterjs :as matterjs]
    [essen.system.middleware :as middleware]
    [essen.system.scene :as scene]
    [essen.system.ticker :as ticker]

@@ -10,7 +10,9 @@
 (defn view-start []
   [:div {:style {:color :white}}
    [:div "Starting..."]
-   [:div (str (entity :scene/start :entity/player))]
+   [:div (str (select-keys (entity :scene/start :entity/player)
+                           [:component.player/stats
+                            :component.player/position]))]
    [:div {:on-click #(do (scene/stop! :scene/start)
                          (scene/start! :scene/battle {:enemies 10}))}
     "To battle!"]])

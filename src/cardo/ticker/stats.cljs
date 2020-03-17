@@ -5,7 +5,7 @@
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :ticker.stats/poisoned
-  [_context {:ticker/keys [ticks damage]}]
+  [_key {:ticker/keys [ticks damage]}]
   (let [remaining (atom ticks)
         last-time (atom (.now js/Date))
         poison-event {:event/damage damage

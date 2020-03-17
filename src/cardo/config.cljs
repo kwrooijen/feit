@@ -3,6 +3,7 @@
    [cardo.entity.yeti :as entity.yeti]
    [cardo.entity.skeleton :as entity.skeleton]
    [cardo.entity.player :as entity.player]
+   [cardo.entity.debug :as entity.debug]
 
    [cardo.scene.load :as scene.load]
    [cardo.scene.start :as scene.start]
@@ -25,7 +26,7 @@
                     :renderer/resolution (.-devicePixelRatio js/window)
                     :renderer/autoDencity true}
 
-   :matterjs/start {}}
+    :matterjs/start {}}
 
    scene.load/config
    scene.start/config
@@ -34,6 +35,7 @@
    entity.player/config
    entity.skeleton/config
    entity.yeti/config
+   entity.debug/config
 
    component.stats/config
    component.equipment/config

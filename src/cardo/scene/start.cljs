@@ -8,4 +8,5 @@
 
 (def config
   {[:essen/scene :scene/start]
-   {:scene/entities [:entity/player]}})
+   {:scene/entities [:entity/player
+                     :entity/debug]}})

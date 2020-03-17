@@ -1,6 +1,5 @@
 (ns cardo.entity.player
   (:require
-   [essen.module.pixi.debug :as pixi.debug]
    [essen.module.matterjs :as m]
    [essen.system.component :as component]
    [essen.core :refer [emit!]]
@@ -22,8 +21,7 @@
       (let [event {:event/x (.. @m/box -position -x)
                    :event/y (.. @m/box -position -y)}]
         (emit! context :handler.pixi.sprite/set-pos event)
-        (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle @m/box)})
-        (pixi.debug/draw-wireframe @m/points scene)))))
+        (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle @m/box)})))))
 
 (def config
   {^:persistent

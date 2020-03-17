@@ -8,3 +8,11 @@
   ([v f]
    (println "SPY: " (f v))
    v))
+
+(defn key-ns? [n]
+  (comp #{n} namespace first))
+
+(defn keep-ns [m n]
+  (->> m
+       (filter (key-ns? n))
+       (into {})))

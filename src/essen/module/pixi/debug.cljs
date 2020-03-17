@@ -11,6 +11,7 @@
 (defn draw-wireframe [wires scene]
   (let [container (get-in @state/state [:pixi/stage scene :stage/container])
         graphics (PIXI/Graphics.)]
+    (set! (.-zOrder graphics) js/Number.MAX_SAFE_INTEGER)
     (.destroy @wireframe)
     (.lineStyle graphics 1 0xFF0000)
     (doseq [wire wires]

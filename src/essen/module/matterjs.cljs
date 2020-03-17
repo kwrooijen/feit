@@ -3,10 +3,7 @@
    ["matter-js" :as Matter :refer [Engine Render Bodies World Mouse MouseConstraint Composite]]
    [integrant.core :as ig]))
 
-;; Remove a body
-;; (.remove Composite (.-world engine) boxA)
 (defonce box (atom nil))
-(defonce points (atom []))
 (defonce engine1 (atom nil))
 (defonce render1 (atom nil))
 
@@ -22,10 +19,12 @@
 (defn engine->points [engine]
   (.map (.-bodies (.-world engine)) body->points))
 
-(defn run [delta]
+(defn points []
+  (js->clj (engine->points @engine1)))
+
+(defn run [_delta]
   (when @engine1
-    (.update Engine @engine1 (/ 1000 60) 1)
-    (reset! points (js->clj (engine->points @engine1)))))
+    (.update Engine @engine1 (/ 1000 60) 1)))
 
 (defmethod ig/init-key :matterjs/start [_ opts]
   (let [canvas (.getElementById js/document "game")

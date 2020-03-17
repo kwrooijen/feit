@@ -22,7 +22,6 @@
   {:stats/hp (* 2.3 hp)})
 
 (derive :component/stats :essen/component)
-
 (def config
   {[:essen/handler :handler.stats/attack]
    {:handler/middleware []}

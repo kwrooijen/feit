@@ -4,7 +4,7 @@
    [integrant.core :as ig]))
 
 (defonce box (atom nil))
-(defonce engine1 (atom nil))
+(defonce engine (atom nil))
 (defonce render1 (atom nil))
 
 (defonce mouse-constraint (atom nil))
@@ -20,29 +20,29 @@
   (.map (.-bodies (.-world engine)) body->points))
 
 (defn points []
-  (js->clj (engine->points @engine1)))
+  (js->clj (engine->points @engine)))
 
 (defn run [_delta]
-  (when @engine1
-    (.update Engine @engine1 (/ 1000 60) 1)))
+  (.update Engine @engine (/ 1000 60) 1))
 
 (defmethod ig/init-key :matterjs/start [_ opts]
   (let [canvas (.getElementById js/document "game")
-        engine (.create Engine (clj->js {:render {:canvas canvas
-                                                  :width (.-width canvas)
-                                                  :height (.-height canvas)}}))
+        engine1  (.create Engine (clj->js {:render {:canvas canvas
+                                                    :width (.-width canvas)
+                                                    :height (.-height canvas)}}))
         boxA (.rectangle Bodies 400 200 20 31 #js {:restitution 1})
         circleA (.circle Bodies 400 200 100 #js {:restitution 0.4 :label "Some Circle"})
         ground (.rectangle Bodies 400 610 810 60 (clj->js {:isStatic true
                                                            :restitution 1}))
-        mouseConstraint (.create MouseConstraint engine
-                                 (js->clj {:mouse (.create Mouse canvas)}))]
-    (.add World (.-world engine) boxA)
-    (.add World (.-world engine) circleA)
-    (.add World (.-world engine) ground)
-    (.add World (.-world engine) mouseConstraint)
+        mouseConstraint (.create MouseConstraint engine1
+                                 (js->clj {:mouse (.create Mouse canvas)}))
+        world (.-world engine1)]
+    (.add World world boxA)
+    (.add World world circleA)
+    (.add World world ground)
+    (.add World world mouseConstraint)
 
-    (.on Matter/Events engine "collisionStart"
+    (.on Matter/Events engine1  "collisionStart"
          (fn [event]
            (let [bodyA (.-bodyA (aget (.-pairs event) 0))
                  bodyB (.-bodyB (aget (.-pairs event) 0))]
@@ -53,9 +53,9 @@
     ;; (set! (.-restitution circleA) 1)
     ;; (set! (.-friction circleA) 0)
     ;; (set! (.-frictionAir circleA) 0)
-    ;; (set! (.. engine -world -gravity -y) 0)
-    ;; (set! (.. engine -world -gravity -x) 0)
+    ;; (set! (.. world -gravity -y) 0)
+    ;; (set! (.. world -gravity -x) 0)
 
     (reset! box boxA)
-    (reset! engine1 engine)
+    (reset! engine engine1)
     run))

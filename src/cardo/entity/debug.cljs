@@ -9,7 +9,7 @@
 
 (defmethod ig/init-key :ticker/debug
   [_context _opts]
-  (fn ticker-debug [{:context/keys [scene]}]
+  (fn ticker-debug [{:context/keys [scene]} _ticker _state]
     (pixi.debug/draw-wireframe (matter/points) scene)))
 
 (derive :component/debug :essen/component)

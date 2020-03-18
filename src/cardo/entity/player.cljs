@@ -17,12 +17,13 @@
   state)
 
 (defmethod ig/init-key :ticker.player/position [_ opts]
-  (fn [{:context/keys [scene] :as context} _delta _time _state]
-    (when @m/box
-      (let [event {:event/x (.. @m/box -position -x)
-                   :event/y (.. @m/box -position -y)}]
-        (emit! context :handler.pixi.sprite/set-pos event)
-        (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle @m/box)})))))
+  (fn [{:context/keys [scene] :as context} _tick _state
+       {:component.player/keys [rectangle]}]
+    (let [body ((:component/body rectangle))
+          event {:event/x (.. body -position -x)
+                 :event/y (.. body -position -y)}]
+      (emit! context :handler.pixi.sprite/set-pos event)
+      (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle body)}))))
 
 (def config
   {^:persistent
@@ -40,7 +41,7 @@
    {:component/sprite [:spritesheet "adventurer-idle"]
     :component/pos {:x 200 :y 300}}
 
-   [:matterjs.component/rectangle :component.player/matter.rectangle]
+   [:matterjs.component/rectangle :component.player/rectangle]
    {:component/x 400
     :component/y 200
     :component/width 20
@@ -57,5 +58,5 @@
     [(ig/ref :component.player/stats)
      (ig/ref :component.player/pixi.sprite)
      (ig/ref :component.player/position)
-     (ig/ref :component.player/matter.rectangle)]
+     (ig/ref :component.player/rectangle)]
     :entity/subs {:entity/monster [:component/stats :component/equipment]}}})

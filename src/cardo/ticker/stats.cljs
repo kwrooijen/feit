@@ -10,7 +10,7 @@
         last-time (atom (.now js/Date))
         poison-event {:event/damage damage
                       :event/damage-type :damage/poison}]
-    (fn [context _delta time _state]
+    (fn [context {:tick/keys [time]} _state]
       (cond
         (zero? @remaining)
         (ticker/remove! context :ticker.stats/poisoned)

@@ -45,25 +45,25 @@
   (get-in component [:component/handlers route :handler/middleware]))
 
 (defn- apply-middleware
-  [context state event [_ middleware]]
-  ((:middleware/fn middleware) context event state))
+  [context state event [_ middleware] entity-state]
+  ((:middleware/fn middleware) context event state entity-state))
 
 (defn- preprocess-event
-  [{:component/keys [context state] :as component} route content]
-  (reduce (partial apply-middleware context state)
+  [{:component/keys [context state] :as component} route content entity-state]
+  (reduce (partial apply-middleware context state entity-state)
           content
           (get-middleware component route)))
 
 (defn- apply-reactors!
-  [{:component/keys [reactors context]} event old-state new-state]
+  [{:component/keys [reactors context]} event old-state new-state entity-state]
   (doseq [[_k reactor] reactors]
-    ((:reactor/fn reactor) context event old-state new-state)))
+    ((:reactor/fn reactor) context event old-state new-state entity-state)))
 
 (defn- update-scene
-  [scene entity {:component/keys [state context] :as component} handler event]
+  [scene entity {:component/keys [state context] :as component} handler event entity-state]
   (update-in scene
              (entity/path-state entity component)
-             (partial (:handler/fn handler) context event state)))
+             #((:handler/fn handler) context event % entity-state)))
 
 (defn- save-component! [scene entity-key component-key]
   (let [component (get-in scene (component/path entity-key component-key))]
@@ -73,24 +73,28 @@
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
   (let [component (-> (get-component scene message)
                       (add-context entity scene))
+        entity-state (entity/state (-> scene :scene/entities entity))
         old-state (:component/state component)
-        event (preprocess-event component route content)
+        event (preprocess-event component route content entity-state)
         handler (get-in component [:component/handlers route])
-        new-scene (update-scene scene entity component handler event)
-        new-state (:component/state (get-component new-scene message))]
+        new-scene (update-scene scene entity component handler event entity-state)
+        new-state (:component/state (get-component new-scene message))
+        new-entity-state (entity/state (-> new-scene :scene/entities entity))]
     (when-not (identical? old-state new-state)
-      (apply-reactors! component event old-state new-state)
+      (apply-reactors! component event old-state new-state new-entity-state)
       (save-component! new-scene entity (:component/key component)))
     new-scene))
 
 (defn- apply-tickers [{:scene/keys [key entities]} delta time]
-  (doseq [[entity-key {:entity/keys [components]}] entities
+  (doseq [[entity-key {:entity/keys [components] :as entity}] entities
           [component-key {:component/keys [tickers state]}] components
           [_ticker-key ticker-v] tickers]
     (let [context {:context/scene key
                    :context/entity entity-key
-                   :context/component component-key}]
-      ((:ticker/fn ticker-v) context delta time state))))
+                   :context/component component-key}
+          tick {:tick/delta delta :tick/time time}
+          entity-state (entity/state entity)]
+      ((:ticker/fn ticker-v) context tick state entity-state))))
 
 (defn keyboard-context [{:scene/keys [key entities]} {:keyboard/keys [subs]}]
   {:context/scene key

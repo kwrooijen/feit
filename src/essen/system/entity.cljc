@@ -1,9 +1,9 @@
 (ns essen.system.entity
   (:require
+   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [essen.system :as es]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :as it.keyword]
-   [essen.state :refer [persistent-entities]]
    [essen.util :refer [vec->map]]
    [integrant.core :as ig]))
 
@@ -12,6 +12,9 @@
   [:scene/entities entity
    :entity/components (:component/key component)
    :component/state])
+
+(defn state [{:entity/keys [components]}]
+  (transform [MAP-VALS] :component/state components))
 
 (defn- routes [{:entity/keys [components]}]
   (apply merge

@@ -7,8 +7,6 @@
 
 (def config {})
 
-(defonce box (atom nil))
-
 (defonce mouse-constraint (atom nil))
 
 (defn vertex->point [vertex]
@@ -32,24 +30,24 @@
         engine  (.create Engine (clj->js {:render {:canvas canvas
                                                     :width (.-width canvas)
                                                     :height (.-height canvas)}}))
-        boxA (.rectangle Bodies 400 200 20 31 #js {:restitution 1})
         circleA (.circle Bodies 400 200 100 #js {:restitution 0.4 :label "Some Circle"})
         ground (.rectangle Bodies 400 610 810 60 (clj->js {:isStatic true
                                                            :restitution 1}))
         mouseConstraint (.create MouseConstraint engine
                                  (js->clj {:mouse (.create Mouse canvas)}))
         world (.-world engine)]
-    (.add World world boxA)
     (.add World world circleA)
     (.add World world ground)
     (.add World world mouseConstraint)
 
-    (.on Matter/Events engine  "collisionStart"
+    (.on Matter/Events engine "collisionStart"
          (fn [event]
            (let [bodyA (.-bodyA (aget (.-pairs event) 0))
                  bodyB (.-bodyB (aget (.-pairs event) 0))]
              ;; (println (.-label bodyA))
-             (.setVelocity Matter/Body bodyA #js{:x 0 :y -10}))))
+             ;; (.setVelocity Matter/Body bodyA #js{:x 0 :y -10})
+             ;;
+             )))
 
     ;; constant velocity
     ;; (set! (.-restitution circleA) 1)
@@ -58,6 +56,5 @@
     ;; (set! (.. world -gravity -y) 0)
     ;; (set! (.. world -gravity -x) 0)
 
-    (reset! box boxA)
     (reset! state/engine engine)
     run))

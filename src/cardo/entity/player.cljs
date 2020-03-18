@@ -1,7 +1,5 @@
 (ns cardo.entity.player
   (:require
-   [essen.module.matterjs.component.rectangle]
-   [essen.module.matterjs :as m]
    [essen.system.component :as component]
    [essen.core :refer [emit!]]
    [integrant.core :as ig]))

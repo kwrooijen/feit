@@ -5,8 +5,8 @@
    ["matter-js" :as Matter :refer [World]]
    [essen.module.matterjs.state :as state]))
 
-(defn add [body]
+(defn add! [body]
   (.add World (.-world @state/engine) body))
 
-(defn remove [body]
+(defn remove! [body]
   (.remove World (.-world @state/engine) body))

@@ -1,7 +1,7 @@
 (ns essen.module.matterjs
   (:require
-   ["matter-js" :as Matter :refer [Engine Render Bodies World Mouse MouseConstraint Composite]]
-   [essen.module.matterjs.component.rectangle]
+   ["matter-js" :as Matter :refer [Engine World Mouse MouseConstraint]]
+   [essen.module.matterjs.component]
    [integrant.core :as ig]
    [essen.module.matterjs.state :as state]))
 
@@ -28,36 +28,23 @@
 (defmethod ig/init-key :matterjs/start [_ opts]
   (let [canvas (.getElementById js/document "game")
         engine  (.create Engine (clj->js {:render {:canvas canvas
-                                                    :width (.-width canvas)
-                                                    :height (.-height canvas)}}))
-        circleA (.circle Bodies 400 200 100 #js {:restitution 0
-                                                 :label "Some Circle"
-                                                 :friction 0
-                                                 :frictionAir 0})
-        ground (.rectangle Bodies 400 610 810 60 (clj->js {:isStatic true
-                                                           :restitution 1}))
+                                                   :width (.-width canvas)
+                                                   :height (.-height canvas)}}))
         mouseConstraint (.create MouseConstraint engine
-                                 (js->clj {:mouse (.create Mouse canvas)}))
+                                 #js {:mouse (.create Mouse canvas)})
         world (.-world engine)]
-    (.add World world circleA)
-    (.add World world ground)
     (.add World world mouseConstraint)
 
     (.on Matter/Events engine "collisionStart"
          (fn [event]
            (let [bodyA (.-bodyA (aget (.-pairs event) 0))
                  bodyB (.-bodyB (aget (.-pairs event) 0))]
-             (println (.-label bodyB))
-             ;; (.setVelocity Matter/Body bodyA #js{:x 0 :y -10})
-             ;;
-             )))
+             (println "Collision BodyA" (.-label bodyA))
+             (println "Collision BodyB" (.-label bodyB)))))
 
     ;; constant velocity
-    ;; (set! (.-restitution circleA) 1)
-    ;; (set! (.-friction circleA) 0)
-    ;; (set! (.-frictionAir circleA) 0)
     ;; (set! (.. world -gravity -y) 0)
     ;; (set! (.. world -gravity -x) 0)
-
+    ;; TODO Maybe create dynamic var for performance boost
     (reset! state/engine engine)
     run))

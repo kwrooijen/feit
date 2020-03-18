@@ -30,7 +30,10 @@
         engine  (.create Engine (clj->js {:render {:canvas canvas
                                                     :width (.-width canvas)
                                                     :height (.-height canvas)}}))
-        circleA (.circle Bodies 400 200 100 #js {:restitution 0.4 :label "Some Circle"})
+        circleA (.circle Bodies 400 200 100 #js {:restitution 0
+                                                 :label "Some Circle"
+                                                 :friction 0
+                                                 :frictionAir 0})
         ground (.rectangle Bodies 400 610 810 60 (clj->js {:isStatic true
                                                            :restitution 1}))
         mouseConstraint (.create MouseConstraint engine
@@ -44,7 +47,7 @@
          (fn [event]
            (let [bodyA (.-bodyA (aget (.-pairs event) 0))
                  bodyB (.-bodyB (aget (.-pairs event) 0))]
-             ;; (println (.-label bodyA))
+             (println (.-label bodyB))
              ;; (.setVelocity Matter/Body bodyA #js{:x 0 :y -10})
              ;;
              )))

@@ -46,8 +46,7 @@
     :component/y 200
     :component/width 20
     :component/height 31
-    :component/opts {:restitution 1}
-    :component/pos {:x 200 :y 300}}
+    :component.opts/restitution 1}
 
    [:essen/ticker :ticker.player/position] {}
 

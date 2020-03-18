@@ -10,7 +10,10 @@
    v))
 
 (defn key-ns? [n]
-  (comp #{n} namespace first))
+  (comp #{n}
+        keyword
+        namespace
+        first))
 
 (defn keep-ns [m n]
   (->> m

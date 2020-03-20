@@ -14,6 +14,13 @@
       (add-label (str k))
       (clj->js)))
 
+;; TODO: Create a custom print method so that when we print the object, we
+;; don't cause an infilite loop.
+;; (extend-protocol IPrintWithWriter
+;;   Body
+;;   (-pr-writer [new-obj writer _]
+;;     (write-all writer "#myObj \"" (:details new-obj) "\"")))
+
 (defmethod ig/init-key :matterjs.component/rectangle
   [[_ k] {:component/keys [x y width height] :as opts}]
   (let [body (.rectangle Bodies x y width height (body-opts opts k))]
@@ -31,6 +38,10 @@
     {:component/body (fn [] body)}))
 
 (defmethod ig/suspend-key! :matterjs.component/circle
+  [_ {:component/keys [state]}]
+  (matterjs.world/remove! ((:component/body state))))
+
+(defmethod ig/halt-key! :matterjs.component/circle
   [_ {:component/keys [state]}]
   (matterjs.world/remove! ((:component/body state))))
 

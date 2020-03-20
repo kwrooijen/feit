@@ -37,3 +37,5 @@
     (entity/stop! entity))
   (state/reset-events! scene-key)
   (state/reset-state! scene-key))
+
+;; TODO Need to implement halt / suspend / resume properly

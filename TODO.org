@@ -23,3 +23,29 @@ reuse the same component.
 ** SOLUTION
 Each entity is its own system. Init with all their required components. Also use
 prep-key on components to reference default handler / reactors etc
+* TODO Use local hierarchies create inheritence
+For example:
+Entity Hierarchy
+#+BEGIN_SRC clojure
+{:entity.group/monster [:component/movable]
+ :entity.group/fire-monster [:entity.group/monster]
+ :entity/fire-crawler [:entity.group/fire-monster]}
+#+END_SRC
+
+* TODO separate system and state
+Currently we have a specification map of our game. then we init each entity +
+scene. State and config get intertwined, Maybe we can separate these concerns.
+For example have the system map, and a db map, which contains a collection of
+all entities, scenes. Maybe map per scene? Maybe have enties in their own map,
+as a table?
+
+* TODO Think of a way to create abstraction layers
+How do we create a abstraction/position? If a component wants to be position
+(Sprite, Physics body), they need to implement an interface. For example
+
+position/set-position
+
+[:component/rectangle Component Body] event-> [:position/set-position [:exclude :component/rectangle]]
+
+Now the all components of the entity will call the :position/set-position
+implementation, exception for the sender (rectangle)

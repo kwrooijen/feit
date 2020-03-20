@@ -6,10 +6,10 @@
   opts)
 
 (def config
-  {[:component/stats :component.yeti/stats]
-   {:stats/hp 60}
+  {[:essen/entity :entity/monster :entity/yeti]
 
-   ^:dynamic
-   [:essen/entity :entity/monster :entity/yeti]
-   {:entity/components
-    [(ig/ref :component.yeti/stats)]}})
+   {:entity/components [(ig/ref :component/stats)]
+    :entity/dynamic true
+
+    [:essen/component :component/stats]
+    {:stats/hp 60}}})

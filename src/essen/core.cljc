@@ -19,12 +19,6 @@
 
 (defmethod ig/init-key :essen/const [_ opts] opts)
 
-(defn- derive-components
-  "Globally derive all components in `config` to make them available"
-  [config]
-  (doseq [k (it/find-derived-keys config :essen/component)]
-    (it/derive-composite k)))
-
 (defn add-scene-opts-ref
   "This scene ref is used to give a scene arguments. For example, if you go
   into a 'battle' scene, you can set a level, scaling all enemies in that level.
@@ -49,7 +43,6 @@
 
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
   ((:essen/setup render) config)
-  (derive-components config)
   (reset! game (update game-config :essen/config prep))
   (start-physics config))
 

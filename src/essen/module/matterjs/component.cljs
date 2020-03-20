@@ -45,5 +45,6 @@
   [_ {:component/keys [state]}]
   (matterjs.world/remove! ((:component/body state))))
 
-(derive :matterjs.component/rectangle :essen/component)
-(derive :matterjs.component/circle :essen/component)
+(def config
+  {[:essen/component :matterjs.component/rectangle] {}
+   [:essen/component :matterjs.component/circle] {}})

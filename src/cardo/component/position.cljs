@@ -37,8 +37,7 @@
         (assoc :position/x x
                :position/y y))))
 
-(derive :component/position :essen/component)
-
 (def config
-  {[:essen/handler :handler.position/move] {}
+  {[:essen/component :component/position] {}
+   [:essen/handler :handler.position/move] {}
    [:essen/handler :handler.position/set] {}})

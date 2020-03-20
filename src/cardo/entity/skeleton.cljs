@@ -6,13 +6,14 @@
   opts)
 
 (def config
-  {[:component/stats :component.skeleton/stats]
-   {:stats/hp 23}
-
-   [:component/equipment :component.skeleton/equipment] {}
-
-   ^:dynamic
-   [:essen/entity :entity/monster :entity/skeleton]
+  {[:essen/entity :entity/monster :entity/skeleton]
    {:entity/components
-    [(ig/ref :component.skeleton/stats)
-     (ig/ref :component.skeleton/equipment)]}})
+    [(ig/ref :component/stats)
+     (ig/ref :component/equipment)]
+
+    :entity/dynamic true
+
+    [:essen/component :component/stats]
+    {:stats/hp 23}
+
+    [:essen/component :component/equipment] {}}})

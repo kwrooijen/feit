@@ -1,10 +1,12 @@
 (ns essen.system.entity
   (:require
+   [clojure.set]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [essen.system :as es]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :as it.keyword]
    [essen.util :refer [vec->map]]
+   [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]))
 
 (defn path-state
@@ -35,12 +37,21 @@
         (->> (merge (ig/init-key k opts))))))
 
 (defn start [config key]
-  (let [ig-key (it/find-derived-key config key)
-        dynamic?  (:dynamic (meta ig-key))
-        v (it/find-derived-value config key)
-        key (if dynamic? (conj ig-key (it.keyword/make-child key)) key)
-        config (if dynamic? (assoc config key v) config)
+  (let [v (it/find-derived-value config key)
+        k (it/find-derived-key config key)
+        dynamic? (:entity/dynamic v)
+        key (if dynamic? (it.keyword/make-child key) key)
+
+        config (meta-merge config (dissoc v
+                                          :entity/dynamic
+                                          :entity/components
+                                          :entity/subs
+                                          :scene/opts
+                                          :entity/opts))
         config (assoc config [:it/const :entity/opts] {:entity/key key})
+
+        config (if dynamic? (clojure.set/rename-keys config {k (conj (vec (drop-last k)) key)})
+                   config)
         system (es/init config [key])]
     (with-meta
       (it/find-derived-value system key)

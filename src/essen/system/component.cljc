@@ -25,11 +25,13 @@
 
 (defmethod es/init-key :essen/component [k opts]
   (-> opts
-      (select-keys [:component/tickers :component/handlers :component/reactors])
+      (select-keys [:component/tickers
+                    :component/handlers
+                    :component/reactors
+                    :component/persistent])
       (assoc :component/key (last k)
              :component/state (or (get-persistent-state k opts)
-                                  (ig/init-key k opts))
-             :component/persistent (:persistent (meta k)))
+                                  (ig/init-key k opts)))
       (update :component/tickers vec->map :ticker/key)
       (update :component/handlers vec->map :handler/key)
       (update :component/reactors vec->map :reactor/key)))

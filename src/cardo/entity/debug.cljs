@@ -12,7 +12,6 @@
   (fn ticker-debug [{:context/keys [scene]} _ticker _state]
     (pixi.debug/draw-wireframe (matter/points) scene)))
 
-(derive :component/debug :essen/component)
 (def config
   {[:essen/entity :entity/debug]
    {:entity/components

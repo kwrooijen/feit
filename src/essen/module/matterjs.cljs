@@ -1,11 +1,12 @@
 (ns essen.module.matterjs
   (:require
    ["matter-js" :as Matter :refer [Engine World Mouse MouseConstraint]]
-   [essen.module.matterjs.component]
+   [essen.module.matterjs.component :as matterjs.component]
    [integrant.core :as ig]
    [essen.module.matterjs.state :as state]))
 
-(def config {})
+(def config
+  (merge matterjs.component/config))
 
 (defonce mouse-constraint (atom nil))
 

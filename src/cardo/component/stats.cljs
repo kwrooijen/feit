@@ -21,9 +21,9 @@
 (defmethod ig/init-key :component/stats [_ {:stats/keys [hp]}]
   {:stats/hp (* 2.3 hp)})
 
-(derive :component/stats :essen/component)
 (def config
-  {[:essen/handler :handler.stats/attack]
+  {[:essen/component :component/stats] {}
+   [:essen/handler :handler.stats/attack]
    {:handler/middleware []}
 
    [:essen/ticker :ticker.stats/poisoned] {}

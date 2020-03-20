@@ -62,11 +62,8 @@
     (set! (.-rotation sprite) rotation)
     state))
 
-;; TODO Modules should get a :module/components key (maybe). which makes sure this
-;; gets derived. It's probably not logical to define the components here.
-(derive :component.pixi/sprite :essen/component)
-
 (def config
-  {[:essen/handler :handler.pixi.sprite/play] {}
+  {[:essen/component :component.pixi/sprite] {}
+   [:essen/handler :handler.pixi.sprite/play] {}
    [:essen/handler :handler.pixi.sprite/set-pos] {}
    [:essen/handler :handler.pixi.sprite/set-rotation] {}})

@@ -41,7 +41,7 @@
         key (if dynamic? (conj ig-key (it.keyword/make-child key)) key)
         config (if dynamic? (assoc config key v) config)
         config (assoc config [:it/const :entity/opts] {:entity/key key})
-        system (it/init config [:essen/init] [key])]
+        system (es/init config [key])]
     (with-meta
       (it/find-derived-value system key)
       {:system system})))

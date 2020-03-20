@@ -10,5 +10,5 @@
 (defmethod init-key :default [k opts]
   (ig/init-key k opts))
 
-(defmethod it/init-fn :essen/init [_ k opts]
-  (init-key k opts))
+(defn init [config key]
+  (ig/build config [key] init-key ig/assert-pre-init-spec ig/resolve-key))

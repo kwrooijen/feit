@@ -26,7 +26,7 @@
    (let [config (assoc (state/config) [:it/const :scene/opts] (assoc opts :scene/key scene-key)
                        [:it/const :entity/opts] nil)]
      (->  config
-          (it/init [:essen/init] [scene-key])
+          (es/init [scene-key])
           (it/find-derived-value scene-key)
           (update :scene/entities (partial entities-fn config))
           (state/save-scene!)))))

@@ -49,3 +49,7 @@ position/set-position
 
 Now the all components of the entity will call the :position/set-position
 implementation, exception for the sender (rectangle)
+
+* TODO Overriding component defaults
+Maybe we can merge component opts by retrieving the parents opts in the base
+config.

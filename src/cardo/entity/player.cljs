@@ -4,9 +4,11 @@
    [essen.core :refer [emit!]]
    [integrant.core :as ig]))
 
-(defmethod ig/init-key :entity/player [_ opts]
-  (fn [config]
-    (assoc-in config [[:essen/component :matterjs.component/rectangle] :component/x] 100)))
+(defmethod ig/init-key :entity/player [_ _]
+  (fn entity--player [config]
+    (-> config
+        (assoc-in [:matterjs.component/rectangle :component/x] 380)
+        (assoc-in [:matterjs.component/rectangle :component/y] 100))))
 
 (defmethod component/persistent-resume :component.player/position
   [_key opts {:position/keys [x y] :as state}]
@@ -36,21 +38,21 @@
 
     :entity/subs {:entity/monster [:component/stats :component/equipment]}
 
-    [:essen/component :component/stats]
+    :component/stats
     {:component/persistent true
      :stats/hp 3}
 
-    [:essen/component :component/position]
+    :component/position
     {:position/x 200
      :position/y 300
      :component/tickers [(ig/ref :ticker.player/position)]
      :component/reactors []}
 
-    [:essen/component :component.pixi/sprite]
+    :component.pixi/sprite
     {:component/sprite [:spritesheet "adventurer-idle"]
      :component/pos {:x 200 :y 300}}
 
-    [:essen/component :matterjs.component/rectangle]
+    :matterjs.component/rectangle
     {:component/x 400
      :component/y 200
      :component/width 20

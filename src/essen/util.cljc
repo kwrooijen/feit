@@ -19,3 +19,6 @@
   (->> m
        (filter (key-ns? n))
        (into {})))
+
+(defn top-key [k]
+  (if (coll? k) (last k) k))

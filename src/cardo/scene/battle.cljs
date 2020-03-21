@@ -15,7 +15,8 @@
                     :entity/player [:component/stats]}}
 
    [:essen/scene :scene/battle]
-   {:scene/entities [:entity/player]
+   {:scene/entities [:entity/player
+                     :entity/yeti]
     :scene/keyboard {:down/p (ig/ref :keyboard/attack)}}})
 
 (defmethod ig/init-key :keyboard/attack [_ opts]

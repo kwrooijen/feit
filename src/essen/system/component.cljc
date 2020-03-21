@@ -1,7 +1,7 @@
 (ns essen.system.component
   (:require
    [integrant.core :as ig]
-   [essen.util :refer [vec->map]]
+   [essen.util :refer [vec->map top-key]]
    [essen.state :refer [persistent-components]]
    [essen.system :as es]))
 
@@ -20,8 +20,9 @@
     :entity/components component]))
 
 (defn get-persistent-state [k opts]
-  (when-let [state (get @persistent-components (last k))]
-    (persistent-resume k opts (:component/state state))))
+  (let [entity-key (-> opts :entity/opts :entity/key)]
+    (when-let [state (get @persistent-components [entity-key (top-key k)])]
+      (persistent-resume k opts (:component/state state)))))
 
 (defmethod es/init-key :essen/component [k opts]
   (-> opts
@@ -29,7 +30,7 @@
                     :component/handlers
                     :component/reactors
                     :component/persistent])
-      (assoc :component/key (last k)
+      (assoc :component/key (top-key k)
              :component/state (or (get-persistent-state k opts)
                                   (ig/init-key k opts)))
       (update :component/tickers vec->map :ticker/key)

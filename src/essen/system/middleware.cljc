@@ -1,6 +1,7 @@
 (ns essen.system.middleware
   (:require
    [essen.system :as es]
+   [essen.util :refer [top-key]]
    [essen.state :refer [get-scene]]
    [integrant.core :as ig]))
 
@@ -37,5 +38,5 @@
 
 (defmethod es/init-key :essen/middleware [k opts]
   (assoc opts
-         :middleware/key (last k)
+         :middleware/key (top-key k)
          :middleware/fn (ig/init-key k opts)))

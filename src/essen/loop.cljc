@@ -1,11 +1,9 @@
 (ns essen.loop
   (:require
    [integrant.core :as ig]
-   [essen.module.matterjs :as m]
    [essen.system.entity :as entity]
    [essen.state :as state :refer
     [get-scene
-     persistent-entities
      persistent-components
      input-messages]]
    [essen.system.component :as component]))
@@ -68,7 +66,7 @@
 (defn- save-component! [scene entity-key component-key]
   (let [component (get-in scene (component/path entity-key component-key))]
     (when (:component/persistent component)
-      (swap! persistent-components assoc component-key component))))
+      (swap! persistent-components assoc [entity-key component-key] component))))
 
 (defn- apply-message [scene {:message/keys [entity route content] :as message}]
   (let [component (-> (get-component scene message)

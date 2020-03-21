@@ -2,7 +2,7 @@
   (:require
    ["matter-js" :as Matter :refer [Bodies]]
    [essen.module.matterjs.world :as matterjs.world]
-   [essen.util :refer [keep-ns]]
+   [essen.util :refer [keep-ns top-key]]
    [integrant.core :as ig]))
 
 (defn- add-label [opts k]
@@ -22,8 +22,8 @@
 ;;     (write-all writer "#myObj \"" (:details new-obj) "\"")))
 
 (defmethod ig/init-key :matterjs.component/rectangle
-  [[_ k] {:component/keys [x y width height] :as opts}]
-  (let [body (.rectangle Bodies x y width height (body-opts opts k))]
+  [k {:component/keys [x y width height] :as opts}]
+  (let [body (.rectangle Bodies x y width height (body-opts opts (top-key k)))]
     (matterjs.world/add! body)
     {:component/body (fn [] body)}))
 
@@ -36,8 +36,8 @@
   (matterjs.world/remove! ((:component/body state))))
 
 (defmethod ig/init-key :matterjs.component/circle
-  [[_ k] {:component/keys [x y radius] :as opts}]
-  (let [body (.circle Bodies x y radius (body-opts opts k))]
+  [k {:component/keys [x y radius] :as opts}]
+  (let [body (.circle Bodies x y radius (body-opts opts (top-key k)))]
     (matterjs.world/add! body)
     {:component/body (fn [] body)}))
 

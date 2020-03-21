@@ -11,5 +11,5 @@
    {:entity/components [(ig/ref :component/stats)]
     :entity/dynamic true
 
-    [:essen/component :component/stats]
+    :component/stats
     {:stats/hp 60}}})

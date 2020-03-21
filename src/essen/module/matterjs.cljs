@@ -40,8 +40,9 @@
          (fn [event]
            (let [bodyA (.-bodyA (aget (.-pairs event) 0))
                  bodyB (.-bodyB (aget (.-pairs event) 0))]
-             (println "Collision BodyA" (.-label bodyA))
-             (println "Collision BodyB" (.-label bodyB)))))
+             ;; (println "Collision BodyA" (.-label bodyA))
+             ;; (println "Collision BodyB" (.-label bodyB))
+             )))
 
     ;; constant velocity
     ;; (set! (.. world -gravity -y) 0)

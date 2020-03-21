@@ -5,7 +5,8 @@
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :entity/player [_ opts]
-  opts)
+  (fn [config]
+    (assoc-in config [[:essen/component :matterjs.component/rectangle] :component/x] 100)))
 
 (defmethod component/persistent-resume :component.player/position
   [_key opts {:position/keys [x y] :as state}]

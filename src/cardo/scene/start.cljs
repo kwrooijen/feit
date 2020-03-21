@@ -6,8 +6,8 @@
 (defmethod ig/init-key :scene/start [_ opts]
   opts)
 
-(defmethod ig/init-key :entity.start/ball [_ opts])
-(defmethod ig/init-key :entity.start/ground [_ opts])
+(defmethod ig/init-key :entity.start/ball [_ opts] identity)
+(defmethod ig/init-key :entity.start/ground [_ opts] identity)
 
 (def config
   {[:essen/scene :scene/start]

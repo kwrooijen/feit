@@ -33,12 +33,12 @@
     (-> opts
         (update :entity/components vec->map :component/key)
         (assoc :entity/routes (routes opts)
-               :entity/key top-key)
-        (->> (merge (ig/init-key k opts))))))
+               :entity/key top-key))))
 
 (defn start [config key]
   (let [v (it/find-derived-value config key)
         k (it/find-derived-key config key)
+        v ((ig/init-key k v) v)
         dynamic? (:entity/dynamic v)
         key (if dynamic? (it.keyword/make-child key) key)
 

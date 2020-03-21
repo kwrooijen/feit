@@ -3,7 +3,7 @@
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :entity/yeti [_ opts]
-  opts)
+  identity)
 
 (def config
   {[:essen/entity :entity/monster :entity/yeti]

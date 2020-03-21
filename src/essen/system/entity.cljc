@@ -9,6 +9,14 @@
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]))
 
+(def ^:private dissocables
+  [:entity/dynamic
+   :entity/components
+   :entity/subs
+   :scene/opts
+   :context/entity
+   :context/scene])
+
 (defn path-state
   [entity component]
   [:scene/entities entity
@@ -18,11 +26,13 @@
 (defn state [{:entity/keys [components]}]
   (transform [MAP-VALS] :component/state components))
 
+(defn components->nested-handlers [components]
+  (for [{:component/keys [key handlers]} components
+        k (keys handlers)]
+    {k key}))
+
 (defn- handlers [{:entity/keys [components]}]
-  (apply merge
-         (for [{:component/keys [key handlers]} components
-               k (keys handlers)]
-           {k key})))
+  (apply merge (components->nested-handlers components)))
 
 (defmethod es/init-key :essen/entity [k opts]
   (-> opts
@@ -30,35 +40,58 @@
       (assoc :entity/handlers (handlers opts)
              :entity/key (top-key k))))
 
-(defn start [config key]
-  (let [v (it/find-derived-value config key)
-        components-replace (into {} (remove (comp (partial some nil?) flatten)
-                                               (mapv (juxt (comp (partial it/find-derived-key config) :key)
-                                                            (comp (partial it/find-derived-key v) :key)) (:entity/components v))))
-        k (it/find-derived-key config key)
-        v ((ig/init-key k v) v)
-        dynamic? (:entity/dynamic v)
-        key (if dynamic? (it.keyword/make-child key) key)
-        config (clojure.set/rename-keys config components-replace)
-        config (meta-merge config (dissoc v
-                                          :entity/dynamic
-                                          :entity/components
-                                          :entity/subs
-                                          :scene/opts
-                                          :context/entity
-                                          :context/scene))
-        config (if dynamic?
-                 (clojure.set/rename-keys config {k key})
-                 config)
-        system
-        (try (es/init config [key])
+(defn- ref->derived-key [config]
+  (comp (partial it/find-derived-key config)
+        :key))
+
+(defn- override-component-names
+  "Renames any keys in `config` to the same (or derived) keys in `entity-opts`.
+  When we merge `entity-opts` into `config`, duplicate keys will be overwritten.
+  This prevents ambiguous keys in the final result, and all component opts will
+  get properly merged."
+  [config entity-opts]
+  (->> (:entity/components entity-opts)
+       (mapv (juxt (ref->derived-key config)
+                   (ref->derived-key entity-opts)))
+       (remove (comp (partial some nil?) flatten))
+       (into {})
+       (clojure.set/rename-keys config)))
+
+(defn- try-init [config entity-key]
+        (try (es/init config [entity-key])
              (catch #?(:clj Throwable :cljs :default) t
-               (println "Failed to init entity" key
+               (println "Failed to init entity" entity-key
                         "because of key" (:key (ex-data t)))
-               (println "Reason: " (:reason (ex-data t)))))]
-    (with-meta
-      (it/find-derived-value system key)
-      {:system system})))
+               (println "Reason: " (:reason (ex-data t))))))
+
+(defn- rename-config-keys
+  "Dynamic entities generate a new key and derives from the original. The
+  original key nees to be overwritten during setup."
+  [config derived-k entity-key dynamic?]
+  (if dynamic?
+    (clojure.set/rename-keys config {derived-k entity-key})
+    config))
+
+(defn extract-system-with-meta
+  "Extract the value of the built entity, and add the system as meta data. This
+  metadata is later used for other integrant tasks."
+  [system entity-key]
+  (with-meta
+    (it/find-derived-value system entity-key)
+    {:system system}))
+
+(defn start [config key]
+  (let [entity-opts (it/find-derived-value config key)
+        derived-k (it/find-derived-key config key)
+        entity-opts ((ig/init-key derived-k entity-opts) entity-opts)
+        dynamic? (:entity/dynamic entity-opts)
+        entity-key (if dynamic? (it.keyword/make-child key) key)]
+    (-> config
+        (override-component-names entity-opts)
+        (meta-merge  (apply dissoc entity-opts dissocables))
+        (rename-config-keys derived-k entity-key dynamic?)
+        (try-init entity-key)
+        (extract-system-with-meta entity-key))))
 
 (defn halt! [entity]
   ;; TODO remove dynamic entity

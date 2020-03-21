@@ -31,8 +31,8 @@
 
 (defn setup
   [config]
-  (start-render config)
   (reset! state/config (system/prep config))
+  (start-render config)
   (start-physics config))
 
 (defn emit!

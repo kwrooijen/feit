@@ -8,12 +8,22 @@
    [integrant.core :as ig]
    [essen.render]))
 
-(defn- entities-fn [config entities]
-  (vec->map (for [entity (flatten entities)]
-              (-> config
-                  (assoc [:it/const :context/entity] entity)
-                  (entity/start entity)))
-            :entity/key))
+(defn- add-defaults
+  [m scene-key opts entity]
+  (assoc m
+         [:it/const :context/scene] scene-key
+         [:it/const :context/entity] entity
+         [:it/const :scene/opts] opts))
+
+(defn- start-entity [config scene-key opts entity]
+  (-> config
+      (add-defaults scene-key opts entity)
+      (entity/start entity)))
+
+(defn- entities-fn [entities config scene-key opts]
+  (-> (map (partial start-entity config scene-key opts)
+           (flatten entities))
+      (vec->map :entity/key)))
 
 (defmethod es/init-key :essen/scene [k opts]
   (-> (ig/init-key k opts)
@@ -26,16 +36,12 @@
    (when-not (:dev extra)
      (essen.render/init scene-key))
    (state/reset-events! scene-key)
-   (let [config (assoc @state/config
-                       [:it/const :context/scene] scene-key
-                       ;; TODO See if we can get rid of this, and not have to init scene?
-                       [:it/const :context/entity] nil
-                       [:it/const :scene/opts] opts)]
-     (->  config
-          (es/init [scene-key])
-          (it/find-derived-value scene-key)
-          (update :scene/entities (partial entities-fn config))
-          (state/save-scene!)))))
+   (-> @state/config
+       (add-defaults scene-key opts nil)
+       (es/init [scene-key])
+       (it/find-derived-value scene-key)
+       (update :scene/entities entities-fn @state/config scene-key opts)
+       (state/save-scene!))))
 
 (defn halt! [scene-key]
   (essen.render/halt! scene-key)

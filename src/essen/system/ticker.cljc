@@ -33,9 +33,7 @@
    (remove! scene entity component ticker))
   ([scene entity component ticker]
    (swap! (get-scene scene)
-          update-in
-          (path entity component)
-         dissoc ticker)))
+          update-in (path entity component) dissoc ticker)))
 
 (defmethod es/init-key :essen/ticker [k opts]
   (assoc opts

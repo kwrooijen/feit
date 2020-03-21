@@ -8,7 +8,6 @@
      input-messages]]
    [essen.system.component :as component]))
 
-
 (defn- add-component
   [components acc component]
   (assoc acc component (get-in components [component :component/state])))
@@ -93,7 +92,8 @@
 (defn- apply-key-events [{:scene/keys [key keyboard] :as scene}]
   (swap! (get @input-messages key)
          (fn [events]
-           (doall (map (partial apply-key-event scene keyboard) events))
+           (doseq [event events]
+             (apply-key-event scene keyboard event))
            [])))
 
 (defn- threshold-reached [key]
@@ -101,20 +101,21 @@
   ;; TODO add debugging info
   :threshold-reached)
 
+(defn run-scene [{:keys [scene/key] :as scene} delta time]
+  (let [messages (get @state/messages key)]
+    (apply-key-events scene)
+    (apply-tickers scene delta time)
+    (loop [scene scene
+           todo-messages @messages
+           threshold 30]
+      (if (zero? threshold)
+        (threshold-reached key)
+        (do
+          (reset! messages [])
+          (let [new-scene (reduce apply-message scene todo-messages)]
+            (if (empty? @messages)
+              new-scene
+              (recur new-scene @messages (dec threshold)))))))))
+
 (defn run [scene-key delta time]
-  (swap! (get-scene scene-key)
-         (fn [scene]
-           (let [messages (get @state/messages scene-key)]
-             (apply-key-events scene)
-             (apply-tickers scene delta time)
-             (loop [scene scene
-                    todo-messages @messages
-                    threshold 30]
-               (if (zero? threshold)
-                 (threshold-reached scene-key)
-                 (do
-                   (reset! messages [])
-                   (let [new-scene (reduce apply-message scene todo-messages)]
-                     (if (empty? @messages)
-                       new-scene
-                       (recur new-scene @messages (dec threshold)))))))))))
+  (swap! (get-scene scene-key) run-scene delta time))

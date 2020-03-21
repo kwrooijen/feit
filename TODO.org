@@ -15,14 +15,15 @@ and the component state should decide whether or not it's activated?
 Add tickers. These are "handlers" that reacto to delta/time
 * TODO Link - fn ; Links can be attached to handlers, to extend "generic"
 Do we really need this?
-* TODO How do we make components more modular between entities?
+* DONE How do we make components more modular between entities?
 Currently in order to re-use a component, we need to re-define it for each
 entity, and define all its handlers, reactors, and tickers, even if there are
 default handlers. Also if you have a collection of monsters (group), they will
 reuse the same component.
 ** SOLUTION
-Each entity is its own system. Init with all their required components. Also use
-prep-key on components to reference default handler / reactors etc
+Each entity is its own system. Init with all their required components. ~Also use
+prep-key on components to reference default handler / reactors etc~
+Look at DONE: Overriding component defaults
 * TODO Use local hierarchies create inheritence
 For example:
 Entity Hierarchy
@@ -50,7 +51,10 @@ position/set-position
 Now the all components of the entity will call the :position/set-position
 implementation, exception for the sender (rectangle)
 
-* TODO Overriding component defaults
+* DONE Overriding component defaults
 Maybe we can merge component opts by retrieving the parents opts in the base
 config. We need to
 * DONE When merging components, change the component key in the base config to the new key
+* TODO Add exclude/handler exclude/ticker exclude/reactor exclude/middleware?
+Allow entities to exclude certain parts of a component, that would allow for
+overriding. How do we exclude middleware? Since it's part of handlers.

@@ -3,17 +3,7 @@
    [essen.module.pixi.state :refer [state sheets textures animations]]
    ["pixi.js" :as PIXI]
    [clojure.spec.alpha :as s]
-   [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]))
-
-;; (defmethod ig/pre-init-spec :component.pixi/sprite [_]
-;;   (s/keys :req [:component.pixi/spritesheet]))
-
-(defmethod ig/prep-key :component.pixi/sprite [_ opts]
-  (meta-merge opts
-              {:component/handlers [(ig/ref :handler.pixi.sprite/play)
-                                    (ig/ref :handler.pixi.sprite/set-pos)
-                                    (ig/ref :handler.pixi.sprite/set-rotation)]}))
 
 (defmethod ig/init-key :component.pixi/sprite
   [_ {:component/keys [sprite pos] :as opts}]
@@ -63,7 +53,10 @@
     state))
 
 (def config
-  {[:essen/component :component.pixi/sprite] {}
+  {[:essen/component :component.pixi/sprite]
+   {:component/handlers [(ig/ref :handler.pixi.sprite/play)
+                         (ig/ref :handler.pixi.sprite/set-pos)
+                         (ig/ref :handler.pixi.sprite/set-rotation)]}
    [:essen/handler :handler.pixi.sprite/play] {}
    [:essen/handler :handler.pixi.sprite/set-pos] {}
    [:essen/handler :handler.pixi.sprite/set-rotation] {}})

@@ -49,8 +49,15 @@
     (assoc acc k (merge v default-keys))
     (assoc acc k v)))
 
+(defn add-context-to-entities [config]
+  (->> (for [[entity-key entity-value] (ig/find-derived config :essen/entity)]
+         [entity-key (reduce-kv add-context {} entity-value)])
+       (into {})
+       (merge config)))
+
 (defn prep [config]
   (->> config
+       (add-context-to-entities)
        (reduce-kv add-context {})
        (ig/prep)))
 

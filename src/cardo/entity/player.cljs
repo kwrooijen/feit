@@ -11,20 +11,20 @@
         (assoc-in [:matterjs.component/rectangle :component/y] 100))))
 
 (defmethod component/persistent-resume :component.player/position
-  [_key opts {:position/keys [x y] :as state}]
+  [_key {:context/keys [scene entity]} {:position/keys [x y] :as state}]
   ;; TODO separate opts and context
-  (emit! opts :handler.pixi.sprite/set-pos {:event/x x :event/y y})
+  (emit! scene entity :handler.pixi.sprite/set-pos {:event/x x :event/y y})
   state)
 
-(defmethod ig/init-key :ticker.player/position [_ opts]
+(defmethod ig/init-key :ticker.player/position [_ {:context/keys [scene entity]}]
   (fn ticker-player--position
-    [context _tick _state
+    [_subs _component _tick _state
      {:matterjs.component/keys [rectangle]}]
     (let [body ((:component/body rectangle))
           event {:event/x (.. body -position -x)
                  :event/y (.. body -position -y)}]
-      (emit! context :handler.pixi.sprite/set-pos event)
-      (emit! context :handler.pixi.sprite/set-rotation {:event/rotation (.-angle body)}))))
+      (emit! scene entity :handler.pixi.sprite/set-pos event)
+      (emit! scene entity :handler.pixi.sprite/set-rotation {:event/rotation (.-angle body)}))))
 
 (def config
   {[:essen/entity :entity/player]

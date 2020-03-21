@@ -39,17 +39,17 @@
   (essen.dev/resume config/config))
 
 (comment
-  (ticker/remove! :scene/start
+  (ticker/remove! :scene/battle
                   :entity/player
                   :component/stats
                   :ticker.stats/poisoned)
 
-  (ticker/add! :scene/start
+  (ticker/add! :scene/battle
                :entity/player
                :component/stats
                :ticker.stats/poisoned
-               {:ticker/ticks 2
-                :ticker/damage 30})
+               {:ticker/ticks 40
+                :ticker/damage 2})
 
   (middleware/add! :scene/start
                    :entity/player

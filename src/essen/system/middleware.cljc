@@ -21,11 +21,14 @@
   ([{:context/keys [scene entity component]} handler middleware opts]
    (add! scene entity component handler middleware opts))
   ([scene entity component handler middleware opts]
-   (swap! (get-scene scene)
-          assoc-in
-          (path entity component handler middleware)
-          {:middleware/key middleware
-           :middleware/fn (ig/init-key middleware opts)})))
+   (let [context {:context/scene scene
+                  :context/entity entity}
+         opts (merge opts context)]
+     (swap! (get-scene scene)
+            assoc-in
+            (path entity component handler middleware)
+            {:middleware/key middleware
+             :middleware/fn (ig/init-key middleware opts)}))))
 
 (defn remove!
   ([{:context/keys [scene entity component]} handler middleware]

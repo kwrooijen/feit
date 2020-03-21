@@ -19,11 +19,14 @@
   ([{:context/keys [scene entity component]} ticker opts]
    (add! scene entity component ticker opts))
   ([scene entity component ticker opts]
-   (swap! (get-scene scene)
-          assoc-in
-          (path entity component ticker)
-          {:ticker/key ticker
-           :ticker/fn (ig/init-key ticker opts)})))
+   (let [context {:context/scene scene
+                  :context/entity entity}
+         opts (merge opts context)]
+     (swap! (get-scene scene)
+            assoc-in
+            (path entity component ticker)
+            {:ticker/key ticker
+             :ticker/fn (ig/init-key ticker opts)}))))
 
 (defn remove!
   ([{:context/keys [scene entity component]} ticker]

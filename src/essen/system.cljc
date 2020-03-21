@@ -1,7 +1,7 @@
 (ns essen.system
   (:require
    [clojure.walk :refer [postwalk]]
-   [com.rpl.specter :as specter :refer [MAP-VALS ALL LAST] :refer-macros [transform]]
+   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 
@@ -28,8 +28,8 @@
   know which entity / scene they belong to."
   [config]
   (->> (ig/find-derived config :essen/entity)
-       (transform [ALL LAST MAP-VALS] add-context)
        (into {})
+       (transform [MAP-VALS MAP-VALS] add-context)
        (merge config)))
 
 (defmulti init-key

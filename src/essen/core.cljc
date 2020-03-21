@@ -18,9 +18,9 @@
 
 (defn- start-physics [config]
   (-> config
-      (ig/prep [:matterjs/start])
-      (ig/init [:matterjs/start])
-      (it/find-derived-value :matterjs/start)
+      (ig/prep [:essen.physics/start])
+      (ig/init [:essen.physics/start])
+      (it/find-derived-value :essen.physics/start)
       (rr/add-ticker :essen/physics)))
 
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]

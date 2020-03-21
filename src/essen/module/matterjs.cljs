@@ -26,6 +26,7 @@
 (defn run [_delta]
   (.update Engine @state/engine (/ 1000 60) 1))
 
+(derive :matterjs/start :essen.physics/start)
 (defmethod ig/init-key :matterjs/start [_ opts]
   (let [canvas (.getElementById js/document "game")
         engine  (.create Engine (clj->js {:render {:canvas canvas

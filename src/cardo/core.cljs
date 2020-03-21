@@ -32,10 +32,10 @@
 
   (scene/start! :scene/load))
 
-(defn stop []
+(defn suspend! []
   (essen.dev/suspend!))
 
-(defn start []
+(defn resume []
   (essen.dev/resume config/config))
 
 (comment

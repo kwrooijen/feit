@@ -22,7 +22,7 @@
     (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
     (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))
 
-  (scene/stop! (-> opts :scene/opts :scene/key))
+  (scene/halt! (-> opts :scene/opts :scene/key))
   (scene/start! transition))
 
 (defmethod ig/pre-init-spec ::load-spritesheet [_]
@@ -42,6 +42,6 @@
 (def module
   {:essen/setup render/setup
    :essen/stage-start render/stage-start
-   :essen/stage-stop render/stage-stop
+   :essen/stage-halt render/stage-halt
    :essen/stage-resume render/stage-resume
    :essen/stage-suspend render/stage-suspend})

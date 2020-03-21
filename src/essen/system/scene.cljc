@@ -31,10 +31,10 @@
           (update :scene/entities (partial entities-fn config))
           (state/save-scene!)))))
 
-(defn stop! [scene-key]
-  (essen.render/run scene-key :essen/stage-stop)
+(defn halt! [scene-key]
+  (essen.render/run scene-key :essen/stage-halt)
   (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
-    (entity/stop! entity))
+    (entity/halt! entity))
   (state/reset-events! scene-key)
   (state/reset-state! scene-key))
 

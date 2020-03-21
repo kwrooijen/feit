@@ -3,8 +3,8 @@
                 :output-dir "resources/public/js/compiled"
                 :asset-path "/js/compiled"
                 :modules {:app {:entries [cardo.core]}}
-                :devtools {:before-load cardo.core/stop
-                           :after-load cardo.core/start
+                :devtools {:before-load cardo.core/suspend!
+                           :after-load cardo.core/resume
                            :http-root "resources/public"
                            :http-port 3449}}
           :prod {:target :browser

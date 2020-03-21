@@ -31,6 +31,10 @@
   [_ {:component/keys [state]}]
   (matterjs.world/remove! ((:component/body state))))
 
+(defmethod ig/halt-key! :matterjs.component/rectangle
+  [_ {:component/keys [state]}]
+  (matterjs.world/remove! ((:component/body state))))
+
 (defmethod ig/init-key :matterjs.component/circle
   [[_ k] {:component/keys [x y radius] :as opts}]
   (let [body (.circle Bodies x y radius (body-opts opts k))]

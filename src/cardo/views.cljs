@@ -13,7 +13,7 @@
    [:div (str (select-keys (entity :scene/start :entity/player)
                            [:component.player/stats
                             :component.player/position]))]
-   [:div {:on-click #(do (scene/stop! :scene/start)
+   [:div {:on-click #(do (scene/halt! :scene/start)
                          (scene/start! :scene/battle {:enemies 10}))}
     "To battle!"]])
 
@@ -21,7 +21,7 @@
   [:div {:style {:color :white}}
    [:div "Battle!"]
    [:div (str (entities :scene/battle :essen/entity))]
-   [:div {:on-click  #(do (scene/stop! :scene/battle)
+   [:div {:on-click  #(do (scene/halt! :scene/battle)
                           (scene/start! :scene/start))}
     "Retreat!"]
    [:div

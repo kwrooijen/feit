@@ -66,7 +66,7 @@
   (setup-stage stage-key)
   (swap! state update-in [:pixi/running-stages] conj stage-key))
 
-(defn stage-stop [_config stage-key]
+(defn stage-halt [_config stage-key]
   (-> (:pixi/ticker @state)
       (.remove (get @tickers stage-key)))
   (.destroy (container stage-key))

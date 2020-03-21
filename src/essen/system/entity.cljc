@@ -57,7 +57,7 @@
       (it/find-derived-value system key)
       {:system system})))
 
-(defn stop! [entity]
+(defn halt! [entity]
   (ig/halt! (:system (meta entity))))
 
 (defn suspend! [entity]

@@ -61,6 +61,7 @@
       {:system system})))
 
 (defn halt! [entity]
+  ;; TODO remove dynamic entity
   (ig/halt! (:system (meta entity))))
 
 (defn suspend! [entity]

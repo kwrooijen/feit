@@ -1,8 +1,18 @@
-{:lein true
+{:source-paths ["src" "test"]
+ :dependencies
+ [[reagent "0.8.1"]
+  [spec-signature "0.2.0"]
+  [integrant "0.8.0"]
+  [meta-merge "1.0.0"]
+  [integrant-tools "0.3.2"]
+  [com.rpl/specter "1.1.3"]]
+
  :builds {:dev {:target :browser
                 :output-dir "resources/public/js/compiled"
                 :asset-path "/js/compiled"
                 :modules {:app {:entries [cardo.core]}}
+                :dependencies [[binaryage/devtools "0.9.10"]
+                               [com.cemerick/pomegranate "1.1.0"]]
                 :devtools {:before-load cardo.core/suspend!
                            :after-load cardo.core/resume
                            :http-root "resources/public"

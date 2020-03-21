@@ -12,3 +12,4 @@
 /.lein-failures
 /.lein-repl-history
 /.clj-kondo/.cache/
+/.cpcache

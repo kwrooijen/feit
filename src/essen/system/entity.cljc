@@ -50,7 +50,7 @@
                                           :entity/opts))
         config (assoc config [:it/const :entity/opts] {:entity/key key})
 
-        config (if dynamic? (clojure.set/rename-keys config {k (conj (vec (drop-last k)) key)})
+        config (if dynamic? (clojure.set/rename-keys config {k key})
                    config)
         system (es/init config [key])]
     (with-meta

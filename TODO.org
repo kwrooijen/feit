@@ -24,7 +24,7 @@ reuse the same component.
 Each entity is its own system. Init with all their required components. ~Also use
 prep-key on components to reference default handler / reactors etc~
 Look at DONE: Overriding component defaults
-* TODO Use local hierarchies create inheritence
+* TODO Use local hierarchies create inheritence -- Maybe not?
 For example:
 Entity Hierarchy
 #+BEGIN_SRC clojure

@@ -1,6 +1,7 @@
 (ns essen.module.pixi.render
   (:require
    ["pixi.js" :as PIXI :refer [Renderer Container Ticker]]
+   [integrant.core :as ig]
    [essen.loop]
    [essen.module.pixi.state :refer [state]]))
 
@@ -16,7 +17,7 @@
   (get-in @state (path-container stage-key)))
 
 (defn setup-renderer
-  [{:renderer/keys [view width height resolution auto-dencity]
+  [{:pixi.renderer/keys [view width height resolution auto-dencity]
     :or {view        "app"
          width       (.-innerWidth js/window)
          height      (.-innerHeight js/window)
@@ -30,7 +31,7 @@
               :width       width
               :height      height
               :transparent true
-              ;; For some reason this doubles screen width
+              ;; For some reason this resolution doubles screen width
               ;; :resolution  resolution
               :autoDencity auto-dencity})))
 
@@ -54,26 +55,27 @@
 (defn start-loop [stage-key]
   (add-ticker (partial animate stage-key) stage-key))
 
-(defn setup [{:game/keys [renderer stages]}]
+(defmethod ig/init-key :essen.module/pixi [_ opts]
   (.addEventListener js/window "resize" handler-resize)
-  (setup-renderer renderer)
+  (setup-renderer opts)
   (js/setTimeout #(handler-resize) 100)
-  (swap! state assoc-in [:pixi/stage-config] stages)
   (swap! state assoc-in [:pixi/running-stages] #{}))
 
-(defn stage-start [config stage-key]
-  (start-loop stage-key)
-  (setup-stage stage-key)
-  (swap! state update-in [:pixi/running-stages] conj stage-key))
+(defmethod ig/init-key :essen.module.spawn/pixi [_ {:essen/keys [scene]}]
+  (start-loop scene)
+  (setup-stage scene)
+  (swap! state update-in [:pixi/running-stages] conj scene))
 
-(defn stage-halt [_config stage-key]
+(defmethod ig/halt-key! :essen.module.spawn/pixi [_ {:essen/keys [scene]}]
   (-> (:pixi/ticker @state)
-      (.remove (get @tickers stage-key)))
-  (.destroy (container stage-key))
+      (.remove (get @tickers scene)))
+  (.destroy (container scene))
   (.clear (renderer))
-  (swap! state update-in [:pixi/stage] dissoc stage-key)
-  (swap! state update-in [:pixi/running-stages] disj stage-key))
+  (swap! state update-in [:pixi/stage] dissoc scene)
+  (swap! state update-in [:pixi/running-stages] disj scene))
 
-(defn stage-suspend [config stage-key])
+(defmethod ig/suspend-key! :essen.module.spawn/pixi [_ opts]
+  opts)
 
-(defn stage-resume [config stage-key])
+(defmethod ig/resume-key :essen.module.spawn/pixi [key opts old-opts old-impl]
+  opts)

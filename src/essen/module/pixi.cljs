@@ -5,7 +5,7 @@
    [integrant.core :as ig]
    [essen.system.scene :as scene]
    [essen.module.pixi.state :as state :refer [sheets textures animations]]
-   [essen.module.pixi.render :as render]
+   [essen.module.pixi.render]
    [essen.module.pixi.component.sprite :as component.sprite]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]))
 
@@ -39,9 +39,6 @@
   (merge
    component.sprite/config))
 
-(def module
-  {:essen/setup render/setup
-   :essen/stage-start render/stage-start
-   :essen/stage-halt render/stage-halt
-   :essen/stage-resume render/stage-resume
-   :essen/stage-suspend render/stage-suspend})
+(derive :essen.module/pixi :essen.module/render)
+(derive :essen.module.spawn/pixi :essen.module.spawn/render)
+

@@ -12,7 +12,7 @@
 
 (defonce systems (atom {}))
 
-(defonce game (atom {}))
+(defonce config (atom {}))
 
 (defonce messages (atom {}))
 
@@ -46,6 +46,3 @@
 
 (defn system [scene-key]
   (get-in @systems [:essen/scenes scene-key]))
-
-(defn config []
-  (:essen/config @game))

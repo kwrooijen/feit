@@ -2,7 +2,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
-   [essen.state :as state :refer [messages game]]
+   [essen.state :as state]
    [essen.system :as system]
    [essen.system.component]
    [essen.system.handler]
@@ -17,23 +17,28 @@
    [spec-signature.core :refer-macros [sdef]]
    [essen.module.pixi.render :as rr]))
 
+(defn- start-render [config]
+  (-> config
+      (ig/prep [:essen.module/render])
+      (ig/init [:essen.module/render])))
+
 (defn- start-physics [config]
   (-> config
-      (ig/prep [:essen.physics/start])
-      (ig/init [:essen.physics/start])
-      (it/find-derived-value :essen.physics/start)
+      (ig/prep [:essen.module/physics])
+      (ig/init [:essen.module/physics])
+      (it/find-derived-value :essen.module/physics)
       (rr/add-ticker :essen/physics)))
 
 (defn setup
-  [{:keys [:essen/config :essen.module/render] :as game-config}]
-  ((:essen/setup render) config)
-  (reset! game (update game-config :essen/config system/prep))
+  [config]
+  (start-render config)
+  (reset! state/config (system/prep config))
   (start-physics config))
 
 (defn emit!
   "Emit a message with `content` to an `entity`'s `handler` in `scene`"
   ([scene entity handler content]
-   (swap! (get @messages scene)
+   (swap! (get @state/messages scene)
           conj {:message/entity entity
                 :message/handler handler
                 :message/content content})))

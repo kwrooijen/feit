@@ -5,7 +5,7 @@
    [essen.core :as essen :refer [emit!]]
    [essen.dev]
    [essen.module.cljs.keyboard :as keyboard]
-   [essen.module.pixi :as pixi]
+   [essen.module.pixi]
    [essen.module.matterjs]
    [essen.system.middleware :as middleware]
    [essen.system.scene :as scene]
@@ -23,9 +23,7 @@
 (defn ^:export init []
   (dev-setup)
   (mount-root)
-  (essen/setup
-   {:essen.module/render pixi/module
-    :essen/config config/config})
+  (essen/setup config/config)
 
   (keyboard/disable-tabbing!)
   (keyboard/add-event-listeners!)

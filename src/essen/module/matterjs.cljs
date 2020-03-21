@@ -26,8 +26,10 @@
 (defn run [_delta]
   (.update Engine @state/engine (/ 1000 60) 1))
 
-(derive :matterjs/start :essen.physics/start)
-(defmethod ig/init-key :matterjs/start [_ opts]
+(derive :essen.module/matterjs :essen.module/physics)
+(derive :essen.module.spawn/matterjs :essen.module.spawn/physics)
+
+(defmethod ig/init-key :essen.module/matterjs [_ opts]
   (let [canvas (.getElementById js/document "game")
         engine  (.create Engine (clj->js {:render {:canvas canvas
                                                    :width (.-width canvas)

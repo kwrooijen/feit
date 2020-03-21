@@ -24,9 +24,9 @@
   ([scene-key opts] (start! scene-key opts {}))
   ([scene-key opts extra]
    (when-not (:dev extra)
-     (essen.render/run scene-key :essen/stage-start))
+     (essen.render/init scene-key))
    (state/reset-events! scene-key)
-   (let [config (assoc (state/config)
+   (let [config (assoc @state/config
                        [:it/const :context/scene] scene-key
                        ;; TODO See if we can get rid of this, and not have to init scene?
                        [:it/const :context/entity] nil
@@ -38,10 +38,8 @@
           (state/save-scene!)))))
 
 (defn halt! [scene-key]
-  (essen.render/run scene-key :essen/stage-halt)
+  (essen.render/halt! scene-key)
   (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
     (entity/halt! entity))
   (state/reset-events! scene-key)
   (state/reset-state! scene-key))
-
-;; TODO Need to implement halt / suspend / resume properly

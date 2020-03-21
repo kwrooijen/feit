@@ -1,6 +1,27 @@
 (ns essen.render
   (:require
-   [essen.state :as state :refer [game]]))
+   [integrant.core :as ig]
+   [essen.state :as state]))
 
-(defn run [scene-key type]
-  ((-> @game :essen.module/render type) (:essen/config @game) scene-key))
+(defn render-key []
+  (first (descendants :essen.module.spawn/render)))
+
+(defn init [scene-key]
+  (ig/init-key (render-key)
+               {:essen/config @state/config
+                :essen/scene scene-key}))
+
+(defn halt! [scene-key]
+  (ig/halt-key! (render-key)
+                {:essen/config @state/config
+                 :essen/scene scene-key}))
+
+(defn resume [scene-key]
+  (ig/resume-key (render-key)
+                  {:essen/config @state/config
+                   :essen/scene scene-key}))
+
+(defn suspend! [scene-key]
+  (ig/suspend-key! (render-key)
+                   {:essen/config @state/config
+                    :essen/scene scene-key}))

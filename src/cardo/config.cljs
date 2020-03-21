@@ -21,13 +21,13 @@
 
 (def config
   (merge
-   {:game/renderer {:renderer/view "game"
-                    :renderer/width (.-innerWidth js/window)
-                    :renderer/height (.-innerHeight js/window)
-                    :renderer/resolution (.-devicePixelRatio js/window)
-                    :renderer/autoDencity true}
+   {:essen.module/pixi {:pixi.renderer/view "game"
+                        :pixi.renderer/width (.-innerWidth js/window)
+                        :pixi.renderer/height (.-innerHeight js/window)
+                        :pixi.renderer/resolution (.-devicePixelRatio js/window)
+                        :pixi.renderer/autoDencity true}
 
-    :matterjs/start {}}
+    :essen.module/matterjs {}}
 
    scene.load/config
    scene.start/config

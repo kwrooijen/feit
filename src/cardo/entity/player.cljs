@@ -12,9 +12,8 @@
 
 (defmethod component/persistent-resume :component.player/position
   [_key opts {:position/keys [x y] :as state}]
-  (emit!  (-> opts :scene/opts :scene/key)
-          (-> opts :entity/opts :entity/key)
-          :handler.pixi.sprite/set-pos {:event/x x :event/y y})
+  ;; TODO separate opts and context
+  (emit! opts :handler.pixi.sprite/set-pos {:event/x x :event/y y})
   state)
 
 (defmethod ig/init-key :ticker.player/position [_ opts]

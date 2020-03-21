@@ -6,9 +6,8 @@
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :component.pixi/sprite
-  [_ {:component/keys [sprite pos] :as opts}]
-  (let [scene-key (-> opts :scene/opts :scene/key)
-        container (get-in @state [:pixi/stage scene-key :stage/container])
+  [_ {:context/keys [scene] :component/keys [sprite pos]}]
+  (let [container (get-in @state [:pixi/stage scene :stage/container])
         textures (get-in @animations sprite)
         sprite (PIXI/AnimatedSprite. textures)]
     (set! (.-animationSpeed sprite) 0.167)

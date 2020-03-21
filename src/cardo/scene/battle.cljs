@@ -19,7 +19,7 @@
                      :entity/yeti]
     :scene/keyboard {:down/p (ig/ref :keyboard/attack)}}})
 
-(defmethod ig/init-key :keyboard/attack [_ opts]
-  (fn [{:context/keys [scene subs]}]
+(defmethod ig/init-key :keyboard/attack [_ {:context/keys [scene]}]
+  (fn [{:context/keys [subs]}]
     (doseq [[k _] subs]
       (emit! scene k :handler.stats/attack {:event/damage 2}))))

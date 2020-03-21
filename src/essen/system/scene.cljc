@@ -9,8 +9,11 @@
    [essen.render]))
 
 (defn- entities-fn [config entities]
-  (-> (map (partial entity/start config) (flatten entities))
-      (vec->map :entity/key)))
+  (vec->map (for [entity (flatten entities)]
+              (-> config
+                  (assoc [:it/const :context/entity] entity)
+                  (entity/start entity)))
+            :entity/key))
 
 (defmethod es/init-key :essen/scene [k opts]
   (-> (ig/init-key k opts)
@@ -24,8 +27,10 @@
      (essen.render/run scene-key :essen/stage-start))
    (state/reset-events! scene-key)
    (let [config (assoc (state/config)
-                       [:it/const :scene/opts] (assoc opts :scene/key scene-key)
-                       [:it/const :entity/opts] nil)]
+                       [:it/const :context/scene] scene-key
+                       ;; TODO See if we can get rid of this, and not have to init scene?
+                       [:it/const :context/entity] nil
+                       [:it/const :scene/opts] opts)]
      (->  config
           (es/init [scene-key])
           (it/find-derived-value scene-key)

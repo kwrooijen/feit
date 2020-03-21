@@ -14,6 +14,7 @@
     (entity/suspend! entity)))
 
 (defn resume [config]
+  ;; TODO add derive-composite-all
   (swap! game assoc :essen/config (essen.core/prep config))
   (doseq [scene-key (scenes)]
     ;; TODO resume instead of start ?

@@ -2,9 +2,9 @@
   (:require
    [integrant.core :as ig]))
 
-(defmethod ig/init-key :handler.stats/attack [_ _opts]
+(defmethod ig/init-key :handler.stats/attack [_ {:context/keys [entity]}]
   (fn handler-stats--attack
-    [{:context/keys [entity _subs]}
+    [_context
      {:event/keys [damage invincible?] :as _event}
      {:stats/keys [hp] :as state}
      _entity-state]

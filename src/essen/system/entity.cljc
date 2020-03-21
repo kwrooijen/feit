@@ -32,8 +32,9 @@
 
 (defn start [config key]
   (let [v (it/find-derived-value config key)
-        components-replace (into {} (remove (comp nil? first) (mapv (juxt (comp (partial it/find-derived-key config) :key)
-                                                                          (comp (partial it/find-derived-key v) :key)) (:entity/components v))))
+        components-replace (into {} (remove (comp (partial some nil?) flatten)
+                                               (mapv (juxt (comp (partial it/find-derived-key config) :key)
+                                                            (comp (partial it/find-derived-key v) :key)) (:entity/components v))))
         k (it/find-derived-key config key)
         v ((ig/init-key k v) v)
         dynamic? (:entity/dynamic v)
@@ -44,8 +45,8 @@
                                           :entity/components
                                           :entity/subs
                                           :scene/opts
-                                          :entity/opts))
-        config (assoc config [:it/const :entity/opts] {:entity/key key})
+                                          :context/entity
+                                          :context/scene))
         config (if dynamic?
                  (clojure.set/rename-keys config {k key})
                  config)

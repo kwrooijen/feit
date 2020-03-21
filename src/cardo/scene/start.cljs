@@ -17,18 +17,20 @@
                      :entity.start/ball]}
 
    [:essen/entity :entity.start/ball]
-   {:entity/components [(ig/ref :component.start/ball)]
+   {:entity/components [(ig/ref :component.start/ball)]}
 
-    [:matterjs.component/circle :component.start/ball]
-    {:component/x 400
-     :component/y 200
-     :component/radius 100
-     :component.opts/restitution 0.5
-     :component.opts/friction 0
-     :component.opts/frictionAir 0}}
+   [:matterjs.component/circle :component.start/ball]
+   {:component/x 400
+    :component/y 200
+    :component/radius 100
+    :component.opts/restitution 0.5
+    :component.opts/friction 0
+    :component.opts/frictionAir 0}
+
 
    [:essen/entity :entity.start/ground]
    {:entity/components [(ig/ref :component.start/ground)]
+
     [:matterjs.component/rectangle :component.start/ground]
     {:component/x 400
      :component/y 600

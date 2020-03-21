@@ -12,30 +12,46 @@
    [essen.system.scene]
    [essen.system.ticker]
    [integrant-tools.core :as it]
+   [integrant-tools.keyword :as it.keyword]
    [integrant.core :as ig]
    [essen.render]
    [spec-signature.core :refer-macros [sdef]]
    [essen.module.pixi.render :as rr]))
 
-(defn- derive-composite-from
-  "Globally composite-derive all keys in `config` that derive from `key`"
-  [config key]
-  (doseq [k (it/find-derived-keys config key)]
-    (it/derive-composite k)))
+(defn- entity-keys
+  "Get all top level keys of every entity system"
+  [config]
+  (->> :essen/entity
+       (it/find-derived-values config)
+       (map keys)
+       (apply concat)))
 
-(defn add-scene-opts-ref
-  "This scene ref is used to give a scene arguments. For example, if you go
-  into a 'battle' scene, you can set a level, scaling all enemies in that level.
-  Or you can set the amount of enemies in a scene."
+(defn- derive-composite-all
+  "Globally composite-derive all keys in `config` that derive from `key`"
+  [config]
+  (doseq [k (keys config)]
+    (when (coll? k) (it/derive-composite k)))
+
+  (doseq [k (entity-keys config)]
+    (when (coll? k)
+      (it/derive-composite k))))
+
+(def ^:private default-keys
+  {:context/entity (ig/ref :context/entity)
+   :context/scene (ig/ref :context/scene)
+   :scene/opts (ig/ref :scene/opts)})
+
+(defn add-context
+  "Add a refence to context for all keys. This is necessary so that components
+  know which entity / scene they belong to."
   [acc k v]
-  (assoc acc k
-         (cond-> v
-           (map? v) (assoc :scene/opts (ig/ref :scene/opts)
-                           :entity/opts (ig/ref :entity/opts)))))
+  (if (and (map? v))
+    (assoc acc k (merge v default-keys))
+    (assoc acc k v)))
 
 (defn prep [config]
   (->> config
-       (reduce-kv add-scene-opts-ref {})
+       (reduce-kv add-context {})
        (ig/prep)))
 
 (defn- start-physics [config]
@@ -47,8 +63,7 @@
 
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
   ((:essen/setup render) config)
-  (derive-composite-from config :essen/component)
-  (derive-composite-from config :essen/entity)
+  (derive-composite-all config)
   (reset! game (update game-config :essen/config prep))
   (start-physics config))
 

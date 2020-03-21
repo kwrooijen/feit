@@ -19,10 +19,9 @@
    [:scene/entities entity
     :entity/components component]))
 
-(defn get-persistent-state [k opts]
-  (let [entity-key (-> opts :entity/opts :entity/key)]
-    (when-let [state (get @persistent-components [entity-key (top-key k)])]
-      (persistent-resume k opts (:component/state state)))))
+(defn get-persistent-state [k {:context/keys [entity] :as opts}]
+  (when-let [state (get @persistent-components [entity (top-key k)])]
+    (persistent-resume k opts (:component/state state))))
 
 (defmethod es/init-key :essen/component [k opts]
   (-> opts

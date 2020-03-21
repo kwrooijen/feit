@@ -11,8 +11,8 @@
   [:div {:style {:color :white}}
    [:div "Starting..."]
    [:div (str (select-keys (entity :scene/start :entity/player)
-                           [:component.player/stats
-                            :component.player/position]))]
+                           [:component/stats
+                            :component/position]))]
    [:div {:on-click #(do (scene/halt! :scene/start)
                          (scene/start! :scene/battle {:enemies 10}))}
     "To battle!"]])

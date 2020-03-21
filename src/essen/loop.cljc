@@ -24,23 +24,23 @@
 (defn- get-subs [entity entities]
   (subs-states entities (-> entities entity :entity/subs)))
 
-(defn- get-component [scene {:message/keys [entity route]}]
-  (->> (get-in scene [:scene/entities entity :entity/routes route])
+(defn- get-component [scene {:message/keys [entity handler]}]
+  (->> (get-in scene [:scene/entities entity :entity/handlers handler])
        (component/path entity)
        (get-in scene)))
 
-(defn- get-middleware [component route]
-  (get-in component [:component/handlers route :handler/middleware]))
+(defn- get-middleware [component handler]
+  (get-in component [:component/handlers handler :handler/middleware]))
 
 (defn- apply-middleware
   [subs state event [_ middleware] entity-state]
   ((:middleware/fn middleware) subs event state entity-state))
 
 (defn- preprocess-event
-  [{:component/keys [state] :as component} subs route content entity-state]
+  [{:component/keys [state] :as component} subs handler content entity-state]
   (reduce (partial apply-middleware subs state entity-state)
           content
-          (get-middleware component route)))
+          (get-middleware component handler)))
 
 (defn- apply-reactors!
   [{:component/keys [reactors]} subs event old-state new-state entity-state]
@@ -58,13 +58,13 @@
     (when (:component/persistent component)
       (swap! persistent-components assoc [entity-key component-key] component))))
 
-(defn- apply-message [scene {:message/keys [entity route content] :as message}]
+(defn- apply-message [scene {:message/keys [entity handler content] :as message}]
   (let [component (-> (get-component scene message))
         subs (get-subs entity (:scene/entities scene))
         entity-state (entity/state (-> scene :scene/entities entity))
         old-state (:component/state component)
-        event (preprocess-event component subs route content entity-state)
-        handler (get-in component [:component/handlers route])
+        event (preprocess-event component subs handler content entity-state)
+        handler (get-in component [:component/handlers handler])
         new-scene (update-scene scene entity component handler subs event entity-state)
         new-state (:component/state (get-component new-scene message))
         new-entity-state (entity/state (-> new-scene :scene/entities entity))]

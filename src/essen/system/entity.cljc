@@ -18,7 +18,7 @@
 (defn state [{:entity/keys [components]}]
   (transform [MAP-VALS] :component/state components))
 
-(defn- routes [{:entity/keys [components]}]
+(defn- handlers [{:entity/keys [components]}]
   (apply merge
          (for [{:component/keys [key handlers]} components
                k (keys handlers)]
@@ -27,7 +27,7 @@
 (defmethod es/init-key :essen/entity [k opts]
   (-> opts
       (update :entity/components vec->map :component/key)
-      (assoc :entity/routes (routes opts)
+      (assoc :entity/handlers (handlers opts)
              :entity/key (top-key k))))
 
 (defn start [config key]

@@ -29,10 +29,10 @@
   (start-physics config))
 
 (defn emit!
-  ([scene entity route content]
+  ([scene entity handler content]
    (swap! (get @messages scene)
           conj {:message/entity entity
-                :message/route route
+                :message/handler handler
                 :message/content content})))
 
 (defn scenes []

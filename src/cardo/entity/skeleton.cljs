@@ -7,11 +7,10 @@
 
 (def config
   {[:essen/entity :entity/monster :entity/skeleton]
-   {:entity/components
+   {:entity/dynamic true
+    :entity/components
     [(ig/ref :component/stats)
      (ig/ref :component/equipment)]
-
-    :entity/dynamic true
 
     [:essen/component :component/stats]
     {:stats/hp 23}

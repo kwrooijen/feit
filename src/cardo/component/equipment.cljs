@@ -2,7 +2,7 @@
   (:require
    [integrant.core :as ig]))
 
-(defmethod ig/init-key :component/equipment [_ opts]
+(defmethod ig/init-key :component/equipment [_ _opts]
   {:equipment/armor :cool})
 
 (def config

@@ -8,8 +8,8 @@
 (def config
   {[:essen/entity :entity/monster :entity/yeti]
 
-   {:entity/components [(ig/ref :component/stats)]
-    :entity/dynamic true
+   {:entity/dynamic true
+    :entity/components [(ig/ref :component/stats)]
 
     :component/stats
     {:stats/hp 60}}})

@@ -53,4 +53,4 @@ implementation, exception for the sender (rectangle)
 * TODO Overriding component defaults
 Maybe we can merge component opts by retrieving the parents opts in the base
 config. We need to
-* TODO When merging components, change the component key in the base config to the new key
+* DONE When merging components, change the component key in the base config to the new key

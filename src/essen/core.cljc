@@ -17,16 +17,10 @@
    [spec-signature.core :refer-macros [sdef]]
    [essen.module.pixi.render :as rr]))
 
-(defn- derive-components
-  "Globally derive all components in `config` to make them available"
-  [config]
-  (doseq [k (it/find-derived-keys config :essen/component)]
-    (it/derive-composite k)))
-
-(defn- derive-entities
-  "Globally derive all entities in `config` to make them available"
-  [config]
-  (doseq [k (it/find-derived-keys config :essen/entity)]
+(defn- derive-composite-from
+  "Globally composite-derive all keys in `config` that derive from `key`"
+  [config key]
+  (doseq [k (it/find-derived-keys config key)]
     (it/derive-composite k)))
 
 (defn add-scene-opts-ref
@@ -53,8 +47,8 @@
 
 (defn setup [{:keys [:essen/config :essen.module/render] :as game-config}]
   ((:essen/setup render) config)
-  (derive-components config)
-  (derive-entities config)
+  (derive-composite-from config :essen/component)
+  (derive-composite-from config :essen/entity)
   (reset! game (update game-config :essen/config prep))
   (start-physics config))
 

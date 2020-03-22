@@ -9,7 +9,7 @@
    [essen.system.keyboard]
    [essen.system.middleware]
    [essen.system.reactor]
-   [essen.system.scene]
+   [essen.system.scene :as scene]
    [essen.system.ticker]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
@@ -61,3 +61,10 @@
 
 (defn entity [scene-key entity-key]
   (get (entities scene-key entity-key) entity-key))
+
+(defn transition-scene
+  "Transition from `scene-from` to `scene-to`. Halts `scene-from` before
+  initializing `scene-to`."
+  [scene-from scene-to]
+  (scene/halt! scene-from)
+  (scene/start! scene-to))

@@ -1,6 +1,7 @@
 (ns essen.module.matterjs.component
   (:require
-   ["matter-js" :as Matter :refer [Bodies Body]]
+   ["matter-js" :as Matter :refer [Bodies]]
+   [essen.module.matterjs.shape.handler :as shape.handler]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [meta-merge.core :refer [meta-merge]]
    [essen.module.matterjs.world :as matterjs.world]
@@ -46,11 +47,12 @@
     {:shape/body (fn [] body)}))
 
 (defn- create-circle [{:circle/keys [x y radius] :as shape}]
-  (println (shape->body-opts shape))
   (let [body (.circle Bodies x y radius (shape->body-opts shape))]
     (matterjs.world/add! body)
     {:shape/body (fn [] body)}))
 
+;; TODO Is shapes correct? Should this maybe be "bodies" ? This includes the
+;; handlers / middleware
 (defmethod ig/init-key :matterjs.component/shapes [_ opts]
   {:component/shapes
    (into {}
@@ -102,17 +104,11 @@
   [_ {:component/keys [state]}]
   (matterjs.world/remove! ((:component/body state))))
 
-(defn body [{:component/keys [shapes]} shape]
-  ((get-in shapes [shape :shape/body])))
-
-(defmethod ig/init-key :matterjs.handler.shape/set-velocity [_ _opts]
-  (fn [_context {:event/keys [shape x y]} state _entity-state]
-    (.setVelocity Body (body state shape) #js {:x x :y y})
-    state))
-
 (def config
-  {[:essen/component :matterjs.component/shapes]
-   {:component/handlers [(ig/ref :matterjs.handler.shape/set-velocity)]}
-   [:essen/handler :matterjs.handler.shape/set-velocity] {}
-   [:essen/component :matterjs.component/rectangle] {}
-   [:essen/component :matterjs.component/circle] {}})
+  (merge
+   shape.handler/config
+   {[:essen/component :matterjs.component/shapes]
+    {:component/handlers shape.handler/handlers}
+
+    [:essen/component :matterjs.component/rectangle] {}
+    [:essen/component :matterjs.component/circle] {}}))

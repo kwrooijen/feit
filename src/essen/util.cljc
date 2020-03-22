@@ -28,6 +28,7 @@
 
 (defn keyword->path [k]
   (->> (conj (string/split (namespace k) #"\.") (name k))
+       ;; TODO Allow camelcasing
        (map keyword)))
 
 (defn ns-kv->map [[k v]]

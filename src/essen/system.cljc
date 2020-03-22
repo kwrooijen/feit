@@ -5,6 +5,15 @@
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 
+(it/derive-hierarchy
+ {:essen/scene [:essen/system]
+  :essen/entity [:essen/system]
+  :essen/component [:essen/system]
+  :essen/handler [:essen/system]
+  :essen/keyboard [:essen/system]
+  :essen/reactor [:essen/system]
+  :essen/ticker [:essen/system]})
+
 (def ^:private default-keys
   {:context/entity (ig/ref :context/entity)
    :context/scene (ig/ref :context/scene)
@@ -17,7 +26,9 @@
             (when (coll? k)
               (it/derive-composite k))
             [k v])]
-    (postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m)))
+    (doall
+     (postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m))))
+
 
 (defn- add-context [v]
   (cond-> v

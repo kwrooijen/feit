@@ -1,11 +1,40 @@
 (ns essen.dev
   (:require
    [essen.core :refer [scenes]]
-   [essen.system.scene :as scene]
-   [essen.system.entity :as entity]
-   [essen.system :as system]
+   [essen.module.matterjs :as matter]
+   [essen.module.pixi.debug :as pixi.debug]
    [essen.render]
-   [essen.state :as state]))
+   [essen.state :as state]
+   [essen.system :as system]
+   [essen.system.entity :as entity]
+   [essen.system.scene :as scene]
+   [integrant.core :as ig]))
+
+(def config
+  {[:essen/entity :entity.essen.dev/wireframe]
+   {:entity/components
+    [(ig/ref :component.essen.dev/wireframe)]
+
+    [:essen/component :component.essen.dev/wireframe]
+    {:component/tickers [(ig/ref :ticker.essen.dev/wireframe)]}
+
+    [:essen/ticker :ticker.essen.dev/wireframe] {}}})
+
+;; TODO Make this generic so we don't have to use pixi / matter
+(defmethod ig/init-key :entity.essen.dev/wireframe [_ opts] identity)
+(defmethod ig/init-key :component.essen.dev/wireframe [_ opts] opts)
+
+(defmethod ig/init-key :ticker.essen.dev/wireframe
+  [_k {:context/keys [scene]}]
+  (fn ticker-essen-dev--wireframe [_subs _component _ticker _state]
+    (pixi.debug/draw-wireframe (matter/points) scene)))
+
+(defn underive-all-from
+  "Underive all child keys starting from `k`"
+  [k]
+  (doseq [descendant (descendants k)
+          ancestor (ancestors descendant)]
+    (underive descendant ancestor)))
 
 (defn suspend! []
   (doseq [scene-key (scenes)]

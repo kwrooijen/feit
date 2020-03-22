@@ -2,8 +2,10 @@
   (:require
    ["matter-js" :as Matter :refer [Engine World Mouse MouseConstraint]]
    [essen.module.matterjs.component :as matterjs.component]
+   [essen.module.matterjs.state :as state]
+   [essen.util :refer [ns-map->nested-map]]
    [integrant.core :as ig]
-   [essen.module.matterjs.state :as state]))
+   [meta-merge.core :refer [meta-merge]]))
 
 (def config
   (merge matterjs.component/config))
@@ -29,13 +31,51 @@
 (derive :essen.module/matterjs :essen.module/physics)
 (derive :essen.module.spawn/matterjs :essen.module.spawn/physics)
 
+(def default-render
+  (let [canvas (.getElementById js/document "game")]
+    {:render {:canvas canvas
+              :width (.-width canvas)
+              :height (.-height canvas)}}))
+
+(def ^{:doc "Default opts for the MatterJS world.
+ https://github.com/liabru/matter-js/issues/129 states that the `Engine.create`
+ method should automatically add these if they are missing. But for some reason
+ that doesn't work."}
+  default-world
+  {:world
+   {:id 0
+    :type "composite"
+    :parent nil
+    :isModified false
+    :bodies []
+    :constraints []
+    :composites []
+    :label "World"
+    :plugin {}
+    :gravity {:x 0
+              :y 1
+              :scale 0.001}
+    :bounds {:min {:x ##-Inf
+                   :y ##-Inf}
+             :max {:x ##Inf
+                   :y ##Inf}}}})
+
+(defn render-config [opts]
+  (select-keys (meta-merge default-render (get opts :engine))
+               [:render]))
+
+(defn world-config [opts]
+  (-> default-world
+      (meta-merge (get opts :engine))
+      (select-keys [:world])))
+
 (defmethod ig/init-key :essen.module/matterjs [_ opts]
-  (let [canvas (.getElementById js/document "game")
-        engine  (.create Engine (clj->js {:render {:canvas canvas
-                                                   :width (.-width canvas)
-                                                   :height (.-height canvas)}}))
-        mouseConstraint (.create MouseConstraint engine
-                                 #js {:mouse (.create Mouse canvas)})
+  (let [nested-opts (ns-map->nested-map opts)
+        engine (.create Engine (clj->js
+                                (merge (render-config nested-opts)
+                                       (world-config nested-opts))))
+        mouse (.create Mouse (.. engine -render -canvas))
+        mouseConstraint (.create MouseConstraint engine #js {:mouse mouse})
         world (.-world engine)]
     (.add World world mouseConstraint)
 
@@ -47,9 +87,6 @@
              ;; (println "Collision BodyB" (.-label bodyB))
              )))
 
-    ;; constant velocity
-    ;; (set! (.. world -gravity -y) 0)
-    ;; (set! (.. world -gravity -x) 0)
     ;; TODO Maybe create dynamic var for performance boost
     (reset! state/engine engine)
     run))

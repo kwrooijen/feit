@@ -23,6 +23,12 @@
   (when-let [state (get @persistent-components [entity (top-key k)])]
     (persistent-resume k opts (:component/state state))))
 
+(defn save-persistent-component!
+  [{:component/keys [key persistent] :as component} entity-key]
+  (when persistent
+    (swap! persistent-components assoc [entity-key key] component))
+  component)
+
 (defmethod es/init-key :essen/component [k opts]
   (-> opts
       (select-keys [:component/tickers
@@ -34,4 +40,5 @@
                                   (ig/init-key k opts)))
       (update :component/tickers vec->map :ticker/key)
       (update :component/handlers vec->map :handler/key)
-      (update :component/reactors vec->map :reactor/key)))
+      (update :component/reactors vec->map :reactor/key)
+      (save-persistent-component! (:context/entity opts))))

@@ -28,8 +28,9 @@
     {:component/body (fn [] body)}))
 
 (defmethod ig/suspend-key! :matterjs.component/rectangle
-  [_ {:component/keys [state]}]
-  (matterjs.world/remove! ((:component/body state))))
+  [_ {:component/keys [state persistent]}]
+  (when-not persistent
+    (matterjs.world/remove! ((:component/body state)))))
 
 (defmethod ig/halt-key! :matterjs.component/rectangle
   [_ {:component/keys [state]}]
@@ -42,8 +43,9 @@
     {:component/body (fn [] body)}))
 
 (defmethod ig/suspend-key! :matterjs.component/circle
-  [_ {:component/keys [state]}]
-  (matterjs.world/remove! ((:component/body state))))
+  [_ {:component/keys [state persistent]}]
+  (when-not persistent
+    (matterjs.world/remove! ((:component/body state)))))
 
 (defmethod ig/halt-key! :matterjs.component/circle
   [_ {:component/keys [state]}]

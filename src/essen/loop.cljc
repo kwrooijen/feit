@@ -32,7 +32,7 @@
   (get-in component [:component/handlers handler :handler/middleware]))
 
 (defn- apply-middleware
-  [subs state event [_ middleware] entity-state]
+  [subs state entity-state event [_ middleware]]
   ((:middleware/fn middleware) subs event state entity-state))
 
 (defn- preprocess-event

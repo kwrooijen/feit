@@ -93,10 +93,15 @@
       (system/post-init-key!))
   system)
 
+(defn init-fn [derived-k entity-opts]
+  (try ((ig/init-key derived-k entity-opts) entity-opts)
+       (catch #?(:clj Throwable :cljs :default) _
+         entity-opts)))
+
 (defn start [config key]
   (let [entity-opts (it/find-derived-value config key)
         derived-k (it/find-derived-key config key)
-        entity-opts ((ig/init-key derived-k entity-opts) entity-opts)
+        entity-opts (init-fn derived-k entity-opts)
         dynamic? (:entity/dynamic entity-opts)
         entity-key (if dynamic? (it.keyword/make-child key) key)]
     (-> config

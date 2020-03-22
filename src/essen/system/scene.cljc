@@ -1,10 +1,11 @@
 (ns essen.system.scene
   (:require
+   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [essen.state :as state]
    [essen.util :refer [vec->map spy top-key]]
    [integrant-tools.core :as it]
    [essen.system.entity :as entity]
-   [essen.system :as es]
+   [essen.system :as system]
    [integrant.core :as ig]
    [essen.render]))
 
@@ -25,9 +26,16 @@
            (flatten entities))
       (vec->map :entity/key)))
 
-(defmethod es/init-key :essen/scene [k opts]
+(defmethod system/init-key :essen/scene [k opts]
   (-> (ig/init-key k opts)
       (assoc :scene/key (top-key k))))
+
+(defn post-init [system]
+  (->> system
+       (transform [:scene/entities MAP-VALS :entity/components MAP-VALS]
+                  :component/state)
+       (system/post-init-key!))
+  system)
 
 (defn start!
   ([scene-key] (start! scene-key {} {}))
@@ -38,9 +46,10 @@
    (state/reset-events! scene-key)
    (-> @state/config
        (add-defaults scene-key opts nil)
-       (es/init [scene-key])
+       (system/init [scene-key])
        (it/find-derived-value scene-key)
        (update :scene/entities entities-fn @state/config scene-key opts)
+       (post-init)
        (state/save-scene!))))
 
 (defn halt! [scene-key]

@@ -2,7 +2,7 @@
   (:require
    [clojure.set]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
-   [essen.system :as es]
+   [essen.system :as system]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :as it.keyword]
    [essen.util :refer [vec->map top-key]]
@@ -34,7 +34,7 @@
 (defn- handlers [{:entity/keys [components]}]
   (apply merge (components->nested-handlers components)))
 
-(defmethod es/init-key :essen/entity [k opts]
+(defmethod system/init-key :essen/entity [k opts]
   (-> opts
       (update :entity/components vec->map :component/key)
       (assoc :entity/handlers (handlers opts)
@@ -58,7 +58,7 @@
        (clojure.set/rename-keys config)))
 
 (defn- try-init [config entity-key]
-        (try (es/init config [entity-key])
+        (try (system/init config [entity-key])
              (catch #?(:clj Throwable :cljs :default) t
                (println "Failed to init entity" entity-key
                         "because of key" (:key (ex-data t)))
@@ -72,13 +72,26 @@
     (clojure.set/rename-keys config {derived-k entity-key})
     config))
 
-(defn extract-system-with-meta
+(defn- extract-system-with-meta
   "Extract the value of the built entity, and add the system as meta data. This
   metadata is later used for other integrant tasks."
   [system entity-key]
   (with-meta
     (it/find-derived-value system entity-key)
     {:system system}))
+
+(defn- system->post-init-entity [system]
+  (-> system
+      (select-keys [:context/scene :context/entity
+                    :entity/components :scene/opts
+                    :entity/key])
+      (->> (transform [:entity/components MAP-VALS] :component/state))))
+
+(defn post-init [system]
+  (-> system
+      (system->post-init-entity)
+      (system/post-init-key!))
+  system)
 
 (defn start [config key]
   (let [entity-opts (it/find-derived-value config key)
@@ -91,7 +104,8 @@
         (meta-merge  (apply dissoc entity-opts dissocables))
         (rename-config-keys derived-k entity-key dynamic?)
         (try-init entity-key)
-        (extract-system-with-meta entity-key))))
+        (extract-system-with-meta entity-key)
+        (post-init))))
 
 (defn halt! [entity]
   ;; TODO remove dynamic entity

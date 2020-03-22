@@ -11,11 +11,14 @@
    [essen.system.reactor]
    [essen.system.scene :as scene]
    [essen.system.ticker]
+   [essen.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [essen.render]
    [spec-signature.core :refer-macros [sdef]]
    [essen.module.pixi.render :as rr]))
+
+(def post-init-key! system/post-init-key!)
 
 (defn- start-render [config]
   (-> config

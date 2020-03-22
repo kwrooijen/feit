@@ -21,8 +21,8 @@
     [:essen/ticker :ticker.essen.dev/wireframe] {}}})
 
 ;; TODO Make this generic so we don't have to use pixi / matter
-(defmethod ig/init-key :entity.essen.dev/wireframe [_ opts] identity)
-(defmethod ig/init-key :component.essen.dev/wireframe [_ opts] opts)
+(defmethod ig/init-key :entity.essen.dev/wireframe [_ _opts] identity)
+(defmethod ig/init-key :component.essen.dev/wireframe [_ _opts] nil)
 
 (defmethod ig/init-key :ticker.essen.dev/wireframe
   [_k {:context/keys [scene]}]

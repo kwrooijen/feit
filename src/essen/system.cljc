@@ -52,6 +52,15 @@
 (defmethod init-key :default [k opts]
   (ig/init-key k opts))
 
+(defmulti post-init-key!
+  "TODO "
+  (fn [system]
+    (or (:entity/key system)
+        (:scene/key system))))
+
+(defmethod post-init-key! :default [_]
+  nil)
+
 (defn init
   "Starts an essen system (scene or entity). This is used internally by essen
   and should not be called directly."

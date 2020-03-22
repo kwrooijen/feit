@@ -26,8 +26,13 @@
            (flatten entities))
       (vec->map :entity/key)))
 
+(defn maybe-init-key [derived-k opts]
+  (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
+    (f derived-k opts)
+    opts))
+
 (defmethod system/init-key :essen/scene [k opts]
-  (-> (ig/init-key k opts)
+  (-> (maybe-init-key k opts)
       (assoc :scene/key (top-key k))))
 
 (defn post-init [system]

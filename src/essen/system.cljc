@@ -52,15 +52,6 @@
 (defmethod init-key :default [k opts]
   (ig/init-key k opts))
 
-(defmulti post-init-key!
-  "TODO "
-  (fn [system]
-    (or (:entity/key system)
-        (:scene/key system))))
-
-(defmethod post-init-key! :default [_]
-  nil)
-
 (defn init
   "Starts an essen system (scene or entity). This is used internally by essen
   and should not be called directly."
@@ -73,7 +64,15 @@
   should not be called directly."
   [config]
   (derive-composite-all config)
-  (->> config
-       (add-context-to-entities)
-       (transform [MAP-VALS] add-context)
-       (ig/prep)))
+  (ig/prep config))
+
+(defn get-init-key [derived-k entity-opts]
+  (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
+    (f derived-k entity-opts)
+    (fn [_ _] nil)))
+
+(defn get-halt-key [derived-k entity-opts]
+  (if-let [f (get-method ig/halt-key! (ig/normalize-key derived-k))]
+    (or (f derived-k entity-opts)
+        (fn [_] nil))
+    (fn [_] nil)))

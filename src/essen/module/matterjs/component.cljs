@@ -54,25 +54,24 @@
 ;; TODO Is shapes correct? Should this maybe be "bodies" ? This includes the
 ;; handlers / middleware
 (defmethod ig/init-key :matterjs.component/shapes [_ opts]
-  {:component/shapes
-   (into {}
-         (for [[k v] (opts->shapes opts)]
-           [k (cond
-                (rectangle? v) (create-rectangle v)
-                (circle? v) (create-circle v))]))})
+  (fn [_context]
+    {:component/shapes
+     (into {}
+           (for [[k v] (opts->shapes opts)]
+             [k (cond
+                  (rectangle? v) (create-rectangle v)
+                  (circle? v) (create-circle v))]))}))
 
 (defmethod ig/suspend-key! :matterjs.component/shapes
   [_ {:component/keys [state persistent]}]
   (when-not persistent
-    (doall
-     (for [[k v] (:component/shapes state)]
-       (matterjs.world/remove! ((:shape/body v)))))))
+    (doseq [[_ v] (:component/shapes state)]
+      (matterjs.world/remove! ((:shape/body v))))))
 
-(defmethod ig/halt-key! :matterjs.component/shapes
-  [_ {:component/keys [state]}]
-  (doall
-   (for [[k v] (:component/shapes state)]
-     (matterjs.world/remove! ((:shape/body v))))))
+(defmethod ig/halt-key! :matterjs.component/shapes [_ _opts]
+  (fn [{:component/keys [state]}]
+    (doseq [[_ v] (:component/shapes state)]
+      (matterjs.world/remove! ((:shape/body v))))))
 
 (defmethod ig/init-key :matterjs.component/rectangle
   [k {:component/keys [x y width height] :as opts}]

@@ -6,18 +6,19 @@
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :component.pixi/sprite
-  [_ {:context/keys [scene] :component/keys [sprite pos]}]
-  (let [container (get-in @state [:pixi/stage scene :stage/container])
-        textures (get-in @animations sprite)
-        sprite (PIXI/AnimatedSprite. textures)]
-    (set! (.-animationSpeed sprite) 0.167)
-    (set! (.-x sprite) (:x pos))
-    (set! (.-y sprite) (:y pos))
-    (.set (.-anchor sprite) 0.5)
-    (.play sprite)
-    (.addChild container sprite)
-    {:pixi.sprite/sprite sprite
-     :pixi.sprite/initial-textures textures}))
+  [_ {:component/keys [sprite pos]}]
+  (fn [{:context/keys [scene]}]
+    (let [container (get-in @state [:pixi/stage scene :stage/container])
+          textures (get-in @animations sprite)
+          sprite (PIXI/AnimatedSprite. textures)]
+      (set! (.-animationSpeed sprite) 0.167)
+      (set! (.-x sprite) (:x pos))
+      (set! (.-y sprite) (:y pos))
+      (.set (.-anchor sprite) 0.5)
+      (.play sprite)
+      (.addChild container sprite)
+      {:pixi.sprite/sprite sprite
+       :pixi.sprite/initial-textures textures})))
 
 (defmethod ig/suspend-key! :component.pixi/sprite [_ {:component/keys [state]}]
   (.destroy (:pixi.sprite/sprite state)))

@@ -78,8 +78,11 @@
           [_ticker-key ticker-v] tickers]
     (let [subs (get-subs entity-key key)
           tick {:tick/delta delta :tick/time time}
-          entity-state (entity/state entity)]
-      ((:ticker/fn ticker-v) subs component-key tick state entity-state))))
+          entity-state (entity/state entity)
+          context {:context/scene key
+                   :context/entity entity-key
+                   :context/component component-key}]
+      ((:ticker/fn ticker-v) (merge subs context) component-key tick state entity-state))))
 
 (defn- apply-key-event
   [{:scene/keys [entities]}

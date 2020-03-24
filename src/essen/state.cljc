@@ -20,6 +20,8 @@
 
 (defonce persistent-entities (atom {}))
 
+(defonce entities (atom {}))
+
 (defonce persistent-components (atom {}))
 
 (defn get-scene [scene-key]
@@ -31,12 +33,6 @@
 
 (defn save-scene! [scene]
   (swap! state assoc-in [:essen/scenes (:scene/key scene)] (atom scene)))
-
-(defn save-state! [scene-key]
-  (swap! state assoc-in [:essen/scenes scene-key]
-         (-> (get-in @systems [:essen/scenes scene-key])
-             (it/find-derived-value scene-key)
-             (atom))))
 
 (defn reset-state! [scene-key]
   (swap! state update :essen/scenes dissoc scene-key))

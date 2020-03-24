@@ -3,6 +3,7 @@
    [clojure.spec.alpha :as s]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [essen.state :as state]
+   [essen.util :as util]
    [essen.system :as system]
    [essen.system.component]
    [essen.system.handler]
@@ -11,14 +12,12 @@
    [essen.system.reactor]
    [essen.system.scene :as scene]
    [essen.system.ticker]
-   [essen.system.entity]
+   [essen.system.entity :as entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [essen.render]
    [spec-signature.core :refer-macros [sdef]]
    [essen.module.pixi.render :as rr]))
-
-(def post-init-key! system/post-init-key!)
 
 (defn- start-render [config]
   (-> config
@@ -35,6 +34,7 @@
 (defn setup
   [config]
   (reset! state/config (system/prep config))
+  (entity/prep)
   (start-render config)
   (start-physics config))
 

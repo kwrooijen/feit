@@ -5,8 +5,9 @@
    [essen.system :as system]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :as it.keyword]
-   [essen.util :refer [vec->map top-key]]
+   [essen.util :refer [vec->map top-key spy]]
    [meta-merge.core :refer [meta-merge]]
+   [essen.state :as state]
    [integrant.core :as ig]))
 
 (def ^:private dissocables
@@ -37,8 +38,12 @@
 (defmethod system/init-key :essen/entity [k opts]
   (-> opts
       (update :entity/components vec->map :component/key)
+      ;; TODO Rename handlers back to routes
+      (select-keys [:entity/components])
       (assoc :entity/handlers (handlers opts)
-             :entity/key (top-key k))))
+             :entity/key (top-key k)
+             :entity/init (system/get-init-key k opts)
+             :entity/halt! (system/get-halt-key k opts))))
 
 (defn- ref->derived-key [config]
   (comp (partial it/find-derived-key config)
@@ -50,27 +55,29 @@
   This prevents ambiguous keys in the final result, and all component opts will
   get properly merged."
   [config entity-opts]
+  ;; TODO intersect between (it/children :essen/component) and component-key
   (->> (:entity/components entity-opts)
        (mapv (juxt (ref->derived-key config)
                    (ref->derived-key entity-opts)))
+       ;; TODO Should throw an error if any nils are found
        (remove (comp (partial some nil?) flatten))
        (into {})
+       ;; spy
        (clojure.set/rename-keys config)))
 
 (defn- try-init [config entity-key]
         (try (system/init config [entity-key])
              (catch #?(:clj Throwable :cljs :default) t
-               (println "Failed to init entity" entity-key
-                        "because of key" (:key (ex-data t)))
-               (println "Reason: " (:reason (ex-data t))))))
-
-(defn- rename-config-keys
-  "Dynamic entities generate a new key and derives from the original. The
-  original key nees to be overwritten during setup."
-  [config derived-k entity-key dynamic?]
-  (if dynamic?
-    (clojure.set/rename-keys config {derived-k entity-key})
-    config))
+               (println ;; Log error
+                (str "Failed to init entity" entity-key "\n\n"
+                     (when-let [key (:key (ex-data t))]
+                       (str "Because of key: " key "\n\n"))
+                     (when-let [value (:value (ex-data t))]
+                       (str "Opts: " value "\n\n"))
+                     (when-let [refs (:missing-refs (ex-data t))]
+                       (str "Missing Refs:" refs "\n\n"))
+                     (when-let [reason (:reason (ex-data t))]
+                       (str "Reason:" reason "\n\n")))))))
 
 (defn- extract-system-with-meta
   "Extract the value of the built entity, and add the system as meta data. This
@@ -80,48 +87,27 @@
     (it/find-derived-value system entity-key)
     {:system system}))
 
-(defn- system->post-init-entity [system]
-  (-> system
-      (select-keys [:context/scene :context/entity
-                    :entity/components :scene/opts
-                    :entity/key])
-      (->> (transform [:entity/components MAP-VALS] :component/state))))
-
-(defn post-init [system]
-  (-> system
-      (system->post-init-entity)
-      (system/post-init-key!))
-  system)
-
-(defn maybe-init-key [derived-k entity-opts]
-  (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
-    ((f derived-k entity-opts) entity-opts)
-    entity-opts))
-
-(defn start [config key]
-  (let [entity-opts (it/find-derived-value config key)
-        derived-k (it/find-derived-key config key)
-        entity-opts (maybe-init-key derived-k entity-opts)
-        dynamic? (:entity/dynamic entity-opts)
-        entity-key (if dynamic? (it.keyword/make-child key) key)]
+(defn setup! [config entity-key]
+  (let [entity-opts (it/find-derived-value config entity-key)]
     (-> config
         (override-component-names entity-opts)
         (meta-merge (apply dissoc entity-opts dissocables))
-        (rename-config-keys derived-k entity-key dynamic?)
         (try-init entity-key)
         (extract-system-with-meta entity-key)
-        (post-init))))
+        (->> (swap! state/entities assoc entity-key)))))
 
-(defn halt! [entity]
+(defn prep []
+  (let [entities (it/find-derived-keys @state/config :essen/entity)]
+    (doseq [entity entities :let [k (top-key entity)]]
+      (setup! @state/config k))))
+
+(defn halt! [{:entity/keys [components] :as entity}]
   ;; TODO remove dynamic entity
-  (ig/halt! (:system (meta entity))))
+  (doseq [[_ component] components]
+    ((:component/halt! component) component))
+  ((:entity/halt! entity) entity))
 
 (defn suspend! [entity]
-  (try (ig/suspend! (:system (meta entity)))
-       (catch #?(:clj Throwable :cljs :default) t
-         (println "Failed to halt entity" (:entity/key entity)
-                  "because of key" (:key (ex-data t)))
-         (println "Reason: " (:reason (ex-data t))))))
-
-;; TODO Add a way to have some sort of "entity creator". You don't want to use
-;; ig/init-key everytime you spawn a bullet.
+  (doseq [[component-key component] (:entity/components entity)]
+    (ig/suspend-key! component-key component))
+  (ig/suspend-key! (:entity/key entity) entity))

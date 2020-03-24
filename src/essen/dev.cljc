@@ -22,11 +22,14 @@
 
 ;; TODO Make this generic so we don't have to use pixi / matter
 (defmethod ig/init-key :entity.essen.dev/wireframe [_ _opts] identity)
-(defmethod ig/init-key :component.essen.dev/wireframe [_ _opts] nil)
+
+(defmethod ig/init-key :component.essen.dev/wireframe [_ _opts]
+  (fn [_context]
+    {:wireframe/active? true}))
 
 (defmethod ig/init-key :ticker.essen.dev/wireframe
-  [_k {:context/keys [scene]}]
-  (fn ticker-essen-dev--wireframe [_subs _component _ticker _state]
+  [_k _opts]
+  (fn ticker-essen-dev--wireframe [{:context/keys [scene] :as _subs} _component _ticker _state]
     (pixi.debug/draw-wireframe (matter/points) scene)))
 
 (defn underive-all-from
@@ -45,6 +48,6 @@
 
 (defn resume [config]
   (reset! state/config (system/prep config))
+  (entity/prep)
   (doseq [scene-key (scenes)]
-    (essen.render/resume scene-key)
-    (scene/start! scene-key {} {:dev true})))
+    (scene/resume! scene-key)))

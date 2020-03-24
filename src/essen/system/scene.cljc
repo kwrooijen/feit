@@ -1,65 +1,72 @@
 (ns essen.system.scene
   (:require
-   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
+   [com.rpl.specter :as specter :refer [MAP-VALS ALL] :refer-macros [transform]]
    [essen.state :as state]
    [essen.util :refer [vec->map spy top-key]]
    [integrant-tools.core :as it]
    [essen.system.entity :as entity]
    [essen.system :as system]
+   [essen.system.component :as component]
    [integrant.core :as ig]
    [essen.render]))
 
-(defn- add-defaults
-  [m scene-key opts entity]
-  (assoc m
-         [:it/const :context/scene] scene-key
-         [:it/const :context/entity] entity
-         [:it/const :scene/opts] opts))
-
-(defn- start-entity [config scene-key opts entity]
-  (-> config
-      (add-defaults scene-key opts entity)
-      (entity/start entity)))
-
-(defn- entities-fn [entities config scene-key opts]
-  (-> (map (partial start-entity config scene-key opts)
-           (flatten entities))
-      (vec->map :entity/key)))
-
-(defn maybe-init-key [derived-k opts]
-  (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
-    (f derived-k opts)
-    opts))
+(defn- start-entity [scene-key {entity-key :entity/key :as entity}]
+  (try (update entity :entity/init (fn [entity-init]
+                                     (entity-init {:context/scene scene-key
+                                                   :context/entity entity-key})))
+       (catch #?(:clj Throwable :cljs :default) t
+         (println "[ERROR] Failed to init entity.\n"
+                  "Scene:" scene-key "\n"
+                  "Entity:" entity-key "\n"
+                  "Reason:" (ex-data t)))))
 
 (defmethod system/init-key :essen/scene [k opts]
-  (-> (maybe-init-key k opts)
-      (assoc :scene/key (top-key k))))
+  ;; TODO save scenes to state and call this. This is currently not being used
+  (-> opts
+      (assoc :scene/key (top-key k)
+             :scene/init (system/get-init-key k opts)
+             :scene/halt! (system/get-halt-key k opts))))
 
-(defn post-init [system]
-  (->> system
-       (transform [:scene/entities MAP-VALS :entity/components MAP-VALS]
-                  :component/state)
-       (system/post-init-key!))
-  system)
+(defn start-components [scene-key {entity-key :entity/key :as entity}]
+  (let [context {:context/scene scene-key
+                 :context/entity entity-key}]
+    (transform [:entity/components MAP-VALS]
+               (comp component/start
+                     (partial merge context))
+               entity)))
 
-(defn start!
-  ([scene-key] (start! scene-key {} {}))
-  ([scene-key opts] (start! scene-key opts {}))
-  ([scene-key opts extra]
-   (when-not (:dev extra)
-     (essen.render/init scene-key))
-   (state/reset-events! scene-key)
-   (-> @state/config
-       (add-defaults scene-key opts nil)
-       (system/init [scene-key])
-       (it/find-derived-value scene-key)
-       (update :scene/entities entities-fn @state/config scene-key opts)
-       (post-init)
-       (state/save-scene!))))
+(defn start-entities [opts scene-key]
+  (->> opts
+       (transform [:scene/entities ALL]
+                  (comp (partial start-entity scene-key)
+                        (partial start-components scene-key)
+                        (partial get @state/entities)))
+       (transform [:scene/entities] #(vec->map % :entity/key))))
+
+(defn init [scene-key]
+  (-> @state/config
+      (it/find-derived-value scene-key)
+      (start-entities scene-key)
+      (assoc :scene/key scene-key)
+      (state/save-scene!)))
+
+(defn start! [scene-key]
+  (state/reset-events! scene-key)
+  (init scene-key)
+  (essen.render/init scene-key))
+
+(defn resume! [scene-key]
+  (state/reset-events! scene-key)
+  (init scene-key)
+  (essen.render/resume scene-key))
 
 (defn halt! [scene-key]
   (essen.render/halt! scene-key)
-  (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
-    (entity/halt! entity))
   (state/reset-events! scene-key)
+  (let [{:scene/keys [entities] :as scene} @(state/get-scene scene-key)]
+    (doseq [[_ entity] entities]
+      (entity/halt! entity))
+    ;; TODO Once system/init-key is used we can call this
+    ;; ((:scene/halt! scene) scene)
+    )
   (state/reset-state! scene-key))

@@ -75,9 +75,10 @@
 
 (defmethod ig/init-key :matterjs.component/rectangle
   [k {:component/keys [x y width height] :as opts}]
-  (let [body (.rectangle Bodies x y width height (body-opts opts (top-key k)))]
-    (matterjs.world/add! body)
-    {:component/body (fn [] body)}))
+  (fn [_context]
+    (let [body (.rectangle Bodies x y width height (body-opts opts (top-key k)))]
+      (matterjs.world/add! body)
+      {:component/body (fn [] body)})))
 
 (defmethod ig/suspend-key! :matterjs.component/rectangle
   [_ {:component/keys [state persistent]}]
@@ -85,14 +86,16 @@
     (matterjs.world/remove! ((:component/body state)))))
 
 (defmethod ig/halt-key! :matterjs.component/rectangle
-  [_ {:component/keys [state]}]
-  (matterjs.world/remove! ((:component/body state))))
+  [_ _opts]
+  (fn [{:component/keys [state]}]
+    (matterjs.world/remove! ((:component/body state)))))
 
 (defmethod ig/init-key :matterjs.component/circle
   [k {:component/keys [x y radius] :as opts}]
-  (let [body (.circle Bodies x y radius (body-opts opts (top-key k)))]
-    (matterjs.world/add! body)
-    {:component/body (fn [] body)}))
+  (fn [_context]
+    (let [body (.circle Bodies x y radius (body-opts opts (top-key k)))]
+      (matterjs.world/add! body)
+      {:component/body (fn [] body)})))
 
 (defmethod ig/suspend-key! :matterjs.component/circle
   [_ {:component/keys [state persistent]}]
@@ -100,8 +103,9 @@
     (matterjs.world/remove! ((:component/body state)))))
 
 (defmethod ig/halt-key! :matterjs.component/circle
-  [_ {:component/keys [state]}]
-  (matterjs.world/remove! ((:component/body state))))
+  [_ _opts]
+  (fn [{:component/keys [state]}]
+    (matterjs.world/remove! ((:component/body state)))))
 
 (def config
   (merge

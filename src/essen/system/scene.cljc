@@ -50,10 +50,12 @@
       (assoc :scene/key scene-key)
       (state/save-scene!)))
 
-(defn start! [scene-key]
-  (state/reset-events! scene-key)
-  (init scene-key)
-  (essen.render/init scene-key))
+(defn start!
+  ([scene-key] (start! scene-key {}))
+  ([scene-key opts]
+   (state/reset-events! scene-key)
+   (init scene-key)
+   (essen.render/init scene-key)))
 
 (defn resume! [scene-key]
   (state/reset-events! scene-key)

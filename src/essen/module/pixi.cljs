@@ -31,9 +31,10 @@
                 ::transition]))
 
 (defmethod ig/init-key ::load-spritesheet [_ {::keys [spritesheet] :as opts}]
-  (-> (.-shared PIXI/Loader)
-      (.add spritesheet)
-      (.load (partial spritesheet-loaded opts))))
+  (fn [_context]
+    (-> (.-shared PIXI/Loader)
+        (.add spritesheet)
+        (.load (partial spritesheet-loaded opts)))))
 
 (def config
   (merge

@@ -62,7 +62,10 @@
        (transform [MAP-VALS MAP-VALS] :component/state)))
 
 (defn entity [scene-key entity-key]
-  (first (vals (get (entities scene-key entity-key) entity-key))))
+  (-> (entities scene-key entity-key)
+      (get entity-key)
+      (vals)
+      (->> (apply merge))))
 
 (defn transition-scene
   "Transition from `scene-from` to `scene-to`. Halts `scene-from` before

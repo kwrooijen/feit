@@ -53,9 +53,9 @@
              #((:handler/fn handler) subs event % entity-state)))
 
 (defn- save-component! [scene entity-key component-key]
-  (let [component (get-in scene (component/path entity-key component-key))]
-    (when (:component/persistent component)
-      (swap! persistent-components assoc [entity-key component-key] component))))
+  (let [{:component/keys [persistent state]} (get-in scene (component/path entity-key component-key))]
+    (when persistent
+      (swap! persistent-components assoc [entity-key component-key] state))))
 
 (defn- apply-message [scene {:message/keys [entity handler content] :as message}]
   (let [component (-> (get-component scene message))

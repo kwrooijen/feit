@@ -59,9 +59,6 @@
 ;; TODO Is shapes correct? Should this maybe be "bodies" ? This includes the
 ;; handlers / middleware
 
-(defmethod ig/prep-key :matterjs.component/shapes [_ opts]
-  (meta-merge {:component/handlers shape.handler/handlers} opts))
-
 (defmethod ig/init-key :matterjs.component/shapes [_ opts]
   (fn [_context]
     {:component/shapes
@@ -124,6 +121,7 @@
 (def config
   (merge
    shape.handler/config
-   {[:essen/component :matterjs.component/shapes] {}
+   {[:essen/component :matterjs.component/shapes]
+    {:component/handlers shape.handler/handlers}
     [:essen/component :matterjs.component/rectangle] {}
     [:essen/component :matterjs.component/circle] {}}))

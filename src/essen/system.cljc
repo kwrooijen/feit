@@ -1,9 +1,10 @@
 (ns essen.system
   (:require
-   [clojure.walk :refer [postwalk]]
-   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
+   [essen.util :refer [top-key derive-composite-all]]
    [essen.state :as state]
+   [meta-merge.core :refer [meta-merge]]
    [integrant-tools.core :as it]
+   [integrant-tools.keyword :refer [parent parent? descendant?]]
    [integrant.core :as ig]))
 
 (it/derive-hierarchy
@@ -14,16 +15,6 @@
   :essen/keyboard [:essen/system]
   :essen/reactor [:essen/system]
   :essen/ticker [:essen/system]})
-
-(defn- derive-composite-all
-  "Recursively apply `it/derive-composite` on all map keys."
-  [m]
-  (let [f (fn [[k v]]
-            (when (coll? k)
-              (it/derive-composite k))
-            [k v])]
-    (doall
-     (postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m))))
 
 (defmulti init-key
   "The init-key for essen system components. This is used internally by essen
@@ -40,13 +31,50 @@
   [config key]
   (ig/build config [key] init-key ig/assert-pre-init-spec ig/resolve-key))
 
+(defn- first-gen-system? [k]
+  (and (descendant? (top-key k) :essen/component)
+       (->> (top-key k)
+            (parent? :essen/component))))
+
+(defn- second-gen-system? [k]
+  (and (descendant? (top-key k) :essen/component)
+        (->> (top-key k)
+             (parent? :essen/component)
+             (not))))
+
+(defn- second-gen-systems [config]
+  (remove first-gen-system?
+          (it/find-derived-keys config :essen/component)))
+
+(defn- first-gen-key [key]
+  (loop [k (top-key key)]
+    (cond
+      (nil? k) k
+      (first-gen-system? k) k
+      :else (recur (parent k)))))
+
+(defn- first-gen-system-value [config system-key]
+  (->> (ig/find-derived config system-key)
+       (remove (fn [[k _]] (some second-gen-system? k)))
+       (last)
+       (last)))
+
+(defn- merge-parent-system
+  [config k]
+  (let [v1 (it/find-derived-value config k)
+        v2 (first-gen-system-value config (first-gen-key k))]
+    (assoc config k (meta-merge v2 v1))))
+
+(defn- inherit-parent-systems [config]
+  (reduce merge-parent-system config (second-gen-systems config)))
+
 (defn prep
   "Prepares the config system by adding context references to all keys. Also
   does a composite derive on all keys. This is used internally by essen and
   should not be called directly."
   [config]
   (derive-composite-all config)
-  (ig/prep config))
+  (inherit-parent-systems (ig/prep config)))
 
 (defn get-init-key [derived-k entity-opts]
   (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]

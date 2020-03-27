@@ -1,5 +1,7 @@
 (ns essen.util
   (:require
+   [clojure.walk :refer [postwalk]]
+   [integrant-tools.core :as it]
    [clojure.string :as string]
    [meta-merge.core :refer [meta-merge]]))
 
@@ -48,3 +50,13 @@
         (map ns-kv->map)
         (apply meta-merge)
         (get-top-key opts))))
+
+(defn derive-composite-all
+  "Recursively apply `it/derive-composite` on all map keys."
+  [m]
+  (let [f (fn [[k v]]
+            (when (coll? k)
+              (it/derive-composite k))
+            [k v])]
+    (doall
+     (postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m))))

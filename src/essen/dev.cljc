@@ -52,7 +52,5 @@
   (-> @state/config
       (system/init  [:essen/scene])
       (->> (reset! state/system)))
-
-  (scene/start! :scene/start)
   (doseq [scene-key @halted-scenes]
     (scene/start! scene-key)))

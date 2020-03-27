@@ -33,8 +33,7 @@
 
 (defn setup
   [config]
-  (reset! state/config (system/prep config))
-  (entity/prep)
+  (system/start config)
   (start-render config)
   (start-physics config))
 

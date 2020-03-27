@@ -2,6 +2,7 @@
   (:require
    [clojure.walk :refer [postwalk]]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
+   [essen.state :as state]
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 
@@ -14,11 +15,6 @@
   :essen/reactor [:essen/system]
   :essen/ticker [:essen/system]})
 
-(def ^:private default-keys
-  {:context/entity (ig/ref :context/entity)
-   :context/scene (ig/ref :context/scene)
-   :scene/opts (ig/ref :scene/opts)})
-
 (defn- derive-composite-all
   "Recursively apply `it/derive-composite` on all map keys."
   [m]
@@ -28,20 +24,6 @@
             [k v])]
     (doall
      (postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m))))
-
-
-(defn- add-context [v]
-  (cond-> v
-    (map? v) (merge v default-keys)))
-
-(defn- add-context-to-entities
-  "Add a refence to context for all keys. This is necessary so that components
-  know which entity / scene they belong to."
-  [config]
-  (->> (ig/find-derived config :essen/entity)
-       (into {})
-       (transform [MAP-VALS MAP-VALS] add-context)
-       (merge config)))
 
 (defmulti init-key
   "The init-key for essen system components. This is used internally by essen
@@ -76,3 +58,9 @@
     (or (f derived-k entity-opts)
         (fn [_] nil))
     (fn [_] nil)))
+
+(defn start [config]
+  (reset! state/config (prep config))
+  (-> @state/config
+      (init [:essen/scene])
+      (->> (reset! state/system))))

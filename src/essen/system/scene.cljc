@@ -25,7 +25,8 @@
   (-> opts
       (assoc :scene/key (top-key k)
              :scene/init (system/get-init-key k opts)
-             :scene/halt! (system/get-halt-key k opts))))
+             :scene/halt! (system/get-halt-key k opts))
+      (update :scene/entities vec->map :entity/key)))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
   (let [context {:context/scene scene-key
@@ -36,15 +37,13 @@
                entity)))
 
 (defn start-entities [opts scene-key]
-  (->> opts
-       (transform [:scene/entities ALL]
-                  (comp (partial start-entity scene-key)
-                        (partial start-components scene-key)
-                        (partial get @state/entities)))
-       (transform [:scene/entities] #(vec->map % :entity/key))))
+  (transform [:scene/entities MAP-VALS]
+             (comp (partial start-entity scene-key)
+                   (partial start-components scene-key))
+             opts))
 
 (defn init [scene-key]
-  (-> @state/config
+  (-> @state/system
       (it/find-derived-value scene-key)
       (start-entities scene-key)
       (assoc :scene/key scene-key)
@@ -67,8 +66,5 @@
   (state/reset-events! scene-key)
   (let [{:scene/keys [entities] :as scene} @(state/get-scene scene-key)]
     (doseq [[_ entity] entities]
-      (entity/halt! entity))
-    ;; TODO Once system/init-key is used we can call this
-    ;; ((:scene/halt! scene) scene)
-    )
+      (entity/halt! entity)))
   (state/reset-state! scene-key))

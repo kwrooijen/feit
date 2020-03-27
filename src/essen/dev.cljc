@@ -13,12 +13,12 @@
 (def config
   {[:essen/entity :entity.essen.dev/wireframe]
    {:entity/components
-    [(ig/ref :component.essen.dev/wireframe)]
+    [(ig/ref :component.essen.dev/wireframe)]}
 
-    [:essen/component :component.essen.dev/wireframe]
-    {:component/tickers [(ig/ref :ticker.essen.dev/wireframe)]}
+   [:essen/component :component.essen.dev/wireframe]
+   {:component/tickers [(ig/ref :ticker.essen.dev/wireframe)]}
 
-    [:essen/ticker :ticker.essen.dev/wireframe] {}}})
+   [:essen/ticker :ticker.essen.dev/wireframe] {}})
 
 ;; TODO Make this generic so we don't have to use pixi / matter
 (defmethod ig/init-key :entity.essen.dev/wireframe [_ _opts] identity)
@@ -39,15 +39,20 @@
           ancestor (ancestors descendant)]
     (underive descendant ancestor)))
 
+(defonce halted-scenes (atom #{}))
+
 (defn suspend! []
+  (reset! halted-scenes (scenes))
+  (ig/suspend! @state/system [:essen/scene])
   (doseq [scene-key (scenes)]
-    (essen.render/suspend! scene-key))
-  (doseq [scene-key (scenes)
-          [_entity-key entity] (:scene/entities @(state/get-scene scene-key))]
-    (entity/suspend! entity)))
+    (scene/halt! scene-key)))
 
 (defn resume [config]
   (reset! state/config (system/prep config))
-  (entity/prep)
-  (doseq [scene-key (scenes)]
-    (scene/resume! scene-key)))
+  (-> @state/config
+      (system/init  [:essen/scene])
+      (->> (reset! state/system)))
+
+  (scene/start! :scene/start)
+  (doseq [scene-key @halted-scenes]
+    (scene/start! scene-key)))

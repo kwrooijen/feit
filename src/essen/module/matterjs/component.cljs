@@ -6,7 +6,8 @@
    [meta-merge.core :refer [meta-merge]]
    [essen.module.matterjs.world :as matterjs.world]
    [essen.util :refer [keep-ns top-key ns-map->nested-map]]
-   [integrant.core :as ig]))
+   [integrant.core :as ig]
+   [essen.system.component :as component]))
 
 (defn- add-label [opts k]
   (merge {:component.opts/label k} opts))
@@ -17,10 +18,14 @@
       (add-label (str k))
       (clj->js)))
 
+;; (defrecord Matterjs.Body [body])
+
 ;; TODO: Create a custom print method so that when we print the object, we
+
 ;; don't cause an infilite loop.
+
 ;; (extend-protocol IPrintWithWriter
-;;   Body
+;;   Matterjs.Body
 ;;   (-pr-writer [new-obj writer _]
 ;;     (write-all writer "#myObj \"" (:details new-obj) "\"")))
 
@@ -53,6 +58,10 @@
 
 ;; TODO Is shapes correct? Should this maybe be "bodies" ? This includes the
 ;; handlers / middleware
+
+(defmethod ig/prep-key :matterjs.component/shapes [_ opts]
+  (meta-merge {:component/handlers shape.handler/handlers} opts))
+
 (defmethod ig/init-key :matterjs.component/shapes [_ opts]
   (fn [_context]
     {:component/shapes
@@ -68,8 +77,13 @@
     (doseq [[_ v] (:component/shapes state)]
       (matterjs.world/remove! ((:shape/body v))))))
 
+(defmethod component/persistent-resume :matterjs.component/shapes [_key _opts state]
+  (doseq [[_ {:shape/keys [body]}] (:component/shapes state)]
+    (matterjs.world/add! (body)))
+  state)
+
 (defmethod ig/halt-key! :matterjs.component/shapes [_ _opts]
-  (fn [{:component/keys [state]}]
+  (fn [{:component/keys [key state]}]
     (doseq [[_ v] (:component/shapes state)]
       (matterjs.world/remove! ((:shape/body v))))))
 
@@ -110,8 +124,6 @@
 (def config
   (merge
    shape.handler/config
-   {[:essen/component :matterjs.component/shapes]
-    {:component/handlers shape.handler/handlers}
-
+   {[:essen/component :matterjs.component/shapes] {}
     [:essen/component :matterjs.component/rectangle] {}
     [:essen/component :matterjs.component/circle] {}}))

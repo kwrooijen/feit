@@ -1,8 +1,7 @@
 (ns essen.state
   (:refer-clojure :exclude [atom])
   (:require
-   #?(:cljs [reagent.core :as r])
-   [integrant-tools.core :as it]))
+   #?(:cljs [reagent.core :as r])))
 
 (defn atom [v]
   #?(:clj  (clojure.core/atom v)
@@ -10,7 +9,7 @@
 
 (defonce state (atom {}))
 
-(defonce systems (atom {}))
+(defonce system (atom {}))
 
 (defonce config (atom {}))
 
@@ -36,9 +35,3 @@
 
 (defn reset-state! [scene-key]
   (swap! state update :essen/scenes dissoc scene-key))
-
-(defn save-system! [system scene-key]
-  (swap! systems assoc-in [:essen/scenes scene-key] system))
-
-(defn system [scene-key]
-  (get-in @systems [:essen/scenes scene-key]))

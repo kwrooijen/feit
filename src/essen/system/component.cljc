@@ -21,12 +21,12 @@
 
 (defn get-persistent-state [{:context/keys [entity] :component/keys [key] :as opts}]
   (when-let [state (get @persistent-components [entity key])]
-    (persistent-resume key opts (:component/state state))))
+    (persistent-resume key opts state)))
 
 (defn save-persistent-component!
-  [{:component/keys [key persistent] :as component} entity-key]
+  [{:component/keys [key persistent state] :as component} entity-key]
   (when persistent
-    (swap! persistent-components assoc [entity-key key] component))
+    (swap! persistent-components assoc [entity-key key] state))
   component)
 
 (defmethod system/init-key :essen/component [k opts]
@@ -37,7 +37,8 @@
                     :component/persistent])
       (assoc :component/key (top-key k)
              :component/state (system/get-init-key k opts)
-             :component/halt! (system/get-halt-key k opts))
+             :component/halt! (system/get-halt-key k opts)
+             :component/opts opts)
       (update :component/tickers vec->map :ticker/key)
       (update :component/handlers vec->map :handler/key)
       (update :component/reactors vec->map :reactor/key)))

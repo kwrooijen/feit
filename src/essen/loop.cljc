@@ -24,7 +24,7 @@
   (subs-states entities (-> entities entity :entity/subs)))
 
 (defn- get-component [scene {:message/keys [entity handler]}]
-  (->> (get-in scene [:scene/entities entity :entity/handlers handler])
+  (->> (get-in scene [:scene/entities entity :entity/routes handler])
        (component/path entity)
        (get-in scene)))
 

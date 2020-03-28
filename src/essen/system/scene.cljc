@@ -21,7 +21,6 @@
                   "Reason:" (ex-data t)))))
 
 (defmethod system/init-key :essen/scene [k opts]
-  ;; TODO save scenes to state and call this. This is currently not being used
   (-> opts
       (assoc :scene/key (top-key k)
              :scene/init (system/get-init-key k opts)
@@ -64,7 +63,6 @@
 (defn halt! [scene-key]
   (essen.render/halt! scene-key)
   (state/reset-events! scene-key)
-  (let [{:scene/keys [entities] :as scene} @(state/get-scene scene-key)]
-    (doseq [[_ entity] entities]
-      (entity/halt! entity)))
+  (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
+    (entity/halt! entity))
   (state/reset-state! scene-key))

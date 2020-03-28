@@ -4,10 +4,10 @@
    [essen.state :as state]
    [essen.util :refer [vec->map spy top-key]]
    [integrant-tools.core :as it]
+   [integrant-tools.keyword :refer [make-child]]
    [essen.system.entity :as entity]
    [essen.system :as system]
    [essen.system.component :as component]
-   [integrant.core :as ig]
    [essen.render]))
 
 (defn- start-entity [scene-key {entity-key :entity/key :as entity}]
@@ -24,8 +24,7 @@
   (-> opts
       (assoc :scene/key (top-key k)
              :scene/init (system/get-init-key k opts)
-             :scene/halt! (system/get-halt-key k opts))
-      (update :scene/entities vec->map :entity/key)))
+             :scene/halt! (system/get-halt-key k opts))))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
   (let [context {:context/scene scene-key
@@ -35,15 +34,31 @@
                      (partial merge context))
                entity)))
 
-(defn start-entities [opts scene-key]
-  (transform [:scene/entities MAP-VALS]
-             (comp (partial start-entity scene-key)
-                   (partial start-components scene-key))
-             opts))
+(defn make-dynamic-entity [entity]
+  (if (:entity/dynamic entity)
+    (update entity :entity/key make-child)
+    entity))
 
-(defn init [scene-key]
+(defn entities->map [entities]
+  (->> (flatten entities)
+       (map make-dynamic-entity)
+       (map (juxt :entity/key identity))
+       (into {})))
+
+(defn start-entities [opts scene-key]
+  (->> opts
+       (transform [:scene/entities] entities->map)
+       (transform [:scene/entities MAP-VALS]
+                  (comp (partial start-entity scene-key)
+                        (partial start-components scene-key)))))
+
+(defn apply-init [scene-opts opts]
+  ((:scene/init scene-opts) scene-opts opts))
+
+(defn init [scene-key opts]
   (-> @state/system
       (it/find-derived-value scene-key)
+      (apply-init opts)
       (start-entities scene-key)
       (assoc :scene/key scene-key)
       (state/save-scene!)))
@@ -52,12 +67,12 @@
   ([scene-key] (start! scene-key {}))
   ([scene-key opts]
    (state/reset-events! scene-key)
-   (init scene-key)
+   (init scene-key opts)
    (essen.render/init scene-key)))
 
 (defn resume! [scene-key]
   (state/reset-events! scene-key)
-  (init scene-key)
+  (init scene-key {})
   (essen.render/resume scene-key))
 
 (defn halt! [scene-key]

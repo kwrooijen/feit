@@ -49,12 +49,12 @@
 (defn- create-rectangle [{:rectangle/keys [x y width height] :as shape}]
   (let [body (.rectangle Bodies x y width height (shape->body-opts shape))]
     (matterjs.world/add! body)
-    {:shape/body (fn [] body)}))
+    {:shape/body (fn rectangle-shape--body [] body)}))
 
 (defn- create-circle [{:circle/keys [x y radius] :as shape}]
   (let [body (.circle Bodies x y radius (shape->body-opts shape))]
     (matterjs.world/add! body)
-    {:shape/body (fn [] body)}))
+    {:shape/body (fn circle-shape--body [] body)}))
 
 ;; TODO Is shapes correct? Should this maybe be "bodies" ? This includes the
 ;; handlers / middleware

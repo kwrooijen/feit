@@ -79,7 +79,7 @@
 (defn get-init-key [derived-k entity-opts]
   (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
     (f derived-k entity-opts)
-    (fn [_ _] nil)))
+    (fn [v _] v)))
 
 (defn get-halt-key [derived-k entity-opts]
   (if-let [f (get-method ig/halt-key! (ig/normalize-key derived-k))]

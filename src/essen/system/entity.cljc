@@ -3,11 +3,7 @@
    [clojure.set]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [essen.system :as system]
-   [integrant-tools.core :as it]
-   [integrant-tools.keyword :as it.keyword]
    [essen.util :refer [vec->map top-key spy]]
-   [meta-merge.core :refer [meta-merge]]
-   [essen.state :as state]
    [integrant.core :as ig]))
 
 (defn path-state
@@ -32,7 +28,8 @@
       ;; TODO Check if any components are direct children of :essen/component
       ;; If they are, throw an error. You're not allowed to use root components
       (update :entity/components vec->map :component/key)
-      (select-keys [:entity/components])
+      (select-keys [:entity/components
+                    :entity/dynamic])
       (assoc :entity/routes (routes opts)
              :entity/key (top-key k)
              :entity/init (system/get-init-key k opts)

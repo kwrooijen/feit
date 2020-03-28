@@ -12,7 +12,7 @@
    [essen.system.reactor]
    [essen.system.scene :as scene]
    [essen.system.ticker]
-   [essen.system.entity :as entity]
+   [essen.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [essen.render]
@@ -37,20 +37,23 @@
   (start-render config)
   (start-physics config))
 
-(defn emit!
-  "Emit a message with `content` to an `entity`'s `handler` in `scene`"
-  ([scene entity handler content]
-   (swap! (get @state/messages scene)
-          conj {:message/entity entity
-                :message/handler handler
-                :message/content content})))
-
 (defn scenes
   "Get all current running scenes as a set."
   []
   (-> (:essen/scenes @state/state)
       (keys)
       (set)))
+
+(defn emit!
+  "Emit a message with `content` to an `entity`'s `handler` in `scene`"
+  ([entity handler content]
+   (doseq [scene (scenes)]
+     (emit! scene entity handler content)))
+  ([scene entity handler content]
+   (swap! (get @state/messages scene)
+          conj {:message/entity entity
+                :message/handler handler
+                :message/content content})))
 
 (defn entities
   "Get all component states of any enitities from `scene-key` which are derived

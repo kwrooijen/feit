@@ -29,8 +29,8 @@
 
 (defmethod ig/init-key :ticker.essen.dev/wireframe
   [_k _opts]
-  (fn ticker-essen-dev--wireframe [{:context/keys [scene] :as _subs} _component _ticker _state]
-    (pixi.debug/draw-wireframe (matter/points) scene)))
+  (fn ticker-essen-dev--wireframe [{:context/keys [scene-key]} _state]
+    (pixi.debug/draw-wireframe (matter/points) scene-key)))
 
 (defn underive-all-from
   "Underive all child keys starting from `k`"

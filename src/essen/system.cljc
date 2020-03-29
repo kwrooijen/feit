@@ -90,5 +90,5 @@
 (defn start [config]
   (reset! state/config (prep config))
   (-> @state/config
-      (init [:essen/scene])
+      (init [:essen/system])
       (->> (reset! state/system))))

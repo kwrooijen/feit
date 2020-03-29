@@ -10,10 +10,11 @@
         last-time (atom (.now js/Date))
         poison-event {:event/damage damage
                       :event/damage-type :damage/poison}]
-    (fn ticker-stats--poisoned [_subs component {:tick/keys [time]} _state]
+    (fn ticker-stats--poisoned
+      [{:context/keys [component-key time]} _state]
       (cond
         (zero? @remaining)
-        (ticker/remove! scene entity component :ticker.stats/poisoned)
+        (ticker/remove! scene entity component-key :ticker.stats/poisoned)
         (> (- time @last-time) 1000)
         (do (reset! last-time time)
             (swap! remaining dec)

@@ -18,10 +18,10 @@
 (defn components->nested-routes [components]
   (for [{:component/keys [key handlers]} components
         k (keys handlers)]
-    {k key}))
+    {k [key]}))
 
 (defn- routes [{:entity/keys [components]}]
-  (apply merge (components->nested-routes components)))
+  (apply merge-with into (components->nested-routes components)))
 
 (defmethod system/init-key :essen/entity [k opts]
   (-> opts

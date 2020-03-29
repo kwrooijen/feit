@@ -11,5 +11,5 @@
           content
           (middlewares ctx)))
 
-(defn process [ctx]
-  (update ctx :context/event process-event-content ctx))
+(defn process [[scene ctx]]
+  [scene (update ctx :context/event process-event-content ctx)])

@@ -69,9 +69,8 @@
   (reduce merge-parent-system config (second-gen-systems config)))
 
 (defn prep
-  "Prepares the config system by adding context references to all keys. Also
-  does a composite derive on all keys. This is used internally by essen and
-  should not be called directly."
+  "Prepares the config system with a composite derive on all keys. This is used
+  internally by essen and should not be called directly."
   [config]
   (derive-composite-all config)
   (inherit-parent-systems (ig/prep config)))

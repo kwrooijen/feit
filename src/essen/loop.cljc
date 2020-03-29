@@ -9,11 +9,14 @@
    [essen.state :as state :refer [get-scene]]))
 
 (defn- apply-message [scene message]
-  (-> (loop.event/event->context scene message)
-      (loop.middleware/process)
-      (loop.handler/process)
-      (loop.reactor/process)
-      (get :context/scene)))
+  (reduce
+   (fn [acc context]
+     (-> [acc context]
+         (loop.middleware/process)
+         (loop.handler/process)
+         (loop.reactor/process)))
+   scene
+   (loop.event/event->context scene message)))
 
 (defn- threshold-reached [_key]
   (println "THRESHOLD REACHED")

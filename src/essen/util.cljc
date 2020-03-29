@@ -26,7 +26,7 @@
        (into {})))
 
 (defn top-key [k]
-  (if (coll? k) (last k) k))
+  (if ^boolean (coll? k) (last k) k))
 
 (defn keyword->path [k]
   (->> (conj (string/split (namespace k) #"\.") (name k))
@@ -41,7 +41,8 @@
 
 (defn get-top-key [{:keys [top-keys]} m]
   (if top-keys
-    (select-keys m top-keys) m))
+    (select-keys m top-keys)
+    m))
 
 (defn ns-map->nested-map
   ([m] (ns-map->nested-map {} m))
@@ -59,4 +60,4 @@
               (it/derive-composite k))
             [k v])]
     (doall
-     (postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m))))
+     (postwalk (fn [x] (if ^boolean (map? x) (into {} (map f x)) x)) m))))

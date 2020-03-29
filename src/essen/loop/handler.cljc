@@ -1,7 +1,7 @@
 (ns essen.loop.handler
   (:require))
 
-(defn path-entity-state [{:context/keys [entity-key component-key]}]
+(defn- path-entity-state [{:context/keys [entity-key component-key]}]
   [:context/scene
    :scene/entities entity-key
    :entity/components component-key

@@ -32,7 +32,7 @@
         (do
           (reset! messages [])
           (let [new-scene (reduce apply-message scene todo-messages)]
-            (if (seq @messages)
+            (if ^boolean (empty? @messages)
               new-scene
               (recur new-scene @messages (dec threshold)))))))))
 

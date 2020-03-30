@@ -6,6 +6,6 @@
 
 (defmethod es/init-key :essen/handler [k opts]
   (-> opts
-      (assoc :handler/key (top-key k)
+      (assoc :handler/key (or (:handler/route opts) (top-key k))
              :handler/fn (ig/init-key k opts))
       (update :handler/middleware vec->map :middleware/key)))

@@ -1,6 +1,6 @@
 (ns essen.module.matterjs.component
   (:require
-   ["matter-js" :as Matter :refer [Bodies]]
+   ["matter-js" :as Matter :refer [Bodies Body]]
    [essen.module.matterjs.shape.handler :as shape.handler]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [meta-merge.core :refer [meta-merge]]
@@ -51,10 +51,12 @@
     (matterjs.world/add! body)
     {:shape/body (fn rectangle-shape--body [] body)}))
 
-(defn- create-circle [{:circle/keys [x y radius] :as shape}]
+(defn- create-circle [{:circle/keys [x y radius offset-x offset-y]  :as shape}]
   (let [body (.circle Bodies x y radius (shape->body-opts shape))]
     (matterjs.world/add! body)
-    {:shape/body (fn circle-shape--body [] body)}))
+    {:shape/body (fn circle-shape--body [] body)
+     :shape/offset-x offset-x
+     :shape/offset-y offset-y}))
 
 ;; TODO Is shapes correct? Should this maybe be "bodies" ? This includes the
 ;; handlers / middleware
@@ -118,10 +120,28 @@
   (fn [{:component/keys [state]}]
     (matterjs.world/remove! ((:component/body state)))))
 
+;; TODO add a ticker to update position
+;; Event should have an exlude key, where you can exclude components
+;; We don't want to cause an infinite loop
+(defmethod ig/init-key :handler.essen.position.matterjs/set [_ _opts]
+  (fn [_context {:position/keys [x y]} state]
+    (transform [MAP-VALS MAP-VALS]
+               (fn [{:shape/keys [body offset-x offset-y]}]
+                 (.setPosition Body (body) #js {:x (+ x offset-x)
+                                                :y (+ y offset-y)}))
+               state)
+    state))
+
 (def config
   (merge
    shape.handler/config
    {[:essen/component :matterjs.component/shapes]
-    {:component/handlers shape.handler/handlers}
+    {:component/handlers [shape.handler/handlers
+                          (ig/ref :handler.essen.position.matterjs/set)]}
+    :interface.essen.position/matterjs {}
+
+    [:essen/handler :handler.essen.position.matterjs/set]
+    {:handler/route :handler.essen.position/set}
+
     [:essen/component :matterjs.component/rectangle] {}
     [:essen/component :matterjs.component/circle] {}}))

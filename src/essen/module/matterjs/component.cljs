@@ -1,39 +1,19 @@
 (ns essen.module.matterjs.component
   (:require
+   [essen.system.component :as component]
+   [essen.module.matterjs.extra.position]
    ["matter-js" :as Matter :refer [Bodies Body]]
    [essen.module.matterjs.shape.handler :as shape.handler]
-   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
-   [meta-merge.core :refer [meta-merge]]
    [essen.module.matterjs.world :as matterjs.world]
-   [essen.util :refer [keep-ns top-key ns-map->nested-map]]
-   [integrant.core :as ig]
-   [essen.system.component :as component]))
+   [essen.util :refer [ns-map->nested-map]]
+   [integrant.core :as ig]))
 
-(defn- add-label [opts k]
-  (merge {:component.opts/label k} opts))
+(defrecord MatterjsBody [body])
 
-(defn- body-opts  [opts k]
-  (-> opts
-      (keep-ns :component.opts)
-      (add-label (str k))
-      (clj->js)))
-
-;; (defrecord Matterjs.Body [body])
-
-;; TODO: Create a custom print method so that when we print the object, we
-
-;; don't cause an infilite loop.
-
-;; (extend-protocol IPrintWithWriter
-;;   Matterjs.Body
-;;   (-pr-writer [new-obj writer _]
-;;     (write-all writer "#myObj \"" (:details new-obj) "\"")))
-
-(defn- rectangle? [shape]
-  (some? (:rectangle/x shape)))
-
-(defn- circle? [shape]
-  (some? (:circle/x shape)))
+(extend-protocol IPrintWithWriter
+  MatterjsBody
+  (-pr-writer [new-obj writer _]
+    (write-all writer "#MatterjsBody")))
 
 (defn- shape->body-opts [shape]
   (-> shape
@@ -41,107 +21,56 @@
       (get :body)
       (clj->js)))
 
-(defn- opts->shapes [{:component/keys [shapes] :as opts}]
-  (transform [MAP-VALS]
-             (partial meta-merge (dissoc opts :component/shapes))
-             shapes))
-
-(defn- create-rectangle [{:rectangle/keys [x y width height] :as shape}]
-  (let [body (.rectangle Bodies x y width height (shape->body-opts shape))]
-    (matterjs.world/add! body)
-    {:shape/body (fn rectangle-shape--body [] body)}))
-
-(defn- create-circle [{:circle/keys [x y radius offset-x offset-y]  :as shape}]
-  (let [body (.circle Bodies x y radius (shape->body-opts shape))]
-    (matterjs.world/add! body)
-    {:shape/body (fn circle-shape--body [] body)
-     :shape/offset-x offset-x
-     :shape/offset-y offset-y}))
-
-;; TODO Is shapes correct? Should this maybe be "bodies" ? This includes the
-;; handlers / middleware
-
-(defmethod ig/init-key :matterjs.component/shapes [_ opts]
-  (fn [_context]
-    {:component/shapes
-     (into {}
-           (for [[k v] (opts->shapes opts)]
-             [k (cond
-                  (rectangle? v) (create-rectangle v)
-                  (circle? v) (create-circle v))]))}))
-
-(defmethod ig/suspend-key! :matterjs.component/shapes
-  [_ {:component/keys [state persistent]}]
-  (when-not persistent
-    (doseq [[_ v] (:component/shapes state)]
-      (matterjs.world/remove! ((:shape/body v))))))
-
-(defmethod component/persistent-resume :matterjs.component/shapes [_key _opts state]
-  (doseq [[_ {:shape/keys [body]}] (:component/shapes state)]
-    (matterjs.world/add! (body)))
-  state)
-
-(defmethod ig/halt-key! :matterjs.component/shapes [_ _opts]
-  (fn [{:component/keys [key state]}]
-    (doseq [[_ v] (:component/shapes state)]
-      (matterjs.world/remove! ((:shape/body v))))))
-
 (defmethod ig/init-key :matterjs.component/rectangle
-  [k {:component/keys [x y width height] :as opts}]
+  [_ {:rectangle/keys [x y width height] :as opts}]
   (fn [_context]
-    (let [body (.rectangle Bodies x y width height (body-opts opts (top-key k)))]
+    (let [body (.rectangle Bodies x y width height (shape->body-opts opts))]
       (matterjs.world/add! body)
-      {:component/body (fn [] body)})))
+      (MatterjsBody. body))))
+
+(defmethod component/persistent-resume :matterjs.component/rectangle [_key _opts state]
+  (matterjs.world/add! (:body state))
+  state)
 
 (defmethod ig/suspend-key! :matterjs.component/rectangle
   [_ {:component/keys [state persistent]}]
   (when-not persistent
-    (matterjs.world/remove! ((:component/body state)))))
+    (matterjs.world/remove! (:body state))))
 
 (defmethod ig/halt-key! :matterjs.component/rectangle
   [_ _opts]
   (fn [{:component/keys [state]}]
-    (matterjs.world/remove! ((:component/body state)))))
+    (matterjs.world/remove! (:body state))))
 
 (defmethod ig/init-key :matterjs.component/circle
-  [k {:component/keys [x y radius] :as opts}]
+  [_ {:circle/keys [x y radius] :as opts}]
   (fn [_context]
-    (let [body (.circle Bodies x y radius (body-opts opts (top-key k)))]
+    (let [body (.circle Bodies x y radius (shape->body-opts opts))]
       (matterjs.world/add! body)
-      {:component/body (fn [] body)})))
+      (MatterjsBody. body))))
+
+(defmethod component/persistent-resume :matterjs.component/circle [_key _opts state]
+  (matterjs.world/add! (:body state))
+  state)
 
 (defmethod ig/suspend-key! :matterjs.component/circle
   [_ {:component/keys [state persistent]}]
   (when-not persistent
-    (matterjs.world/remove! ((:component/body state)))))
+    (matterjs.world/remove! (:body state))))
 
 (defmethod ig/halt-key! :matterjs.component/circle
   [_ _opts]
   (fn [{:component/keys [state]}]
-    (matterjs.world/remove! ((:component/body state)))))
-
-;; TODO add a ticker to update position
-;; Event should have an exlude key, where you can exclude components
-;; We don't want to cause an infinite loop
-(defmethod ig/init-key :handler.essen.position.matterjs/set [_ _opts]
-  (fn [_context {:position/keys [x y]} state]
-    (transform [MAP-VALS MAP-VALS]
-               (fn [{:shape/keys [body offset-x offset-y]}]
-                 (.setPosition Body (body) #js {:x (+ x offset-x)
-                                                :y (+ y offset-y)}))
-               state)
-    state))
+    (matterjs.world/remove! (:body state))))
 
 (def config
   (merge
    shape.handler/config
-   {[:essen/component :matterjs.component/shapes]
-    {:component/handlers [shape.handler/handlers
-                          (ig/ref :handler.essen.position.matterjs/set)]}
-    :interface.essen.position/matterjs {}
-
-    [:essen/handler :handler.essen.position.matterjs/set]
+   {[:essen/handler :handler.essen.position.matterjs/set]
     {:handler/route :handler.essen.position/set}
 
-    [:essen/component :matterjs.component/rectangle] {}
-    [:essen/component :matterjs.component/circle] {}}))
+    [:essen/component :matterjs.component/rectangle]
+    {:component/handlers [shape.handler/handlers]}
+
+    [:essen/component :matterjs.component/circle]
+    {:component/handlers [shape.handler/handlers]}}))

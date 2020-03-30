@@ -63,7 +63,9 @@
   [config k]
   (let [v1 (it/find-derived-value config k)
         v2 (first-gen-system-value config (first-gen-key k))]
-    (assoc config k (meta-merge v2 v1))))
+    (-> config
+        (assoc k (meta-merge v2 v1))
+        (update k with-meta (meta v1)))))
 
 (defn- inherit-parent-systems [config]
   (reduce merge-parent-system config (second-gen-systems config)))

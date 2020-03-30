@@ -44,16 +44,16 @@
       (keys)
       (set)))
 
+(def ^:private event-keys
+  [:event/entity
+   :event/handler
+   :event/content
+   :event/excludes])
+
 (defn emit!
   "Emit a event with `content` to an `entity`'s `handler` in `scene`"
-  ([entity handler content]
-   (doseq [scene (scenes)]
-     (emit! scene entity handler content)))
-  ([scene entity handler content]
-   (swap! (get @state/events scene)
-          conj {:event/entity entity
-                :event/handler handler
-                :event/content content})))
+  [{:event/keys [scene] :as event}]
+  (swap! (get @state/events scene) conj (select-keys event event-keys)))
 
 (defn entities
   "Get all component states of any enitities from `scene-key` which are derived

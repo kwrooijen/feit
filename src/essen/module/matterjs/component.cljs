@@ -2,11 +2,14 @@
   (:require
    [essen.system.component :as component]
    [essen.module.matterjs.extra.position :as extra.position]
-   ["matter-js" :as Matter :refer [Bodies Body]]
+   ["matter-js" :as Matter :refer [Bodies]]
    [essen.module.matterjs.shape.handler :as shape.handler]
    [essen.module.matterjs.world :as matterjs.world]
    [essen.util :refer [ns-map->nested-map]]
    [integrant.core :as ig]))
+
+(derive :matterjs.component/rectangle :matterjs/body)
+(derive :matterjs.component/circle :matterjs/body)
 
 (defrecord MatterjsBody [body x y])
 

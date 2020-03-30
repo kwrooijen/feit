@@ -16,7 +16,7 @@
          (loop.handler/process)
          (loop.reactor/process)))
    scene
-   (loop.event/event->context scene event)))
+   (loop.event/event->contexts scene event)))
 
 (defn- threshold-reached [_key]
   (println "THRESHOLD REACHED")

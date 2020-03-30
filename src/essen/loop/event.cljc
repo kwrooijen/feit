@@ -2,6 +2,7 @@
   (:require
    [essen.system.component :as component]
    [essen.system.entity :as entity]
+   [integrant-tools.keyword :refer [ancestor?]]
    [integrant.core :as ig]))
 
 (defn- add-component
@@ -26,17 +27,31 @@
   (->> (get-component-key scene event)
        (mapv #(get-in scene (component/path entity %)))))
 
-(defn event->context [scene {:event/keys [entity handler content] :as event}]
-  (for [component (get-components scene event)]
-    {:context/scene-key (:scene/key scene)
-     :context/entity-key entity
-     :context/component-key (:component/key component)
-     :context/scene scene
-     :context/entity (-> scene :scene/entities entity entity/state)
-     :context/component component
-     :context/state (:component/state component)
-     :context/old-state (:component/state component)
-     :context/handler (get-in component [:component/handlers handler])
-     :context/handler-key handler
-     :context/subs (get-subs entity (:scene/entities scene))
-     :context/event content}))
+(defn excludable? [{:component/keys [key]} excludes]
+  (some (fn [exclude]
+          (or ^boolean (identical? key exclude)
+              ^boolean (ancestor? exclude key)))
+        excludes))
+
+(defn event->context [scene {:event/keys [entity handler content]} component]
+  {:context/scene-key (:scene/key scene)
+   :context/entity-key entity
+   :context/component-key (:component/key component)
+   :context/scene scene
+   :context/entity (-> scene :scene/entities entity entity/state)
+   :context/component component
+   :context/state (:component/state component)
+   :context/old-state (:component/state component)
+   :context/handler (get-in component [:component/handlers handler])
+   :context/handler-key handler
+   :context/subs (get-subs entity (:scene/entities scene))
+   :context/event content})
+
+(defn event->contexts [scene {:event/keys [excludes] :as event}]
+  (reduce
+   (fn [acc component]
+     (if ^boolean (excludable? component excludes)
+       acc
+       (conj acc (event->context scene event component))))
+   []
+   (get-components scene event)))

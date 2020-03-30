@@ -15,13 +15,13 @@
                        :y (+ y (:y state))})
     state))
 
-(defmethod ig/init-key :ticker.essen.position.matterjs/update [_ opts]
-  (fn [{:context/keys [scene-key entity-key component-key]} {:keys [body x y]}]
+(defmethod ig/init-key :ticker.essen.position.matterjs/update [k opts]
+  (fn [{:context/keys [scene-key entity-key]} {:keys [body x y]}]
     (essen/emit!
      {:event/scene scene-key
       :event/entity entity-key
       :event/handler :handler.essen.position/set
-      :event/excludes [component-key]
+      :event/excludes [:matterjs/body]
       :event/content
       {:position/x (- (.. body -position -x) x)
        :position/y (- (.. body -position -y) y)}})))

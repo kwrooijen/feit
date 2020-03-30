@@ -19,4 +19,7 @@
     (select-keys event [:position/x :position/y])))
 
 (def config
-  {[:essen/component :component.essen/position] {}})
+  {[:essen/component :component.essen/position]
+   {:component/handlers [(ig/ref :handler.essen.position/set)]}
+
+   [:essen/handler :handler.essen.position/set] {}})

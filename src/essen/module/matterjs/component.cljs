@@ -1,14 +1,14 @@
 (ns essen.module.matterjs.component
   (:require
    [essen.system.component :as component]
-   [essen.module.matterjs.extra.position]
+   [essen.module.matterjs.extra.position :as extra.position]
    ["matter-js" :as Matter :refer [Bodies Body]]
    [essen.module.matterjs.shape.handler :as shape.handler]
    [essen.module.matterjs.world :as matterjs.world]
    [essen.util :refer [ns-map->nested-map]]
    [integrant.core :as ig]))
 
-(defrecord MatterjsBody [body])
+(defrecord MatterjsBody [body x y])
 
 (extend-protocol IPrintWithWriter
   MatterjsBody
@@ -26,7 +26,7 @@
   (fn [_context]
     (let [body (.rectangle Bodies x y width height (shape->body-opts opts))]
       (matterjs.world/add! body)
-      (MatterjsBody. body))))
+      (map->MatterjsBody. {:body body :x x :y y}))))
 
 (defmethod component/persistent-resume :matterjs.component/rectangle [_key _opts state]
   (matterjs.world/add! (:body state))
@@ -47,7 +47,7 @@
   (fn [_context]
     (let [body (.circle Bodies x y radius (shape->body-opts opts))]
       (matterjs.world/add! body)
-      (MatterjsBody. body))))
+      (map->MatterjsBody. {:body body :x x :y y}))))
 
 (defmethod component/persistent-resume :matterjs.component/circle [_key _opts state]
   (matterjs.world/add! (:body state))
@@ -66,11 +66,13 @@
 (def config
   (merge
    shape.handler/config
-   {[:essen/handler :handler.essen.position.matterjs/set]
-    {:handler/route :handler.essen.position/set}
-
-    [:essen/component :matterjs.component/rectangle]
-    {:component/handlers [shape.handler/handlers]}
+   extra.position/config
+   {[:essen/component :matterjs.component/rectangle]
+    {:component/handlers [shape.handler/handlers
+                          extra.position/handlers]
+     :component/tickers [extra.position/tickers]}
 
     [:essen/component :matterjs.component/circle]
-    {:component/handlers [shape.handler/handlers]}}))
+    {:component/handlers [shape.handler/handlers
+                          extra.position/handlers]
+     :component/tickers [extra.position/tickers]}}))

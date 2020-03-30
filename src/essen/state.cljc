@@ -13,9 +13,9 @@
 
 (defonce config (atom {}))
 
-(defonce messages (atom {}))
+(defonce events (atom {}))
 
-(defonce input-messages (atom {}))
+(defonce input-events (atom {}))
 
 (defonce persistent-entities (atom {}))
 
@@ -27,8 +27,8 @@
   (get-in @state [:essen/scenes scene-key]))
 
 (defn reset-events! [scene-key]
-  (swap! messages assoc scene-key (atom []))
-  (swap! input-messages assoc scene-key (atom [])))
+  (swap! events assoc scene-key (atom []))
+  (swap! input-events assoc scene-key (atom [])))
 
 (defn save-scene! [scene]
   (swap! state assoc-in [:essen/scenes (:scene/key scene)] (atom scene)))

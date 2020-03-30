@@ -45,15 +45,15 @@
       (set)))
 
 (defn emit!
-  "Emit a message with `content` to an `entity`'s `handler` in `scene`"
+  "Emit a event with `content` to an `entity`'s `handler` in `scene`"
   ([entity handler content]
    (doseq [scene (scenes)]
      (emit! scene entity handler content)))
   ([scene entity handler content]
-   (swap! (get @state/messages scene)
-          conj {:message/entity entity
-                :message/handler handler
-                :message/content content})))
+   (swap! (get @state/events scene)
+          conj {:event/entity entity
+                :event/handler handler
+                :event/content content})))
 
 (defn entities
   "Get all component states of any enitities from `scene-key` which are derived

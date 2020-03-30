@@ -19,14 +19,14 @@
 (defn- get-subs [entity entities]
   (subs-states entities (-> entities entity :entity/subs)))
 
-(defn get-component-key [scene {:message/keys [entity handler]}]
+(defn get-component-key [scene {:event/keys [entity handler]}]
   (get-in scene [:scene/entities entity :entity/routes handler]))
 
-(defn- get-components [scene {:message/keys [entity] :as event}]
+(defn- get-components [scene {:event/keys [entity] :as event}]
   (->> (get-component-key scene event)
        (mapv #(get-in scene (component/path entity %)))))
 
-(defn event->context [scene {:message/keys [entity handler content] :as event}]
+(defn event->context [scene {:event/keys [entity handler content] :as event}]
   (for [component (get-components scene event)]
     {:context/scene-key (:scene/key scene)
      :context/entity-key entity

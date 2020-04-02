@@ -2,7 +2,7 @@
   (:require
    [clojure.set]
    [meta-merge.core :refer [meta-merge]]
-   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
+   [com.rpl.specter :as specter :refer [MAP-VALS MAP-KEYS ALL] :refer-macros [transform select]]
    [essen.system :as system]
    [essen.util :refer [vec->map top-key spy]]
    [integrant.core :as ig]))
@@ -16,13 +16,27 @@
 (defn state [{:entity/keys [components]}]
   (transform [MAP-VALS] :component/state components))
 
-(defn components->nested-routes [components]
-  (for [{:component/keys [key handlers]} components
-        k (keys handlers)]
-    {k [key]}))
+(defn has-handler? [handler-key component]
+  ((set (select [:component/handlers MAP-VALS :handler/key] component))
+   handler-key))
 
-(defn- routes [{:entity/keys [key components]}]
-  (apply merge-with into (components->nested-routes components)))
+(defn filter-handler-components [handler-key components]
+  (mapv :component/key
+        (filter #(has-handler? handler-key %) components)))
+
+(defn components->nested-routes [handler-keys components]
+  (for [handler-key handler-keys]
+    {handler-key (filter-handler-components handler-key components)}))
+
+(defn routes [entity]
+  (let [components (select [:entity/components MAP-VALS] entity)
+        handler-keys (select [ALL :component/handlers MAP-KEYS] components)]
+    (->> components
+         (components->nested-routes handler-keys)
+         (apply merge))))
+
+(defn add-routes [entity] []
+  (assoc entity :entity/routes (routes entity)))
 
 (defn set-component-key [ref {:component/keys [key]}]
   (if key
@@ -48,8 +62,7 @@
       (update :entity/components process-components)
       (select-keys [:entity/components
                     :entity/dynamic])
-      (assoc :entity/routes (routes opts)
-             :entity/key (top-key k)
+      (assoc :entity/key (top-key k)
              :entity/opts (dissoc opts :entity/components)
              :entity/init (system/get-init-key k opts)
              :entity/halt! (system/get-halt-key k opts))))

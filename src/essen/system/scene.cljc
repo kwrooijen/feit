@@ -1,6 +1,6 @@
 (ns essen.system.scene
   (:require
-   [com.rpl.specter :as specter :refer [MAP-VALS ALL] :refer-macros [transform]]
+   [com.rpl.specter :as specter :refer [MAP-VALS MAP-KEYS ALL] :refer-macros [transform select]]
    [essen.state :as state]
    [essen.util :refer [vec->map spy top-key]]
    [integrant-tools.core :as it]
@@ -11,14 +11,15 @@
    [essen.render]))
 
 (defn- start-entity [scene-key {entity-key :entity/key :as entity}]
-  (try (update entity :entity/init (fn [entity-init]
-                                     (entity-init {:context/scene-key scene-key
-                                                   :context/entity-key entity-key})))
-       (catch #?(:clj Throwable :cljs :default) t
-         (println "[ERROR] Failed to init entity.\n"
-                  "Scene:" scene-key "\n"
-                  "Entity:" entity-key "\n"
-                  "Reason:" (ex-data t)))))
+  (try
+    ((:entity/init entity) {:context/scene-key scene-key
+                            :context/entity-key entity-key})
+    (entity/add-routes entity)
+    (catch #?(:clj Throwable :cljs :default) t
+      (println "[ERROR] Failed to init entity.\n"
+               "Scene:" scene-key "\n"
+               "Entity:" entity-key "\n"
+               "Reason:" (ex-data t)))))
 
 (defmethod system/init-key :essen/scene [k opts]
   (-> opts

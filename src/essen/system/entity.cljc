@@ -1,6 +1,7 @@
 (ns essen.system.entity
   (:require
    [clojure.set]
+   [meta-merge.core :refer [meta-merge]]
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [essen.system :as system]
    [essen.util :refer [vec->map top-key spy]]
@@ -23,11 +24,20 @@
 (defn- routes [{:entity/keys [components]}]
   (apply merge-with into (components->nested-routes components)))
 
+(defn merge-extra-opts [component]
+  (if-let [ref (:component/ref component)]
+    (assoc ref :component/opts
+           (meta-merge (:component/opts ref)
+                       (dissoc component :component/ref)))
+    component))
+
+(defn process-components [components]
+  (-> (mapv merge-extra-opts components)
+      (vec->map :component/key)))
+
 (defmethod system/init-key :essen/entity [k opts]
   (-> opts
-      ;; TODO Check if any components are direct children of :essen/component
-      ;; If they are, throw an error. You're not allowed to use root components
-      (update :entity/components vec->map :component/key)
+      (update :entity/components process-components)
       (select-keys [:entity/components
                     :entity/dynamic])
       (assoc :entity/routes (routes opts)

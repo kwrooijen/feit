@@ -31,14 +31,7 @@
                  :context/entity entity-key}]
     (transform [:entity/components MAP-VALS]
                (comp component/start
-                     (fn [component]
-                       (merge
-                        {:component/persistent
-                         (get-in (:entity/opts entity) [(:component/key component)
-                                                        :component/persistent])}
-                        (update component :component/opts
-                                merge context
-                                (get (:entity/opts entity) (:component/key component))))))
+                     #(update % :component/opts merge context))
                entity)))
 
 (defn make-dynamic-entity [entity]

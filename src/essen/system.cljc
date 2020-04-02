@@ -32,51 +32,12 @@
   [config key]
   (ig/build config [key] init-key ig/assert-pre-init-spec ig/resolve-key))
 
-(defn- first-gen-system? [k]
-  (and (descendant? (top-key k) :essen/component)
-       (->> (top-key k)
-            (parent? :essen/component))))
-
-(defn- second-gen-system? [k]
-  (and (descendant? (top-key k) :essen/component)
-        (->> (top-key k)
-             (parent? :essen/component)
-             (not))))
-
-(defn- second-gen-systems [config]
-  (remove first-gen-system?
-          (it/find-derived-keys config :essen/component)))
-
-(defn- first-gen-key [key]
-  (loop [k (top-key key)]
-    (cond
-      (nil? k) k
-      (first-gen-system? k) k
-      :else (recur (parent k)))))
-
-(defn- first-gen-system-value [config system-key]
-  (->> (ig/find-derived config system-key)
-       (remove (fn [[k _]] (some second-gen-system? k)))
-       (last)
-       (last)))
-
-(defn- merge-parent-system
-  [config k]
-  (let [v1 (it/find-derived-value config k)
-        v2 (first-gen-system-value config (first-gen-key k))]
-    (-> config
-        (assoc k (meta-merge v2 v1))
-        (update k with-meta (meta v1)))))
-
-(defn- inherit-parent-systems [config]
-  (reduce merge-parent-system config (second-gen-systems config)))
-
 (defn prep
   "Prepares the config system with a composite derive on all keys. This is used
   internally by essen and should not be called directly."
   [config]
   (derive-composite-all config)
-  (inherit-parent-systems (ig/prep config)))
+  config)
 
 (defn method [derived-k]
   (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]

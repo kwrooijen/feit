@@ -1,7 +1,7 @@
 (ns essen.system.component
   (:require
    [integrant.core :as ig]
-   [essen.util :refer [vec->map top-key]]
+   [essen.util :refer [vec->map top-key spy]]
    [essen.state :refer [persistent-components]]
    [essen.system :as system]))
 
@@ -24,8 +24,8 @@
     (persistent-resume key opts state)))
 
 (defn save-persistent-component!
-  [{:component/keys [key persistent state] :as component} entity-key]
-  (when persistent
+  [{:component/keys [key opts state] :as component} entity-key]
+  (when (:component/persistent opts)
     (swap! persistent-components assoc [entity-key key] state))
   component)
 

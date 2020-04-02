@@ -7,4 +7,5 @@
 (defmethod es/init-key :essen/reactor [k opts]
   (assoc opts
          :reactor/key (top-key k)
+         :reactor/init (get-method ig/init-key k)
          :reactor/fn (ig/init-key k opts)))

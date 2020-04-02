@@ -26,10 +26,9 @@
 
 (defmethod ig/init-key :matterjs.component/rectangle
   [_ {:rectangle/keys [x y width height] :as opts}]
-  (fn [_context]
-    (let [body (.rectangle Bodies x y width height (shape->body-opts opts))]
-      (matterjs.world/add! body)
-      (map->MatterjsBody. {:body body :x x :y y}))))
+  (let [body (.rectangle Bodies x y width height (shape->body-opts opts))]
+    (matterjs.world/add! body)
+    (map->MatterjsBody. {:body body :x x :y y})))
 
 (defmethod component/persistent-resume :matterjs.component/rectangle [_key _opts state]
   (matterjs.world/add! (:body state))
@@ -47,10 +46,9 @@
 
 (defmethod ig/init-key :matterjs.component/circle
   [_ {:circle/keys [x y radius] :as opts}]
-  (fn [_context]
-    (let [body (.circle Bodies x y radius (shape->body-opts opts))]
-      (matterjs.world/add! body)
-      (map->MatterjsBody. {:body body :x x :y y}))))
+  (let [body (.circle Bodies x y radius (shape->body-opts opts))]
+    (matterjs.world/add! body)
+    (map->MatterjsBody. {:body body :x x :y y})))
 
 (defmethod component/persistent-resume :matterjs.component/circle [_key _opts state]
   (matterjs.world/add! (:body state))

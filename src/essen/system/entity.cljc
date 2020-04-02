@@ -32,6 +32,7 @@
                     :entity/dynamic])
       (assoc :entity/routes (routes opts)
              :entity/key (top-key k)
+             :entity/opts (dissoc opts :entity/components)
              :entity/init (system/get-init-key k opts)
              :entity/halt! (system/get-halt-key k opts))))
 

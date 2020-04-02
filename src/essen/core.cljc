@@ -19,6 +19,7 @@
    [spec-signature.core :refer-macros [sdef]]
    [essen.module.pixi.render :as rr]))
 
+(set! *print-meta* true)
 (defn- start-render [config]
   (-> config
       (ig/prep [:essen.module/render])

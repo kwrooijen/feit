@@ -24,8 +24,7 @@
 (defmethod ig/init-key :entity.essen.dev/wireframe [_ _opts] identity)
 
 (defmethod ig/init-key :component.essen.dev/wireframe [_ _opts]
-  (fn [_context]
-    {:wireframe/active? true}))
+  {:wireframe/active? true})
 
 (defmethod ig/init-key :ticker.essen.dev/wireframe
   [_k _opts]

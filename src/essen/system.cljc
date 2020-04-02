@@ -1,5 +1,6 @@
 (ns essen.system
   (:require
+   [cljs.pprint]
    [essen.util :refer [top-key derive-composite-all]]
    [essen.state :as state]
    [meta-merge.core :refer [meta-merge]]
@@ -76,6 +77,11 @@
   [config]
   (derive-composite-all config)
   (inherit-parent-systems (ig/prep config)))
+
+(defn method [derived-k]
+  (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
+    f
+    (fn [v _] v)))
 
 (defn get-init-key [derived-k entity-opts]
   (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]

@@ -36,20 +36,24 @@
                     :component/reactors
                     :component/persistent])
       (assoc :component/key (top-key k)
-             :component/state (system/get-init-key k opts)
+             :component/init (system/method k)
+             :component/state nil
              :component/halt! (system/get-halt-key k opts)
-             :component/opts opts)
+             :component/opts (dissoc opts
+                                     :component/handlers
+                                     :component/tickers
+                                     :component/reactors))
       (update :component/tickers vec->map :ticker/key)
       (update :component/handlers vec->map :handler/key)
       (update :component/reactors vec->map :reactor/key)))
 
 (defn start
-  [{:context/keys [scene entity] :component/keys [key state] :as component}]
+  [{:context/keys [scene entity] :component/keys [key state init] :as component}]
   (try
     (-> component
         (assoc :component/state
                (or (get-persistent-state component)
-                   (state component)))
+                   (init key (:component/opts component))))
         (save-persistent-component! entity))
     (catch #?(:clj Throwable :cljs :default) t
       (println "[ERROR] Failed to start component.\n"

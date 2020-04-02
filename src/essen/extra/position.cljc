@@ -5,10 +5,10 @@
 
 (defmethod ig/init-key :component.essen/position [_ {:position/keys [x y]}]
   ;; TODO separate context + rename scene / entity to scene-key and entity-key
-  (fn [{:context/keys [scene entity]}]
+  (fn [{:context/keys [scene-key entity-key]}]
     (essen/emit!
-     {:event/scene scene
-      :event/entity entity
+     {:event/scene scene-key
+      :event/entity entity-key
       :event/handler :handler.essen.position/set
       :event/content {:position/x x :position/y y}})
     {:position/x x

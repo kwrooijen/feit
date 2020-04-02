@@ -13,7 +13,7 @@
   (transform [MAP-VALS] clj->js (js->clj o)))
 
 (defn- spritesheet-loaded
-  [{::keys [spritesheet name transition] :context/keys [scene] :as opts}]
+  [{::keys [spritesheet name transition] :context/keys [scene-key] :as opts}]
   (let [sheet
         (-> (.-shared PIXI/Loader)
             (.-resources)
@@ -22,7 +22,7 @@
     (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
     (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))
 
-  (scene/halt! scene)
+  (scene/halt! scene-key)
   (scene/start! transition))
 
 (defmethod ig/pre-init-spec ::load-spritesheet [_]

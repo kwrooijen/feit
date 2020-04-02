@@ -19,12 +19,12 @@
    [:scene/entities entity
     :entity/components component]))
 
-(defn get-persistent-state [{:context/keys [entity] :component/keys [key] :as opts}]
-  (when-let [state (get @persistent-components [entity key])]
-    (persistent-resume key opts state)))
+(defn get-persistent-state [{:context/keys [entity-key] :component/keys [key alpha-key] :as opts}]
+  (when-let [state (get @persistent-components [entity-key key])]
+    (persistent-resume alpha-key opts state)))
 
 (defn save-persistent-component!
-  [{:component/keys [key opts state] :as component} entity-key]
+  [{:component/keys [key opts state] :context/keys [entity-key] :as component}]
   (when (:component/persistent opts)
     (swap! persistent-components assoc [entity-key key] state))
   component)
@@ -36,6 +36,7 @@
                     :component/reactors
                     :component/persistent])
       (assoc :component/key (top-key k)
+             :component/alpha-key (top-key k)
              :component/init (system/method k)
              :component/state nil
              :component/halt! (system/get-halt-key k opts)
@@ -48,16 +49,16 @@
       (update :component/reactors vec->map :reactor/key)))
 
 (defn start
-  [{:context/keys [scene entity] :component/keys [key state init] :as component}]
+  [{:context/keys [scene-key entity-key] :component/keys [key state init] :as component}]
   (try
     (-> component
         (assoc :component/state
                (or (get-persistent-state component)
                    (init key (:component/opts component))))
-        (save-persistent-component! entity))
+        (save-persistent-component!))
     (catch #?(:clj Throwable :cljs :default) t
       (println "[ERROR] Failed to start component.\n"
-               "Scene:" scene "\n"
-               "Entity:" entity "\n"
+               "Scene:" scene-key "\n"
+               "Entity:" entity-key "\n"
                "Component:" key "\n"
                "Reason:" (ex-data t)))))

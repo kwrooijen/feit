@@ -12,8 +12,8 @@
 
 (defn- start-entity [scene-key {entity-key :entity/key :as entity}]
   (try (update entity :entity/init (fn [entity-init]
-                                     (entity-init {:context/scene scene-key
-                                                   :context/entity entity-key})))
+                                     (entity-init {:context/scene-key scene-key
+                                                   :context/entity-key entity-key})))
        (catch #?(:clj Throwable :cljs :default) t
          (println "[ERROR] Failed to init entity.\n"
                   "Scene:" scene-key "\n"
@@ -27,11 +27,11 @@
              :scene/halt! (system/get-halt-key k opts))))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
-  (let [context {:context/scene scene-key
-                 :context/entity entity-key}]
+  (let [context {:context/scene-key scene-key
+                 :context/entity-key entity-key}]
     (transform [:entity/components MAP-VALS]
                (comp component/start
-                     #(update % :component/opts merge context))
+                     (partial merge context))
                entity)))
 
 (defn make-dynamic-entity [entity]

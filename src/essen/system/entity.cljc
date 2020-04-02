@@ -21,14 +21,22 @@
         k (keys handlers)]
     {k [key]}))
 
-(defn- routes [{:entity/keys [components]}]
+(defn- routes [{:entity/keys [key components]}]
   (apply merge-with into (components->nested-routes components)))
+
+(defn set-component-key [ref {:component/keys [key]}]
+  (if key
+    (assoc ref :component/key key)
+    ref))
+
+(defn set-component-opts [ref component]
+  (update ref :component/opts meta-merge (dissoc component :component/ref)))
 
 (defn merge-extra-opts [component]
   (if-let [ref (:component/ref component)]
-    (assoc ref :component/opts
-           (meta-merge (:component/opts ref)
-                       (dissoc component :component/ref)))
+    (-> ref
+        (set-component-key  component)
+        (set-component-opts  component))
     component))
 
 (defn process-components [components]

@@ -6,34 +6,34 @@
    [integrant.core :as ig]))
 
 (defn path
-  ([entity component]
-   [:scene/entities entity
-    :entity/components component
+  ([entity-key component-key]
+   [:scene/entities entity-key
+    :entity/components component-key
     :component/tickers])
-  ([entity component ticker]
-   [:scene/entities entity
-    :entity/components component
+  ([entity-key component-key ticker]
+   [:scene/entities entity-key
+    :entity/components component-key
     :component/tickers ticker]))
 
 (defn add!
-  ([{:context/keys [scene entity component]} ticker opts]
-   (add! scene entity component ticker opts))
-  ([scene entity component ticker opts]
-   (let [context {:context/scene scene
-                  :context/entity entity}
+  ([{:context/keys [scene-key entity-key component]} ticker opts]
+   (add! scene-key entity-key component ticker opts))
+  ([scene-key entity-key component ticker opts]
+   (let [context {:context/scene-key scene-key
+                  :context/entity-key entity-key}
          opts (merge opts context)]
-     (swap! (get-scene scene)
+     (swap! (get-scene scene-key)
             assoc-in
-            (path entity component ticker)
+            (path entity-key component ticker)
             {:ticker/key ticker
              :ticker/fn (ig/init-key ticker opts)}))))
 
 (defn remove!
-  ([{:context/keys [scene entity component]} ticker]
-   (remove! scene entity component ticker))
-  ([scene entity component ticker]
-   (swap! (get-scene scene)
-          update-in (path entity component) dissoc ticker)))
+  ([{:context/keys [scene-key entity-key component]} ticker]
+   (remove! scene-key entity-key component ticker))
+  ([scene-key entity-key component ticker]
+   (swap! (get-scene scene-key)
+          update-in (path entity-key component) dissoc ticker)))
 
 (defmethod es/init-key :essen/ticker [k opts]
   (assoc opts

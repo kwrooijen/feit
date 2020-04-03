@@ -6,7 +6,7 @@
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [make-child]]
    [essen.system.entity :as entity]
-   [essen.system :as system]
+   [essen.system.core :as system]
    [essen.system.component :as component]
    [essen.render]))
 

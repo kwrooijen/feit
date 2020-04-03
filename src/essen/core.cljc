@@ -4,7 +4,7 @@
    [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [essen.state :as state]
    [essen.util :as util]
-   [essen.system :as system]
+   [essen.system.core :as system]
    [essen.system.component]
    [essen.system.handler]
    [essen.system.keyboard]

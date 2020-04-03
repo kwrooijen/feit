@@ -5,7 +5,7 @@
    [essen.module.pixi.debug :as pixi.debug]
    [essen.render]
    [essen.state :as state]
-   [essen.system :as system]
+   [essen.system.core :as system]
    [essen.system.entity :as entity]
    [essen.system.scene :as scene]
    [integrant.core :as ig]))

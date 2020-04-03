@@ -3,7 +3,7 @@
    [integrant.core :as ig]
    [essen.util :refer [vec->map top-key spy]]
    [essen.state :refer [persistent-components]]
-   [essen.system :as system]))
+   [essen.system.core :as system]))
 
 (defmulti persistent-resume
   (fn [key _opts _state]

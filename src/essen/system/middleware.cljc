@@ -1,6 +1,6 @@
 (ns essen.system.middleware
   (:require
-   [essen.system :as es]
+   [essen.system.core :as system]
    [essen.util :refer [top-key]]
    [essen.state :refer [get-scene]]
    [integrant.core :as ig]))
@@ -39,7 +39,7 @@
           (path entity-key component handler)
           dissoc middleware)))
 
-(defmethod es/init-key :essen/middleware [k opts]
+(defmethod system/init-key :essen/middleware [k opts]
   (assoc opts
          :middleware/key (top-key k)
          :middleware/fn (ig/init-key k opts)))

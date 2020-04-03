@@ -1,11 +1,9 @@
-(ns essen.system
+(ns essen.system.core
   (:require
    [cljs.pprint]
-   [essen.util :refer [top-key derive-composite-all]]
+   [essen.util :refer [derive-composite-all]]
    [essen.state :as state]
-   [meta-merge.core :refer [meta-merge]]
    [integrant-tools.core :as it]
-   [integrant-tools.keyword :refer [parent parent? descendant?]]
    [integrant.core :as ig]))
 
 (it/derive-hierarchy

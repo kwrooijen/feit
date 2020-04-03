@@ -3,7 +3,7 @@
    [clojure.set]
    [meta-merge.core :refer [meta-merge]]
    [com.rpl.specter :as specter :refer [MAP-VALS MAP-KEYS ALL] :refer-macros [transform select]]
-   [essen.system :as system]
+   [essen.system.core :as system]
    [essen.util :refer [vec->map top-key spy]]
    [integrant.core :as ig]))
 

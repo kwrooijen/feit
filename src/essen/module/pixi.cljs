@@ -7,10 +7,10 @@
    [essen.module.pixi.state :as state :refer [sheets textures animations]]
    [essen.module.pixi.render]
    [essen.module.pixi.component.sprite :as component.sprite]
-   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]))
+   [com.rpl.specter :as sp :refer [MAP-VALS]]))
 
 (defn js-keys->clj-keys [o]
-  (transform [MAP-VALS] clj->js (js->clj o)))
+  (sp/transform [MAP-VALS] clj->js (js->clj o)))
 
 (defn- spritesheet-loaded
   [{::keys [spritesheet name transition] :context/keys [scene-key] :as opts}]

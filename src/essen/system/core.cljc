@@ -28,7 +28,7 @@
   "Starts an essen system (scene or entity). This is used internally by essen
   and should not be called directly."
   [config key]
-  (ig/build config [key] init-key ig/assert-pre-init-spec ig/resolve-key))
+  (ig/build config [key] init-key #'ig/assert-pre-init-spec ig/resolve-key))
 
 (defn prep
   "Prepares the config system with a composite derive on all keys. This is used
@@ -38,17 +38,17 @@
   config)
 
 (defn method [derived-k]
-  (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
+  (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]
     f
     (fn [v _] v)))
 
 (defn get-init-key [derived-k entity-opts]
-  (if-let [f (get-method ig/init-key (ig/normalize-key derived-k))]
+  (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]
     (f derived-k entity-opts)
     (fn [v _] v)))
 
 (defn get-halt-key [derived-k entity-opts]
-  (if-let [f (get-method ig/halt-key! (ig/normalize-key derived-k))]
+  (if-let [f (get-method ig/halt-key! (#'ig/normalize-key derived-k))]
     (or (f derived-k entity-opts)
         (fn [_] nil))
     (fn [_] nil)))

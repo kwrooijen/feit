@@ -2,7 +2,7 @@
   (:require
    [clojure.set]
    [meta-merge.core :refer [meta-merge]]
-   [com.rpl.specter :as specter :refer [MAP-VALS MAP-KEYS ALL] :refer-macros [transform select]]
+   [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
    [essen.system.core :as system]
    [essen.util :refer [vec->map top-key spy]]
    [integrant.core :as ig]))
@@ -14,10 +14,10 @@
    :component/state])
 
 (defn state [{:entity/keys [components]}]
-  (transform [MAP-VALS] :component/state components))
+  (sp/transform [MAP-VALS] :component/state components))
 
 (defn has-handler? [handler-key component]
-  ((set (select [:component/handlers MAP-VALS :handler/key] component))
+  ((set (sp/select [:component/handlers MAP-VALS :handler/key] component))
    handler-key))
 
 (defn filter-handler-components [handler-key components]
@@ -29,8 +29,8 @@
     {handler-key (filter-handler-components handler-key components)}))
 
 (defn routes [entity]
-  (let [components (select [:entity/components MAP-VALS] entity)
-        handler-keys (select [ALL :component/handlers MAP-KEYS] components)]
+  (let [components (sp/select [:entity/components MAP-VALS] entity)
+        handler-keys (sp/select [ALL :component/handlers MAP-KEYS] components)]
     (->> components
          (components->nested-routes handler-keys)
          (apply merge))))

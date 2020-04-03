@@ -2,7 +2,6 @@
   (:require
    [essen.core :as essen]
    ["matter-js" :as Matter :refer [Body]]
-   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
    [integrant.core :as ig]))
 
 ;; TODO add a ticker to update position

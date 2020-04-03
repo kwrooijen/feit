@@ -1,11 +1,13 @@
 (ns essen.state
-  (:refer-clojure :exclude [atom])
-  (:require
-   #?(:cljs [reagent.core :as r])))
+  #?(:cljs
+     (:refer-clojure :exclude [atom]))
+  #?(:cljs
+     (:require
+      [reagent.core :as r])))
 
-(defn atom [v]
-  #?(:clj  (clojure.core/atom v)
-     :cljs (r/atom v)))
+#?(:cljs
+   (defn atom [v]
+     (r/atom v)))
 
 (defonce state (atom {}))
 

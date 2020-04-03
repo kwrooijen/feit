@@ -1,9 +1,9 @@
 (ns essen.core
   (:require
+   [essen.loop.core]
    [clojure.spec.alpha :as s]
-   [com.rpl.specter :as specter :refer [MAP-VALS] :refer-macros [transform]]
+   [com.rpl.specter :as sp :refer [MAP-VALS]]
    [essen.state :as state]
-   [essen.util :as util]
    [essen.system.core :as system]
    [essen.system.component]
    [essen.system.handler]
@@ -16,10 +16,10 @@
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [essen.render]
-   [spec-signature.core :refer-macros [sdef]]
    [essen.module.pixi.render :as rr]))
 
 (set! *print-meta* true)
+
 (defn- start-render [config]
   (-> config
       (ig/prep [:essen.module/render])
@@ -62,8 +62,8 @@
   [scene-key entity-key]
   (->> (ig/find-derived (:scene/entities @(state/get-scene scene-key)) entity-key)
        (into {})
-       (transform [MAP-VALS] :entity/components)
-       (transform [MAP-VALS MAP-VALS] :component/state)))
+       (sp/transform [MAP-VALS] :entity/components)
+       (sp/transform [MAP-VALS MAP-VALS] :component/state)))
 
 (defn entity [scene-key entity-key]
   (-> (entities scene-key entity-key)

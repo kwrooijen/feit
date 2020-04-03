@@ -1,6 +1,6 @@
 (ns essen.system.scene
   (:require
-   [com.rpl.specter :as specter :refer [MAP-VALS MAP-KEYS ALL] :refer-macros [transform select]]
+   [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
    [essen.state :as state]
    [essen.util :refer [vec->map spy top-key]]
    [integrant-tools.core :as it]
@@ -30,7 +30,7 @@
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
   (let [context {:context/scene-key scene-key
                  :context/entity-key entity-key}]
-    (transform [:entity/components MAP-VALS]
+    (sp/transform [:entity/components MAP-VALS]
                (comp component/start
                      (partial merge context))
                entity)))
@@ -48,8 +48,8 @@
 
 (defn start-entities [opts scene-key]
   (->> opts
-       (transform [:scene/entities] entities->map)
-       (transform [:scene/entities MAP-VALS]
+       (sp/transform [:scene/entities] entities->map)
+       (sp/transform [:scene/entities MAP-VALS]
                   (comp (partial start-entity scene-key)
                         (partial start-components scene-key)))))
 

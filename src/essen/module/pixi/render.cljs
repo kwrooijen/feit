@@ -2,7 +2,7 @@
   (:require
    ["pixi.js" :as PIXI :refer [Renderer Container Ticker]]
    [integrant.core :as ig]
-   [essen.loop]
+   [essen.loop.core]
    [essen.module.pixi.state :refer [state]]))
 
 (defonce tickers (atom {}))
@@ -44,7 +44,7 @@
            (.-innerHeight js/window)))
 
 (defn animate [stage-key delta]
-  (essen.loop/run stage-key delta (.now js/Date))
+  (essen.loop.core/run stage-key delta (.now js/Date))
   (.render (renderer) (container stage-key)))
 
 (defn add-ticker [f k]

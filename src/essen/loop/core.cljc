@@ -1,4 +1,4 @@
-(ns essen.loop
+(ns essen.loop.core
   (:require
    [essen.loop.event :as loop.event]
    [essen.loop.middleware :as loop.middleware]

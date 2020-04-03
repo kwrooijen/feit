@@ -15,8 +15,7 @@
    [essen.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
-   [essen.render]
-   [essen.module.pixi.render :as rr]))
+   [essen.render]))
 
 (set! *print-meta* true)
 
@@ -30,13 +29,14 @@
       (ig/prep [:essen.module/physics])
       (ig/init [:essen.module/physics])
       (it/find-derived-value :essen.module/physics)
-      (rr/add-ticker :essen/physics)))
+      (essen.loop.core/add!)))
 
 (defn setup
   [config]
   (system/start config)
   (start-render config)
-  (start-physics config))
+  (start-physics config)
+  (essen.loop.core/start!))
 
 (defn scenes
   "Get all current running scenes as a set."

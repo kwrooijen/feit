@@ -1,11 +1,9 @@
 (ns essen.module.pixi.render
   (:require
-   ["pixi.js" :as PIXI :refer [Renderer Container Ticker]]
+   ["pixi.js" :as PIXI :refer [Renderer Container]]
    [integrant.core :as ig]
-   [essen.loop.core]
    [essen.module.pixi.state :refer [state]]))
 
-(defonce tickers (atom {}))
 
 (defn renderer []
   (:pixi/renderer @state))
@@ -23,8 +21,6 @@
          height      (.-innerHeight js/window)
          resolution  (.-devicePixelRatio js/window)
          auto-dencity true}}]
-  (swap! state assoc :pixi/ticker (Ticker.))
-  (.start (:pixi/ticker @state))
   (swap! state assoc :pixi/renderer
          (Renderer.
           #js{:view        (js/document.getElementById view)
@@ -43,17 +39,8 @@
            (.-innerWidth js/window)
            (.-innerHeight js/window)))
 
-(defn animate [stage-key delta]
-  (essen.loop.core/run stage-key delta (.now js/Date))
+(defn render [stage-key]
   (.render (renderer) (container stage-key)))
-
-(defn add-ticker [f k]
-  (swap! tickers assoc k f)
-  (-> (:pixi/ticker @state)
-      (.add f)))
-
-(defn start-loop [stage-key]
-  (add-ticker (partial animate stage-key) stage-key))
 
 (defmethod ig/init-key :essen.module/pixi [_ opts]
   (.addEventListener js/window "resize" handler-resize)
@@ -62,13 +49,10 @@
   (swap! state assoc-in [:pixi/running-stages] #{}))
 
 (defmethod ig/init-key :essen.module.spawn/pixi [_ {:essen/keys [scene]}]
-  (start-loop scene)
   (setup-stage scene)
   (swap! state update-in [:pixi/running-stages] conj scene))
 
 (defmethod ig/halt-key! :essen.module.spawn/pixi [_ {:essen/keys [scene]}]
-  (-> (:pixi/ticker @state)
-      (.remove (get @tickers scene)))
   (.destroy (container scene))
   (.clear (renderer))
   (swap! state update-in [:pixi/stage] dissoc scene)

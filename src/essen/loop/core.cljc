@@ -1,7 +1,6 @@
 (ns essen.loop.core
   (:require
    #?(:clj [clojure.core.async :as async])
-   [essen.module.pixi.render]
    [essen.loop.event :as loop.event]
    [essen.loop.middleware :as loop.middleware]
    [essen.loop.handler :as loop.handler]

@@ -1,6 +1,7 @@
 (ns essen.module.pixi.core
   (:require
    [essen.module.pixi.state :as state]
+   [essen.module.pixi.component.sprite :as component.sprite]
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :pixi.core.event-listener/resize [_ opts]
@@ -41,15 +42,42 @@
     (.render state/renderer (state/get-scene scene-key))))
 
 
-;; (derive :pixi.core/scene :essen.interface.graphics-2d/scene)
+;; (defn js-keys->clj-keys [o]
+;;   (sp/transform [MAP-VALS] clj->js (js->clj o)))
+
+;; (defn- spritesheet-loaded
+;;   [{::keys [spritesheet name transition] :context/keys [scene-key]}]
+;;   (let [sheet
+;;         (-> (.-shared PIXI/Loader)
+;;             (.-resources)
+;;             (aget spritesheet))]
+;;     (swap! sheets assoc name sheet)
+;;     (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
+;;     (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))
+
+;;   (scene/halt! scene-key)
+;;   (scene/start! transition))
+
+;; (defmethod ig/pre-init-spec ::load-spritesheet [_]
+;;   (s/keys :req [::spritesheet
+;;                 ::name
+;;                 ::transition]))
+
+;; (defmethod ig/init-key ::load-spritesheet [_ {::keys [spritesheet] :as opts}]
+;;   (fn [_context]
+;;     (-> (.-shared PIXI/Loader)
+;;         (.add spritesheet)
+;;         (.load (partial spritesheet-loaded opts)))))
 
 (def config
-  {[:essen.interface.graphics-2d/system :pixi.core/system]
-   {:dep/renderer (ig/ref :pixi.core/renderer)
-    :dep/event-listener.resize (ig/ref :pixi.core.event-listener/resize)}
+  (merge
+   {[:essen.interface.graphics-2d/system :pixi.core/system]
+    {:dep/renderer (ig/ref :pixi.core/renderer)
+     :dep/event-listener.resize (ig/ref :pixi.core.event-listener/resize)}
 
-   [:essen.interface.graphics-2d/scene :pixi.core/scene] {}
+    [:essen.interface.graphics-2d/scene :pixi.core/scene] {}
 
-   :pixi.core.event-listener/resize {}
+    :pixi.core.event-listener/resize {}
 
-   [:essen.interface.graphics-2d/window :pixi.core/renderer] {}})
+    [:essen.interface.graphics-2d/window :pixi.core/renderer] {}}
+   component.sprite/config))

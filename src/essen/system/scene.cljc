@@ -7,8 +7,7 @@
    [integrant-tools.keyword :refer [make-child]]
    [essen.system.entity :as entity]
    [essen.system.core :as system]
-   [essen.system.component :as component]
-   [essen.render]))
+   [essen.system.component :as component]))
 
 (defmethod system/init-key :essen/scene [k opts]
   (assoc opts
@@ -62,11 +61,9 @@
 
 (defn resume! [scene-key]
   (state/reset-events! scene-key)
-  (init scene-key {})
-  (essen.render/resume scene-key))
+  (init scene-key {}))
 
 (defn halt! [scene-key]
-  (essen.render/halt! scene-key)
   (state/reset-events! scene-key)
   (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
     (entity/halt! entity))

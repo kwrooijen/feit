@@ -15,9 +15,7 @@
    [essen.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
-   [essen.interface.graphics-2d.core :as interface.graphics-2d]
-
-   [essen.render]))
+   [essen.interface.graphics-2d.core :as interface.graphics-2d]))
 
 (set! *print-meta* true)
 

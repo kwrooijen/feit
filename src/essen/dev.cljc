@@ -3,10 +3,8 @@
    [essen.core :refer [scenes]]
    [essen.module.matterjs :as matter]
    [essen.module.pixi.debug :as pixi.debug]
-   [essen.render]
    [essen.state :as state]
    [essen.system.core :as system]
-   [essen.system.entity :as entity]
    [essen.system.scene :as scene]
    [integrant.core :as ig]))
 

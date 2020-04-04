@@ -64,13 +64,13 @@
                     :entity/dynamic])
       (assoc :entity/key (top-key k)
              :entity/opts (dissoc opts :entity/components)
-             :entity/init (system/get-init-key k opts)
+             :entity/init (system/method k)
              :entity/halt! (system/get-halt-key k opts))))
 
-(defn init [scene-key {entity-key :entity/key :as entity}]
+;; TODO Create prep function (like component)
+(defn init [scene-key {entity-key :entity/key opts :entity/opts :as entity}]
   (try
-    ((:entity/init entity) {:context/scene-key scene-key
-                            :context/entity-key entity-key})
+    ((:entity/init entity) entity-key opts)
     (add-routes entity)
     (catch #?(:clj Throwable :cljs :default) t
       (println "[ERROR] Failed to init entity.\n"

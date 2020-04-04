@@ -8,7 +8,8 @@
 (defmethod ig/init-key :component/sprite
   [_ {:sprite/keys [file x y]
       :context/keys [scene-key]}]
- (let [sprite (PIXI/Sprite. (.from PIXI/Texture file))]
+  (let [texture (-> state/loader .-resources (aget file) .-texture)
+        sprite (PIXI/Sprite. texture)]
     (set! (.-x sprite) x)
     (set! (.-y sprite) y)
     (.addChild (state/get-scene scene-key)

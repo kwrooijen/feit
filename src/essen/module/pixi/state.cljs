@@ -14,6 +14,8 @@
 
 (defonce animations (atom nil))
 
+(defonce loader (.-shared PIXI/Loader))
+
 (def ^:dynamic renderer #js {})
 
 (defn set-renderer! [opts]

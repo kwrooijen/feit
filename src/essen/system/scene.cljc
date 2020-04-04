@@ -4,7 +4,7 @@
    [essen.state :as state]
    [essen.util :refer [top-key]]
    [integrant-tools.core :as it]
-   [integrant-tools.keyword :refer [make-child]]
+   [integrant-tools.keyword :refer [make-child descendant?]]
    [essen.system.entity :as entity]
    [essen.system.core :as system]
    [essen.system.component :as component]))
@@ -35,11 +35,13 @@
        (into {})))
 
 (defn start-entities [opts scene-key]
-  (->> opts
-       (sp/transform [:scene/entities] entities->map)
-       (sp/transform [:scene/entities MAP-VALS]
-                  (comp (partial entity/init scene-key)
-                        (partial start-components scene-key)))))
+  (let [context {:context/scene-key scene-key}]
+    (->> opts
+        (sp/transform [:scene/entities] entities->map)
+        (sp/transform [:scene/entities MAP-VALS]
+                      (comp (partial entity/init scene-key)
+                            #(update % :entity/opts merge context)
+                            (partial start-components scene-key))))))
 
 (defn apply-init [scene-opts opts]
   ((:scene/init scene-opts) scene-opts opts))
@@ -52,9 +54,14 @@
       (assoc :scene/key scene-key)
       (state/save-scene!)))
 
+(defn validate-scene [scene-key]
+  (when-not (descendant? scene-key :essen/scene)
+    (throw (ex-info (str "Scene not found: " scene-key) {:scene/key scene-key}))))
+
 (defn start!
   ([scene-key] (start! scene-key {}))
   ([scene-key opts]
+   (validate-scene scene-key)
    ((:init state/graphics-2d-scene) scene-key)
    (state/reset-events! scene-key)
    (init scene-key opts)))
@@ -67,4 +74,5 @@
   (state/reset-events! scene-key)
   (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
     (entity/halt! entity))
-  (state/reset-state! scene-key))
+  (state/remove-scene! scene-key)
+  ((:halt! state/graphics-2d-scene) scene-key))

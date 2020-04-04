@@ -1,0 +1,12 @@
+{:deps {org.clojure/clojure {:mvn/version "1.10.1"}
+        org.clojure/clojurescript {:mvn/version "1.10.597"}
+        reagent {:mvn/version "0.8.1"}
+        spec-signature {:mvn/version "0.2.0"}
+        integrant {:mvn/version "0.8.0"}
+        meta-merge {:mvn/version "1.0.0"}
+        integrant-tools {:mvn/version "0.3.3"}
+        com.rpl/specter {:mvn/version "1.1.3"}
+        org.clojure/core.async {:mvn/version "1.1.587"}
+        malli {:git/url "https://github.com/metosin/malli"
+               :sha "3e0d72a9869f475beec19cd4ea6ac6bc5bd0ecc0"} }
+ :paths ["src"]}

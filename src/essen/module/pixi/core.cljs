@@ -1,5 +1,6 @@
 (ns essen.module.pixi.core
   (:require
+   [essen.module.pixi.entity]
    [essen.module.pixi.state :as state]
    [essen.module.pixi.component.sprite :as component.sprite]
    [integrant.core :as ig]))
@@ -28,11 +29,11 @@
     :autoDencity auto-dencity}))
 
 (defmethod ig/init-key :pixi.core/scene [_ _]
-  (fn [scene-key]
+  (fn init-pixi-scene [scene-key]
     (state/init-scene! scene-key)))
 
 (defmethod ig/halt-key! :pixi.core/scene [_ _]
-  (fn [scene-key]
+  (fn halt-pixi-scene [scene-key]
     (.destroy (state/get-scene scene-key))
     (.clear state/renderer)
     (state/halt-scene! scene-key)))

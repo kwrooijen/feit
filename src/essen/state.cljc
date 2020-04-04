@@ -43,8 +43,8 @@
 (defn save-scene! [scene]
   (swap! scenes assoc (:scene/key scene) (atom scene)))
 
-(defn reset-state! [scene-key]
-  (swap! state update :essen/scenes dissoc scene-key))
+(defn remove-scene! [scene-key]
+  (swap! scenes dissoc scene-key))
 
 (defn get-component [entity-key component-key]
   (get @persistent-components [entity-key component-key]))

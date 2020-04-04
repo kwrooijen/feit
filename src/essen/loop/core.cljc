@@ -44,10 +44,6 @@
 (defn run [scene-key delta time]
   (swap! (get-scene scene-key) run-scene delta time))
 
-(defn get-current-time []
-  #?(:clj (System/nanoTime)
-     :cljs (.now js/Date)))
-
 ;; TODO find a proper solution for this
 (def physics (atom nil))
 
@@ -57,7 +53,7 @@
 (defn run-scenes [delta time]
   (doseq [scene-key (keys (state/get-scenes))]
     (swap! (get-scene scene-key) run-scene delta time)
-    (essen.module.pixi.render/render scene-key)
+    (state/graphics-2d scene-key)
     (when @physics
       (@physics))))
 
@@ -71,11 +67,11 @@
 #?(:clj
    (defn game-loop []
      (async/go-loop [delta 0
-                     start-time (get-current-time)]
+                     start-time (System/nanoTime)]
        (when (>= delta 1)
          (run-scenes delta start-time))
        (async/<! (async/timeout 0))
-       (let [current-time (get-current-time)
+       (let [current-time (System/nanoTime)
              extra-d (if (>= delta 1) (dec delta) delta)
              new-delta (+ extra-d (/ (- current-time start-time) optimal-time) )]
          (recur new-delta current-time)))))
@@ -83,6 +79,7 @@
 #?(:cljs
    (defn
      game-loop
+     ([] (fn [time] (game-loop time time)))
      ([old-time] (fn [time] (game-loop old-time time)))
      ([old-time time]
       (let [delta  (/ (- time old-time) 1000)]
@@ -91,4 +88,4 @@
 
 (defn start! []
   #?(:clj (game-loop)
-     :cljs (.requestAnimationFrame js/window (game-loop (get-current-time)))))
+     :cljs (.requestAnimationFrame js/window (game-loop))))

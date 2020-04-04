@@ -1,8 +1,8 @@
 (ns essen.system.scene
   (:require
-   [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
+   [com.rpl.specter :as sp :refer [MAP-VALS]]
    [essen.state :as state]
-   [essen.util :refer [vec->map spy top-key]]
+   [essen.util :refer [top-key]]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [make-child]]
    [essen.system.entity :as entity]
@@ -11,18 +11,18 @@
    [essen.render]))
 
 (defmethod system/init-key :essen/scene [k opts]
-  (-> opts
-      (assoc :scene/key (top-key k)
-             :scene/init (system/get-init-key k opts)
-             :scene/halt! (system/get-halt-key k opts))))
+  (assoc opts
+         :scene/key (top-key k)
+         :scene/init (system/get-init-key k opts)
+         :scene/halt! (system/get-halt-key k opts)))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
   (let [context {:context/scene-key scene-key
                  :context/entity-key entity-key}]
     (sp/transform [:entity/components MAP-VALS]
-               (comp component/start
-                     (partial merge context))
-               entity)))
+                  (comp component/start
+                        #(component/prep % context))
+                  entity)))
 
 (defn make-dynamic-entity [entity]
   (if (:entity/dynamic entity)
@@ -56,9 +56,9 @@
 (defn start!
   ([scene-key] (start! scene-key {}))
   ([scene-key opts]
+   ((:init state/graphics-2d-scene) scene-key)
    (state/reset-events! scene-key)
-   (init scene-key opts)
-   (essen.render/init scene-key)))
+   (init scene-key opts)))
 
 (defn resume! [scene-key]
   (state/reset-events! scene-key)

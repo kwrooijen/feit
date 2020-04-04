@@ -13,6 +13,10 @@
 
 (defonce system (atom {}))
 
+(defonce ^:dynamic graphics-2d (fn [_]))
+
+(defonce ^:dynamic graphics-2d-scene {:init nil :halt! nil})
+
 (defonce ^:private state (atom {}))
 
 (defonce ^:private scenes (atom {}))
@@ -51,3 +55,9 @@
 (defn get-input-events
   ([] @input-events)
   ([scene-key] (get @input-events scene-key)))
+
+(defn set-graphics-2d! [v]
+  (set! graphics-2d v))
+
+(defn set-graphics-2d-scene! [v]
+  (set! graphics-2d-scene v))

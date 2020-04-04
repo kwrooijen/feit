@@ -15,27 +15,45 @@
    [essen.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
+   [essen.interface.graphics-2d.core :as interface.graphics-2d]
+
    [essen.render]))
 
 (set! *print-meta* true)
 
-(defn- start-render [config]
-  (-> config
-      (ig/prep [:essen.module/render])
-      (ig/init [:essen.module/render])))
+(defn- start-graphics-2d [config]
+  (try
+    (-> config
+        (ig/prep [interface.graphics-2d/system])
+        (ig/init [interface.graphics-2d/system])
+        (it/find-derived-value interface.graphics-2d/system)
+        (state/set-graphics-2d!))
 
-(defn- start-physics [config]
-  (-> config
-      (ig/prep [:essen.module/physics])
-      (ig/init [:essen.module/physics])
-      (it/find-derived-value :essen.module/physics)
-      (essen.loop.core/add!)))
+    (state/set-graphics-2d-scene!
+     {:init (ig/init-key (first (descendants interface.graphics-2d/scene)) {})
+      :halt! (ig/halt-key! (first (descendants interface.graphics-2d/scene)){})})
+    (catch #?(:clj Throwable :cljs :default) t
+      (throw (ex-info
+              (str "[ERROR] Failed to start graphics-2d.\n"
+                   "Key: " (:key (ex-data t)) "\n"
+                   "Cause: " (.-cause t) "\n"
+                   "Value: " (:value (ex-data t)) "\n\n"
+                   "Data: "  (ex-data t))
+              t)))))
+
+
+;; (defn- start-physics [config]
+;;   (-> config
+;;       (ig/prep [:essen.module/physics])
+;;       (ig/init [:essen.module/physics])
+;;       (it/find-derived-value :essen.module/physics)
+;;       (essen.loop.core/add!)))
 
 (defn setup
   [config]
   (system/start config)
-  (start-render config)
-  (start-physics config)
+  (start-graphics-2d config)
+  ;; (start-physics config)
   (essen.loop.core/start!))
 
 (defn scenes

@@ -43,22 +43,29 @@
              :component/opts (dissoc opts
                                      :component/handlers
                                      :component/tickers
-                                     :component/reactors))
-      (update :component/tickers vec->map :ticker/key)
-      (update :component/handlers vec->map :handler/key)
-      (update :component/reactors vec->map :reactor/key)))
+                                     :component/reactors))))
 
 (defn start
-  [{:context/keys [scene-key entity-key] :component/keys [key state init] :as component}]
+  [{:component/keys [key init ] :as component}]
   (try
     (-> component
         (assoc :component/state
                (or (get-persistent-state component)
-                   (init key (:component/opts component))))
+                   (init key component)))
         (save-persistent-component!))
     (catch #?(:clj Throwable :cljs :default) t
+      (println (.-message t))
       (println "[ERROR] Failed to start component.\n"
-               "Scene:" scene-key "\n"
-               "Entity:" entity-key "\n"
+               "Key: " (:key (ex-data t)) "\n"
+               "Cause: " (.-cause t) "\n"
+               "Scene:"  (:context/scene-key component) "\n"
+               "Entity:" (:context/entity-key component) "\n"
                "Component:" key "\n"
                "Reason:" (ex-data t)))))
+
+(defn prep [component context]
+  (-> component
+      (merge (:component/opts component) context)
+      (update :component/tickers vec->map :ticker/key)
+      (update :component/handlers vec->map :handler/key)
+      (update :component/reactors vec->map :reactor/key)))

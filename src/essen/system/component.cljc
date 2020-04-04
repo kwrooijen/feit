@@ -2,7 +2,7 @@
   (:require
    [integrant.core :as ig]
    [essen.util :refer [vec->map top-key spy]]
-   [essen.state :refer [persistent-components]]
+   [essen.state :as state]
    [essen.system.core :as system]))
 
 (defmulti persistent-resume
@@ -20,13 +20,13 @@
     :entity/components component]))
 
 (defn get-persistent-state [{:context/keys [entity-key] :component/keys [key alpha-key] :as opts}]
-  (when-let [state (get @persistent-components [entity-key key])]
+  (when-let [state (state/get-component entity-key key)]
     (persistent-resume alpha-key opts state)))
 
 (defn save-persistent-component!
   [{:component/keys [key opts state] :context/keys [entity-key] :as component}]
   (when (:component/persistent opts)
-    (swap! persistent-components assoc [entity-key key] state))
+    (state/save-component! state entity-key key))
   component)
 
 (defmethod system/init-key :essen/component [k opts]

@@ -1,7 +1,7 @@
 (ns essen.loop.key
   (:require
    [integrant.core :as ig]
-   [essen.state :as state :refer [input-events]]))
+   [essen.state :as state]))
 
 (defn- add-component
   [components acc component]
@@ -24,7 +24,7 @@
       (f (subs-states entities subs)))))
 
 (defn process [{:scene/keys [key keyboard] :as scene}]
-  (swap! (get @input-events key)
+  (swap! (state/get-input-events key)
          (fn [events]
            (doseq [event events]
              (apply-key-event scene keyboard event))

@@ -41,7 +41,7 @@
 (defn scenes
   "Get all current running scenes as a set."
   []
-  (-> (:essen/scenes @state/state)
+  (-> (state/get-scenes)
       (keys)
       (set)))
 
@@ -54,7 +54,7 @@
 (defn emit!
   "Emit a event with `content` to an `entity`'s `handler` in `scene`"
   [{:event/keys [scene] :as event}]
-  (swap! (get @state/events scene) conj (select-keys event event-keys)))
+  (swap! (state/get-scene-events scene) conj (select-keys event event-keys)))
 
 (defn entities
   "Get all component states of any enitities from `scene-key` which are derived

@@ -1,12 +1,12 @@
 (ns essen.keyboard
   (:refer-clojure :exclude [keys])
   (:require
-   [essen.state :refer [input-events]]))
+   [essen.state :as state]))
 
 ;; TODO Maybe we can optimize the creation of the input-event map with memoize
 (defn emit-keydown! [key]
   (let [tag (keyword "down" (name (or key "unknown")))]
-    (doseq [[_ scene] @input-events]
+    (doseq [[_ scene] (state/get-input-events)]
       (swap! scene conj
              {:input-event/type :key/down
               :input-event/key key
@@ -14,7 +14,7 @@
 
 (defn emit-keyup! [key]
   (let [tag (keyword "up" (name (or key "unknown")))]
-    (doseq [[_ scene] @input-events]
+    (doseq [[_ scene] (state/get-input-events)]
       (swap! scene conj
              {:input-event/type :key/up
               :input-event/key key

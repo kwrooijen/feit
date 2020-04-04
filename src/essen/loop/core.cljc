@@ -1,7 +1,7 @@
 (ns essen.loop.core
   (:require
+   #?(:clj [clojure.core.async :as async])
    [essen.module.pixi.render]
-   [clojure.core.async :as async]
    [essen.loop.event :as loop.event]
    [essen.loop.middleware :as loop.middleware]
    [essen.loop.handler :as loop.handler]
@@ -26,7 +26,7 @@
   :threshold-reached)
 
 (defn run-scene [{:keys [scene/key] :as scene} delta time]
-  (let [events (get @state/events key)]
+  (let [events (state/get-scene-events key)]
     (loop.key/process scene)
     (loop.ticker/process scene delta time)
     (loop [scene scene
@@ -55,7 +55,7 @@
   (reset! physics p))
 
 (defn run-scenes [delta time]
-  (doseq [scene-key (keys (:essen/scenes @state/state))]
+  (doseq [scene-key (keys (state/get-scenes))]
     (swap! (get-scene scene-key) run-scene delta time)
     (essen.module.pixi.render/render scene-key)
     (when @physics
@@ -73,7 +73,7 @@
      (async/go-loop [delta 0
                      start-time (get-current-time)]
        (when (>= delta 1)
-         (run-scenes delta time))
+         (run-scenes delta start-time))
        (async/<! (async/timeout 0))
        (let [current-time (get-current-time)
              extra-d (if (>= delta 1) (dec delta) delta)

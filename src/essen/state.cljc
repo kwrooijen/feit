@@ -9,31 +9,45 @@
    (defn atom [v]
      (r/atom v)))
 
-(defonce state (atom {}))
+(defonce config (atom {}))
 
 (defonce system (atom {}))
 
-(defonce config (atom {}))
+(defonce ^:private state (atom {}))
 
-(defonce events (atom {}))
+(defonce ^:private scenes (atom {}))
 
-(defonce input-events (atom {}))
+(defonce ^:private events (atom {}))
 
-(defonce persistent-entities (atom {}))
+(defonce ^:private input-events (atom {}))
 
-(defonce entities (atom {}))
-
-(defonce persistent-components (atom {}))
-
-(defn get-scene [scene-key]
-  (get-in @state [:essen/scenes scene-key]))
+(defonce ^:private persistent-components (atom {}))
 
 (defn reset-events! [scene-key]
   (swap! events assoc scene-key (atom []))
   (swap! input-events assoc scene-key (atom [])))
 
+(defn get-scenes []
+  @scenes)
+
+(defn get-scene [scene-key]
+  (get @scenes scene-key))
+
+(defn get-scene-events [scene-key]
+  (get @events scene-key))
+
 (defn save-scene! [scene]
-  (swap! state assoc-in [:essen/scenes (:scene/key scene)] (atom scene)))
+  (swap! scenes assoc (:scene/key scene) (atom scene)))
 
 (defn reset-state! [scene-key]
   (swap! state update :essen/scenes dissoc scene-key))
+
+(defn get-component [entity-key component-key]
+  (get @persistent-components [entity-key component-key]))
+
+(defn save-component! [state entity-key component-key]
+  (swap! persistent-components assoc [entity-key component-key] state))
+
+(defn get-input-events
+  ([] @input-events)
+  ([scene-key] (get @input-events scene-key)))

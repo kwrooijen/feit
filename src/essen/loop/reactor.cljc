@@ -15,7 +15,7 @@
 
 (defn- save-component! [{:context/keys [entity-key component component-key state]}]
   (when ^boolean (:component/persistent component false)
-      (swap! state/persistent-components assoc [entity-key component-key] state)))
+    (state/save-component! state entity-key component-key)))
 
 (defn process [[scene {:context/keys [old-state] :as ctx}] ]
   (when-not ^boolean (identical? old-state (get-in scene (path-entity-state ctx)))

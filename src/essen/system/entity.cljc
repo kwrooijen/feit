@@ -67,6 +67,17 @@
              :entity/init (system/get-init-key k opts)
              :entity/halt! (system/get-halt-key k opts))))
 
+(defn init [scene-key {entity-key :entity/key :as entity}]
+  (try
+    ((:entity/init entity) {:context/scene-key scene-key
+                            :context/entity-key entity-key})
+    (add-routes entity)
+    (catch #?(:clj Throwable :cljs :default) t
+      (println "[ERROR] Failed to init entity.\n"
+               "Scene:" scene-key "\n"
+               "Entity:" entity-key "\n"
+               "Reason:" (ex-data t)))))
+
 (defn halt! [{:entity/keys [components] :as entity}]
   ;; TODO remove dynamic entity
   (doseq [[_ component] components]

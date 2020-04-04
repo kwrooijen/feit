@@ -10,17 +10,6 @@
    [essen.system.component :as component]
    [essen.render]))
 
-(defn- start-entity [scene-key {entity-key :entity/key :as entity}]
-  (try
-    ((:entity/init entity) {:context/scene-key scene-key
-                            :context/entity-key entity-key})
-    (entity/add-routes entity)
-    (catch #?(:clj Throwable :cljs :default) t
-      (println "[ERROR] Failed to init entity.\n"
-               "Scene:" scene-key "\n"
-               "Entity:" entity-key "\n"
-               "Reason:" (ex-data t)))))
-
 (defmethod system/init-key :essen/scene [k opts]
   (-> opts
       (assoc :scene/key (top-key k)
@@ -50,7 +39,7 @@
   (->> opts
        (sp/transform [:scene/entities] entities->map)
        (sp/transform [:scene/entities MAP-VALS]
-                  (comp (partial start-entity scene-key)
+                  (comp (partial entity/init scene-key)
                         (partial start-components scene-key)))))
 
 (defn apply-init [scene-opts opts]

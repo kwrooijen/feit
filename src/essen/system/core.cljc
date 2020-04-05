@@ -1,8 +1,9 @@
 (ns essen.system.core
   (:require
    [cljs.pprint]
-   [essen.util :refer [derive-composite-all]]
+   [essen.methods :refer [assert-schema-key]]
    [essen.state :as state]
+   [essen.util :refer [derive-composite-all]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 
@@ -28,7 +29,7 @@
   "Starts an essen system (scene or entity). This is used internally by essen
   and should not be called directly."
   [config key]
-  (ig/build config [key] init-key #'ig/assert-pre-init-spec ig/resolve-key))
+  (ig/build config [key] init-key assert-schema-key ig/resolve-key))
 
 (defn prep
   "Prepares the config system with a composite derive on all keys. This is used

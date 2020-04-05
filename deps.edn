@@ -8,5 +8,5 @@
         com.rpl/specter {:mvn/version "1.1.3"}
         org.clojure/core.async {:mvn/version "1.1.587"}
         malli {:git/url "https://github.com/metosin/malli"
-               :sha "3e0d72a9869f475beec19cd4ea6ac6bc5bd0ecc0"} }
+               :sha "3e0d72a9869f475beec19cd4ea6ac6bc5bd0ecc0"}}
  :paths ["src"]}

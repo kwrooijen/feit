@@ -9,9 +9,7 @@
   "Entity to load assets.")
 
 (defmethod es/schema-key :graphics-2d.entity/asset-loader [_]
-  {:interface/name :graphics-2d.entity/asset-loader
-   :interface/schema
-   [:map
-    [:g2d.asset-loader/files [:vector {:file-names? true} 'string?]]
-    [:g2d.asset-loader/prefix 'string?]
-    [:g2d.asset-loader/next-scene 'qualified-keyword?]]})
+  [:map
+   [:g2d.asset-loader/files [:vector {:file-names? true} 'string?]]
+   [:g2d.asset-loader/prefix 'string?]
+   [:g2d.asset-loader/next-scene 'qualified-keyword?]])

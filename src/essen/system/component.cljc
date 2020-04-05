@@ -37,7 +37,7 @@
                     :component/persistent])
       (assoc :component/key (top-key k)
              :component/alpha-key (top-key k)
-             :component/init (system/method k)
+             :component/init (system/get-init-key k)
              :component/state nil
              :component/halt! (system/get-halt-key k opts)
              :component/opts (dissoc opts
@@ -66,6 +66,7 @@
 (defn prep [component context]
   (-> component
       (merge (:component/opts component) context)
+      ;; TODO Should start all tickers/handlers/reactors/middleware with new opts
       (update :component/tickers vec->map :ticker/key)
       (update :component/handlers vec->map :handler/key)
       (update :component/reactors vec->map :reactor/key)))

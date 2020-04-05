@@ -12,7 +12,7 @@
 (defmethod system/init-key :essen/scene [k opts]
   (assoc opts
          :scene/key (top-key k)
-         :scene/init (system/method k)
+         :scene/init (system/get-init-key k)
          :scene/halt! (system/get-halt-key k opts)))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]

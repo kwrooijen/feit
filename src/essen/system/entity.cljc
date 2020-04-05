@@ -64,7 +64,7 @@
                     :entity/dynamic])
       (assoc :entity/key (top-key k)
              :entity/opts (dissoc opts :entity/components)
-             :entity/init (system/method k)
+             :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))
 
 ;; TODO Create prep function (like component)

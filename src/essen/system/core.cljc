@@ -41,7 +41,7 @@
 (defn method [derived-k]
   (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]
     f
-    (fn [v _] v)))
+    (fn [_ opts] opts)))
 
 (defn get-init-key [derived-k entity-opts]
   (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]

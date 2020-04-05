@@ -12,7 +12,7 @@
 (defmethod system/init-key :essen/scene [k opts]
   (assoc opts
          :scene/key (top-key k)
-         :scene/init (system/get-init-key k opts)
+         :scene/init (system/method k)
          :scene/halt! (system/get-halt-key k opts)))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
@@ -43,13 +43,13 @@
                             #(update % :entity/opts merge context)
                             (partial start-components scene-key))))))
 
-(defn apply-init [scene-opts opts]
-  ((:scene/init scene-opts) scene-opts opts))
+(defn apply-init [scene-opts scene-key opts]
+  ((:scene/init scene-opts) scene-key (merge scene-opts opts)))
 
 (defn init [scene-key opts]
   (-> @state/system
       (it/find-derived-value scene-key)
-      (apply-init opts)
+      (apply-init scene-key opts)
       (start-entities scene-key)
       (assoc :scene/key scene-key)
       (state/save-scene!)))

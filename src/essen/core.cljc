@@ -16,30 +16,23 @@
    [integrant-tools.core :as it]
    [integrant.core :as ig]
 
+   #?(:clj [clojure.stacktrace :as st]
+      :cljs [cljs.stacktrace :as st])
    [essen.interface.graphics-2d.entity]
    [essen.interface.graphics-2d.core :as interface.graphics-2d]))
 
 (set! *print-meta* true)
 
 (defn- start-graphics-2d [config]
-  (try
-    (-> config
-        (ig/prep [interface.graphics-2d/system])
-        (ig/init [interface.graphics-2d/system])
-        (it/find-derived-value interface.graphics-2d/system)
-        (state/set-graphics-2d!))
+  (-> config
+      (ig/prep [interface.graphics-2d/system])
+      (ig/init [interface.graphics-2d/system])
+      (it/find-derived-value interface.graphics-2d/system)
+      (state/set-graphics-2d!))
 
-    (state/set-graphics-2d-scene!
-     {:init (ig/init-key (first (descendants interface.graphics-2d/scene)) {})
-      :halt! (ig/halt-key! (first (descendants interface.graphics-2d/scene)){})})
-    (catch #?(:clj Throwable :cljs :default) t
-      (throw (ex-info
-              (str "[ERROR] Failed to start graphics-2d.\n"
-                   "Key: " (:key (ex-data t)) "\n"
-                   "Cause: " (.-cause t) "\n"
-                   "Value: " (:value (ex-data t)) "\n\n"
-                   "Data: "  (ex-data t))
-              t)))))
+  (state/set-graphics-2d-scene!
+   {:init (ig/init-key (first (descendants interface.graphics-2d/scene)) {})
+    :halt! (ig/halt-key! (first (descendants interface.graphics-2d/scene)){})}))
 
 
 ;; (defn- start-physics [config]
@@ -49,12 +42,19 @@
 ;;       (it/find-derived-value :essen.module/physics)
 ;;       (essen.loop.core/add!)))
 
-(defn setup
-  [config]
+(defn- start [config]
   (system/start config)
   (start-graphics-2d config)
   ;; (start-physics config)
   (essen.loop.core/start!))
+
+(defn setup
+  [config]
+  (try
+    (start config)
+    (catch #?(:clj Throwable :cljs :default) t
+      ;; TODO Handle errors
+      (start config))))
 
 (defn scenes
   "Get all current running scenes as a set."

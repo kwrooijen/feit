@@ -25,8 +25,7 @@
 (defmethod schema-key :default [_] nil)
 
 (defn invalid-schema-error [key schema value]
-  (str "\n"
-       "Schema error on key " key
+  (str "Schema error on key " key
        "\n\n"
        (with-out-str (pprint (me/humanize (m/explain schema value {:registry @registry}))))))
 

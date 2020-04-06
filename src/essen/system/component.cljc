@@ -46,7 +46,7 @@
                                      :component/reactors))))
 
 (defn start
-  [{:component/keys [key init ] :as component}]
+  [{:component/keys [key init] :as component}]
   (try
     (-> component
         (assoc :component/state

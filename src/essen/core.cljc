@@ -1,5 +1,6 @@
 (ns essen.core
   (:require
+   [essen.error]
    [essen.logger]
    [taoensso.timbre :as timbre]
    [essen.loop.core]
@@ -54,8 +55,8 @@
   (try
     (timbre/debug ::setup config)
     (start config)
-    (catch #?(:clj Throwable :cljs :default) t
-      ;; TODO Handle errors
+    (catch #?(:clj Throwable :cljs :default) e
+      (essen.error/handle-error e)
       (start config))))
 
 (defn scenes

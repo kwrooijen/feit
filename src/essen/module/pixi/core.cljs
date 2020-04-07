@@ -42,34 +42,6 @@
   (fn [scene-key]
     (.render state/renderer (state/get-scene scene-key))))
 
-
-;; (defn js-keys->clj-keys [o]
-;;   (sp/transform [MAP-VALS] clj->js (js->clj o)))
-
-;; (defn- spritesheet-loaded
-;;   [{::keys [spritesheet name transition] :context/keys [scene-key]}]
-;;   (let [sheet
-;;         (-> (.-shared PIXI/Loader)
-;;             (.-resources)
-;;             (aget spritesheet))]
-;;     (swap! sheets assoc name sheet)
-;;     (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
-;;     (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))
-
-;;   (scene/halt! scene-key)
-;;   (scene/start! transition))
-
-;; (defmethod ig/pre-init-spec ::load-spritesheet [_]
-;;   (s/keys :req [::spritesheet
-;;                 ::name
-;;                 ::transition]))
-
-;; (defmethod ig/init-key ::load-spritesheet [_ {::keys [spritesheet] :as opts}]
-;;   (fn [_context]
-;;     (-> (.-shared PIXI/Loader)
-;;         (.add spritesheet)
-;;         (.load (partial spritesheet-loaded opts)))))
-
 (def config
   (merge
    {[:essen.interface.graphics-2d/system :pixi.core/system]

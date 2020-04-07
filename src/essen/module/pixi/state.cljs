@@ -1,5 +1,6 @@
 (ns essen.module.pixi.state
   (:require
+   [com.rpl.specter :as sp :refer [MAP-VALS]]
    ["pixi.js" :as PIXI :refer [Renderer Container]]))
 
 (defonce state (atom {}))
@@ -31,3 +32,11 @@
 (defn halt-scene! [scene-key]
   (swap! scenes dissoc scene-key)
   (swap! running-scenes disj scene-key))
+
+(defn- js-keys->clj-keys [o]
+  (sp/transform [MAP-VALS] clj->js (js->clj o)))
+
+(defn add-spritesheet! [name sheet]
+  (swap! sheets assoc name sheet)
+  (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
+  (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))

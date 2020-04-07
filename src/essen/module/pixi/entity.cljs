@@ -1,5 +1,6 @@
 (ns essen.module.pixi.entity
   (:require
+   [taoensso.timbre :as timbre]
    [clojure.string :as string]
    [essen.core :as essen]
    [essen.module.pixi.state :as state]
@@ -21,5 +22,21 @@
       :context/keys [scene-key] :as opts}]
   (doseq [[alias file] (mapv ->vector files)]
     (.add state/loader (process-asset-alias alias opts) (or file alias)))
+  (timbre/info ::asset-loader {:files files})
   (.load state/loader #(essen/transition-scene scene-key next-scene)))
 
+(defn- spritesheet-loaded
+  [{:g2d.spritesheet-loader/keys [file name next-scene]
+    :context/keys [scene-key]}]
+  (-> state/loader
+      (.-resources)
+      (aget file)
+      (->> (state/add-spritesheet! name)))
+  (timbre/info ::spritesheet-loader {:name name :file file})
+  (essen/transition-scene scene-key next-scene))
+
+(defmethod ig/init-key :graphics-2d.entity/spritesheet-loader
+  [_ {:g2d.spritesheet-loader/keys [file] :as opts}]
+  (-> state/loader
+      (.add file)
+      (.load (partial spritesheet-loaded opts))))

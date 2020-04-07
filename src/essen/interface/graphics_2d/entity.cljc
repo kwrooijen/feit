@@ -49,3 +49,20 @@
    [:g2d.asset-loader/as
     {:optional true}]])
 
+(define-schema! :g2d.spritesheet-loader/name
+  ['qualified-keyword?
+   {:description ""}])
+
+(define-schema! :g2d.spritesheet-loader/file
+  ['string?
+   {:description ""}])
+
+(define-schema! :g2d.spritesheet-loader/next-scene
+  ['qualified-keyword?
+   {:description ""}])
+
+(defmethod es/schema-key :graphics-2d.entity/spritesheet-loader [_]
+  [:map
+   :g2d.spritesheet-loader/name
+   :g2d.spritesheet-loader/file
+   :g2d.spritesheet-loader/next-scene])

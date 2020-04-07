@@ -2,14 +2,16 @@
   (:require
    #?(:clj [clojure.core.async :as async])
    [essen.loop.event :as loop.event]
-   [essen.loop.middleware :as loop.middleware]
    [essen.loop.handler :as loop.handler]
+   [essen.loop.key :as loop.key]
+   [essen.loop.middleware :as loop.middleware]
    [essen.loop.reactor :as loop.reactor]
    [essen.loop.ticker :as loop.ticker]
-   [essen.loop.key :as loop.key]
-   [essen.state :as state :refer [get-scene]]))
+   [essen.state :as state :refer [get-scene]]
+   [taoensso.timbre :as timbre]))
 
 (defn- apply-event [scene event]
+  (timbre/debug ::event scene event)
   (reduce
    (fn [acc context]
      (-> [acc context]

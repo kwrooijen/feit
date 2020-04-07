@@ -1,6 +1,6 @@
 (ns essen.system.core
   (:require
-   [cljs.pprint]
+   [taoensso.timbre :as timbre]
    [essen.methods :refer [assert-schema-key]]
    [essen.state :as state]
    [essen.util :refer [derive-composite-all]]
@@ -50,6 +50,7 @@
     (fn [_] nil)))
 
 (defn start [config]
+  (timbre/info ::start)
   (reset! state/config (prep config))
   (-> @state/config
       (init [:essen/system])

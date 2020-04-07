@@ -18,20 +18,40 @@
 
 (def config {[:essen/component :component/sprite] {}})
 
+(defn spritesheet-animated-sprite [{:spritesheet/keys [name animation]}]
+  (let [textures (state/spritesheet-animation-texture name animation)
+        sprite  (PIXI/AnimatedSprite. textures)]
+    (.play sprite)
+    {:pixi.sprite/sprite sprite
+     :pixi.sprite/initial-textures textures}))
 
-;; (defmethod ig/init-key :component.pixi/sprite
-;;   [_ {:component/keys [sprite pos] :context/keys [scene-key]}]
-;;   (let [container (get-in @state [:pixi/stage scene-key :stage/container])
-;;         textures (get-in @animations sprite)
-;;         sprite (PIXI/AnimatedSprite. textures)]
-;;     (set! (.-animationSpeed sprite) 0.167)
-;;     (set! (.-x sprite) (:x pos))
-;;     (set! (.-y sprite) (:y pos))
-;;     (.set (.-anchor sprite) 0.5)
-;;     (.play sprite)
-;;     (.addChild container sprite)
-;;     {:pixi.sprite/sprite sprite
-;;      :pixi.sprite/initial-textures textures}))
+(defn spritesheet-static-sprite [{:spritesheet/keys [name texture]}]
+  (let [texture (state/spritesheet-static-texture name texture)]
+    {:pixi.sprite/sprite (PIXI/AnimatedSprite. #js [texture])
+     :pixi.sprite/initial-textures [texture]}))
+
+(defn texture-static-sprite [{:texture/keys [name]}]
+  (let [texture (-> state/loader .-resources (aget name) .-texture)]
+    {:pixi.sprite/sprite (PIXI/AnimatedSprite. #js [texture])
+     :pixi.sprite/initial-textures [texture]}))
+
+(defn ->sprite [opts]
+  (cond
+    (:spritesheet/animation opts) (spritesheet-animated-sprite opts)
+    (:spritesheet/texture opts)   (spritesheet-static-sprite opts)
+    (:texture/name opts)          (texture-static-sprite opts)))
+
+(defmethod ig/init-key :graphics-2d.component/sprite
+  [_ {:context/keys [scene-key] :as opts}]
+  (let [{:pixi.sprite/keys [sprite] :as state} (->sprite opts)]
+    (set! (.-animationSpeed sprite) 0.167)
+    (set! (.-x sprite) 100)
+    (set! (.-y sprite) 100)
+    (set! (.. sprite -scale -x) 2)
+    (set! (.. sprite -scale -y) 2)
+    (.set (.-anchor sprite) 0.5)
+    (.addChild (state/get-scene scene-key) sprite)
+    state))
 
 ;; (defmethod ig/suspend-key! :component.pixi/sprite [_ {:component/keys [state]}]
 ;;   (.destroy (:pixi.sprite/sprite state)))

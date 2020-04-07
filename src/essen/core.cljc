@@ -21,6 +21,7 @@
    #?(:clj [clojure.stacktrace :as st]
       :cljs [cljs.stacktrace :as st])
    [essen.interface.graphics-2d.entity]
+   [essen.interface.graphics-2d.component]
    [essen.interface.graphics-2d.core :as interface.graphics-2d]))
 
 (set! *print-meta* true)

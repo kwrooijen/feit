@@ -1,5 +1,6 @@
 (ns essen.module.pixi.state
   (:require
+   [taoensso.timbre :as timbre]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    ["pixi.js" :as PIXI :refer [Renderer Container]]))
 
@@ -40,3 +41,13 @@
   (swap! sheets assoc name sheet)
   (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
   (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))
+
+(defn spritesheet-animation-texture [spritesheet animation]
+  (or (get-in @animations [spritesheet animation])
+      (timbre/error ::spritesheet-animation-texture-not-found
+                    {:spritesheet spritesheet :animation animation})))
+
+(defn spritesheet-static-texture [spritesheet texture]
+  (or (get-in @textures [spritesheet texture])
+      (timbre/error ::spritesheet-static-texture-not-found
+                    {:spritesheet spritesheet :texture texture})))

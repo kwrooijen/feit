@@ -1,10 +1,10 @@
 (ns essen.system.entity
   (:require
-   [clojure.set]
+   [taoensso.timbre :as timbre]
    [meta-merge.core :refer [meta-merge]]
    [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
    [essen.system.core :as system]
-   [essen.util :refer [vec->map top-key spy]]
+   [essen.util :refer [vec->map top-key]]
    [integrant.core :as ig]))
 
 (defn path-state
@@ -58,6 +58,7 @@
       (vec->map :component/key)))
 
 (defmethod system/init-key :essen/entity [k opts]
+  (timbre/debug ::init-key opts)
   (-> opts
       (update :entity/components process-components)
       (select-keys [:entity/components
@@ -68,15 +69,10 @@
              :entity/halt! (system/get-halt-key k opts))))
 
 ;; TODO Create prep function (like component)
-(defn init [scene-key {entity-key :entity/key opts :entity/opts :as entity}]
-  (try
-    ((:entity/init entity) entity-key opts)
-    (add-routes entity)
-    (catch #?(:clj Throwable :cljs :default) t
-      (println "[ERROR] Failed to init entity.\n"
-               "Scene:" scene-key "\n"
-               "Entity:" entity-key "\n"
-               "Reason:" (ex-data t)))))
+(defn init [{entity-key :entity/key opts :entity/opts :as entity}]
+  (timbre/debug ::start entity)
+  ((:entity/init entity) entity-key opts)
+  (add-routes entity))
 
 (defn halt! [{:entity/keys [components] :as entity}]
   ;; TODO remove dynamic entity

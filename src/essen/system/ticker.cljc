@@ -1,5 +1,6 @@
 (ns essen.system.ticker
   (:require
+   [taoensso.timbre :as timbre]
    [essen.util :refer [top-key]]
    [essen.system.core :as system]
    [essen.state :refer [get-scene]]
@@ -36,6 +37,7 @@
           update-in (path entity-key component) dissoc ticker)))
 
 (defmethod system/init-key :essen/ticker [k opts]
+  (timbre/debug ::init-key opts)
   (assoc opts
          :ticker/key (top-key k)
          :ticker/fn (ig/init-key k opts)))

@@ -1,5 +1,6 @@
 (ns essen.system.scene
   (:require
+   [taoensso.timbre :as timbre]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [essen.state :as state]
    [essen.util :refer [top-key]]
@@ -10,6 +11,7 @@
    [essen.system.component :as component]))
 
 (defmethod system/init-key :essen/scene [k opts]
+  (timbre/debug ::init-key opts)
   (assoc opts
          :scene/key (top-key k)
          :scene/init (system/get-init-key k)
@@ -19,7 +21,7 @@
   (let [context {:context/scene-key scene-key
                  :context/entity-key entity-key}]
     (sp/transform [:entity/components MAP-VALS]
-                  (comp component/start
+                  (comp component/init
                         #(component/prep % context))
                   entity)))
 
@@ -39,7 +41,7 @@
     (->> opts
         (sp/transform [:scene/entities] entities->map)
         (sp/transform [:scene/entities MAP-VALS]
-                      (comp (partial entity/init scene-key)
+                      (comp entity/init
                             #(update % :entity/opts merge context)
                             (partial start-components scene-key))))))
 
@@ -47,6 +49,7 @@
   ((:scene/init scene-opts) scene-key (merge scene-opts opts)))
 
 (defn init [scene-key opts]
+  (timbre/debug ::init opts)
   (-> @state/system
       (it/find-derived-value scene-key)
       (apply-init scene-key opts)
@@ -61,6 +64,7 @@
 (defn start!
   ([scene-key] (start! scene-key {}))
   ([scene-key opts]
+   (timbre/debug ::start! opts)
    (validate-scene scene-key)
    ((:init state/graphics-2d-scene) scene-key)
    (state/reset-events! scene-key)

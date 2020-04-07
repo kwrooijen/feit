@@ -1,5 +1,6 @@
 (ns essen.system.middleware
   (:require
+   [taoensso.timbre :as timbre]
    [essen.system.core :as system]
    [essen.util :refer [top-key]]
    [essen.state :refer [get-scene]]
@@ -21,6 +22,7 @@
   ([{:context/keys [scene-key entity-key component]} handler middleware opts]
    (add! scene-key entity-key component handler middleware opts))
   ([scene entity component handler middleware opts]
+  (timbre/debug ::add! opts)
    (let [context {:context/scene-key scene
                   :context/entity-key entity}
          opts (merge opts context)]
@@ -40,6 +42,7 @@
           dissoc middleware)))
 
 (defmethod system/init-key :essen/middleware [k opts]
+  (timbre/debug ::init-key opts)
   (assoc opts
          :middleware/key (top-key k)
          :middleware/fn (ig/init-key k opts)))

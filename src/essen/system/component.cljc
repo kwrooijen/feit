@@ -1,5 +1,6 @@
 (ns essen.system.component
   (:require
+   [taoensso.timbre :as timbre]
    [integrant.core :as ig]
    [essen.util :refer [vec->map top-key spy]]
    [essen.state :as state]
@@ -30,6 +31,7 @@
   component)
 
 (defmethod system/init-key :essen/component [k opts]
+  (timbre/debug ::init-key opts)
   (-> opts
       (select-keys [:component/tickers
                     :component/handlers
@@ -45,23 +47,14 @@
                                      :component/tickers
                                      :component/reactors))))
 
-(defn start
+(defn init
   [{:component/keys [key init] :as component}]
-  (try
-    (-> component
-        (assoc :component/state
-               (or (get-persistent-state component)
-                   (init key component)))
-        (save-persistent-component!))
-    (catch #?(:clj Throwable :cljs :default) t
-      (println (.-message t))
-      (println "[ERROR] Failed to start component.\n"
-               "Key: " (:key (ex-data t)) "\n"
-               "Cause: " (.-cause t) "\n"
-               "Scene:"  (:context/scene-key component) "\n"
-               "Entity:" (:context/entity-key component) "\n"
-               "Component:" key "\n"
-               "Reason:" (ex-data t)))))
+  (timbre/debug ::start component)
+  (-> component
+      (assoc :component/state
+             (or (get-persistent-state component)
+                 (init key component)))
+      (save-persistent-component!)))
 
 (defn prep [component context]
   (-> component

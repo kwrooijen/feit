@@ -10,7 +10,8 @@
                  [meta-merge "1.0.0"]
                  [integrant-tools "0.3.3"]
                  [com.rpl/specter "1.1.3"]
-                 [org.clojure/core.async "1.1.587"]]
+                 [org.clojure/core.async "1.1.587"]
+                 [com.taoensso/timbre "4.10.0"]]
 
   :plugins []
 

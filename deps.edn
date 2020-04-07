@@ -10,3 +10,4 @@
         malli {:git/url "https://github.com/metosin/malli"
                :sha "3e0d72a9869f475beec19cd4ea6ac6bc5bd0ecc0"}}
  :paths ["src"]}
+        com.taoensso/timbre {:mvn/version "4.10.0"}

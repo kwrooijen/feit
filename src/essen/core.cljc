@@ -1,5 +1,7 @@
 (ns essen.core
   (:require
+   [essen.logger]
+   [taoensso.timbre :as timbre]
    [essen.loop.core]
    [clojure.spec.alpha :as s]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
@@ -15,7 +17,6 @@
    [essen.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
-
    #?(:clj [clojure.stacktrace :as st]
       :cljs [cljs.stacktrace :as st])
    [essen.interface.graphics-2d.entity]
@@ -34,7 +35,6 @@
    {:init (ig/init-key (first (descendants interface.graphics-2d/scene)) {})
     :halt! (ig/halt-key! (first (descendants interface.graphics-2d/scene)){})}))
 
-
 ;; (defn- start-physics [config]
 ;;   (-> config
 ;;       (ig/prep [:essen.module/physics])
@@ -50,7 +50,9 @@
 
 (defn setup
   [config]
+  (essen.logger/setup-logging!)
   (try
+    (timbre/debug ::setup config)
     (start config)
     (catch #?(:clj Throwable :cljs :default) t
       ;; TODO Handle errors

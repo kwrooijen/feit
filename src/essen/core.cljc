@@ -24,7 +24,7 @@
 
 (defn- start [config]
   (system/start config)
-  (essen.interface.graphics-2d.core/init config)
+  (interface.graphics-2d/init config)
   (essen.loop.core/start!))
 
 (defn setup

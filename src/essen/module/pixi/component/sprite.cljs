@@ -2,7 +2,7 @@
   (:require
    [essen.module.pixi.state :as state]
    ["pixi.js" :as PIXI]
-   [clojure.spec.alpha :as s]
+   [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]))
 
 (defmethod ig/init-key :component/sprite
@@ -41,6 +41,11 @@
     (:spritesheet/texture opts)   (spritesheet-static-sprite opts)
     (:texture/name opts)          (texture-static-sprite opts)))
 
+(defmethod ig/prep-key :graphics-2d.component/sprite [_ opts]
+  (meta-merge
+   {:component/handlers [(ig/ref :handler.pixi.sprite/play)]}
+   opts))
+
 (defmethod ig/init-key :graphics-2d.component/sprite
   [_ {:context/keys [scene-key] :as opts}]
   (let [{:pixi.sprite/keys [sprite] :as state} (->sprite opts)]
@@ -56,19 +61,19 @@
 ;; (defmethod ig/suspend-key! :component.pixi/sprite [_ {:component/keys [state]}]
 ;;   (.destroy (:pixi.sprite/sprite state)))
 
-;; (defmethod ig/init-key :handler.pixi.sprite/play [_ opts]
-;;   (fn handler-pixi-sprite--play
-;;     [_context
-;;      {:event/keys [animation]}
-;;      {:pixi.sprite/keys [sprite initial-textures] :as state}]
-;;     (set! (.-textures sprite) (get-in @animations animation))
-;;     (.play sprite)
-;;     (set! (.-loop sprite) false)
-;;     (set! (.-onComplete sprite) (fn []
-;;                                   (set! (.-textures sprite) initial-textures)
-;;                                   (set! (.-loop sprite) true)
-;;                                   (.play sprite)))
-;;     state))
+(defmethod ig/init-key :handler.pixi.sprite/play [_ opts]
+  (fn handler-pixi-sprite--play
+    [_context
+     {:event/keys [spritesheet animation]}
+     {:pixi.sprite/keys [sprite initial-textures] :as state}]
+    (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
+    (set! (.-loop sprite) false)
+    (set! (.-onComplete sprite) (fn []
+                                  (set! (.-textures sprite) initial-textures)
+                                  (set! (.-loop sprite) true)
+                                  (.play sprite)))
+    (.play sprite)
+    state))
 
 ;; (defmethod ig/init-key :handler.pixi.sprite/set-pos [_ opts]
 ;;   (fn [_context

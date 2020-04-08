@@ -28,3 +28,7 @@
   :graphics-2d.entity/spritesheet-loader [:essen/entity]
 
   :graphics-2d.component/sprite [:essen/component]})
+
+(def config
+  ;; TODO remove pixi
+  {[:essen/handler :handler.pixi.sprite/play] {}})

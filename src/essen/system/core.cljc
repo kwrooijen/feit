@@ -1,5 +1,7 @@
 (ns essen.system.core
   (:require
+   [essen.interface.graphics-2d.core :as interface.graphics-2d]
+   [meta-merge.core :refer [meta-merge]]
    [taoensso.timbre :as timbre]
    [essen.methods :refer [assert-schema-key]]
    [essen.state :as state]
@@ -25,18 +27,24 @@
 (defmethod init-key :default [k opts]
   (ig/init-key k opts))
 
+(defn merge-configs [config]
+  (meta-merge interface.graphics-2d/config
+              config))
+
 (defn init
   "Starts an essen system (scene or entity). This is used internally by essen
   and should not be called directly."
   [config key]
-  (ig/build config [key] init-key assert-schema-key ig/resolve-key))
+  (-> config
+      merge-configs
+      (ig/build [key] init-key assert-schema-key ig/resolve-key)))
 
 (defn prep
   "Prepares the config system with a composite derive on all keys. This is used
   internally by essen and should not be called directly."
   [config]
   (derive-composite-all config)
-  config)
+  (ig/prep config))
 
 (defn get-init-key [derived-k]
   (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]

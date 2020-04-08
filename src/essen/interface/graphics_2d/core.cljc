@@ -21,7 +21,7 @@
 
   (state/set-graphics-2d-scene!
    {:init (-> scene descendants first (ig/init-key {}))
-    :halt! (-> scene descendants first ig/halt-key!{})}))
+    :halt! (-> scene descendants first (ig/halt-key! {}))}))
 
 (it/derive-hierarchy
  {:graphics-2d.entity/asset-loader [:essen/entity]

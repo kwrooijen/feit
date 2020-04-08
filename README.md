@@ -61,6 +61,15 @@ Tickers are pieces of functionality that happens over time. For example you
 could have a poison ticker that damages the health component over time. Or a
 regeneration ticker that heals every second.
 
+### Keyword Hierarchy
+
+Keyword hierarchy is used to group entities together. For example you might want
+to reference all monsters in a certain scene. But you could have many different
+kinds of monsters. As long as all of these are descendants of `:entity/monster`,
+for example, you could lookup all of them through that specific keyword. This
+method is also used to share state, emit events to multiple entities, and more.
+
+---
 
 ## Project code structure
 
@@ -96,6 +105,8 @@ platform agnostic.
 
 The module namespace contains 3rd party modules that implement these schemas.
 These shouldn't be in the Rooij project, but this is for development purposes.
+
+---
 
 ## Code usage
 

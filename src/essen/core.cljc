@@ -18,36 +18,13 @@
    [essen.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
-   #?(:clj [clojure.stacktrace :as st]
-      :cljs [cljs.stacktrace :as st])
-   [essen.interface.graphics-2d.entity]
-   [essen.interface.graphics-2d.component]
    [essen.interface.graphics-2d.core :as interface.graphics-2d]))
 
 (set! *print-meta* true)
 
-(defn- start-graphics-2d [config]
-  (-> config
-      (ig/prep [interface.graphics-2d/system])
-      (ig/init [interface.graphics-2d/system])
-      (it/find-derived-value interface.graphics-2d/system)
-      (state/set-graphics-2d!))
-
-  (state/set-graphics-2d-scene!
-   {:init (ig/init-key (first (descendants interface.graphics-2d/scene)) {})
-    :halt! (ig/halt-key! (first (descendants interface.graphics-2d/scene)){})}))
-
-;; (defn- start-physics [config]
-;;   (-> config
-;;       (ig/prep [:essen.module/physics])
-;;       (ig/init [:essen.module/physics])
-;;       (it/find-derived-value :essen.module/physics)
-;;       (essen.loop.core/add!)))
-
 (defn- start [config]
   (system/start config)
-  (start-graphics-2d config)
-  ;; (start-physics config)
+  (essen.interface.graphics-2d.core/init config)
   (essen.loop.core/start!))
 
 (defn setup

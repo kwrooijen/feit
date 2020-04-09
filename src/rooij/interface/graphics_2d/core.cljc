@@ -20,8 +20,8 @@
       (state/set-graphics-2d!))
 
   (state/set-graphics-2d-scene!
-   {:init (-> scene descendants first (ig/init-key {}))
-    :halt! (-> scene descendants first (ig/halt-key! {}))}))
+   {:init (ig/init-key scene {})
+    :halt! (ig/halt-key! scene {})}))
 
 (it/derive-hierarchy
  {:graphics-2d.entity/asset-loader [:rooij/entity]

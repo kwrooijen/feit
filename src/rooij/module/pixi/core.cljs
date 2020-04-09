@@ -28,29 +28,32 @@
     ;; :resolution  resolution
     :autoDencity auto-dencity}))
 
-(defmethod ig/init-key :pixi.core/scene [_ _]
+(defmethod ig/init-key :rooij.interface.graphics-2d/scene  [_ _]
   (fn init-pixi-scene [scene-key]
     (state/init-scene! scene-key)))
 
-(defmethod ig/halt-key! :pixi.core/scene [_ _]
+(defmethod ig/halt-key! :rooij.interface.graphics-2d/scene [_ _]
   (fn halt-pixi-scene [scene-key]
     (.destroy (state/get-scene scene-key))
     (.clear state/renderer)
     (state/halt-scene! scene-key)))
 
-(defmethod ig/init-key :pixi.core/system [_ _]
+(defmethod ig/init-key :rooij.interface.graphics-2d/system [_ _]
   (fn [scene-key]
     (.render state/renderer (state/get-scene scene-key))))
 
+(def core-config
+  {:rooij.interface.graphics-2d/system
+   {:dep/renderer (ig/ref :pixi.core/renderer)
+    :dep/event-listener.resize (ig/ref :pixi.core.event-listener/resize)}
+
+   :rooij.interface.graphics-2d/scene {}
+
+   :pixi.core.event-listener/resize {}
+
+   :pixi.core/renderer {}})
+
 (def config
   (merge
-   {[:rooij.interface.graphics-2d/system :pixi.core/system]
-    {:dep/renderer (ig/ref :pixi.core/renderer)
-     :dep/event-listener.resize (ig/ref :pixi.core.event-listener/resize)}
-
-    [:rooij.interface.graphics-2d/scene :pixi.core/scene] {}
-
-    :pixi.core.event-listener/resize {}
-
-    [:rooij.interface.graphics-2d/window :pixi.core/renderer] {}}
+   core-config
    component.sprite/config))

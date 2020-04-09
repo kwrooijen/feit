@@ -67,6 +67,7 @@
    (timbre/debug ::start! opts)
    (validate-scene scene-key)
    ((:init state/graphics-2d-scene) scene-key)
+   ((:init state/physics-2d-scene) scene-key)
    (state/reset-events! scene-key)
    (init scene-key opts)))
 
@@ -79,4 +80,5 @@
   (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
     (entity/halt! entity))
   (state/remove-scene! scene-key)
-  ((:halt! state/graphics-2d-scene) scene-key))
+  ((:halt! state/graphics-2d-scene) scene-key)
+  ((:halt! state/physics-2d-scene) scene-key))

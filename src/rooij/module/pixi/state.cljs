@@ -31,6 +31,8 @@
   (swap! running-scenes conj scene-key))
 
 (defn halt-scene! [scene-key]
+  (.destroy (get-scene scene-key))
+  (.clear renderer)
   (swap! scenes dissoc scene-key)
   (swap! running-scenes disj scene-key))
 

@@ -28,17 +28,15 @@
     ;; :resolution  resolution
     :autoDencity auto-dencity}))
 
-(defmethod ig/init-key :rooij.interface.graphics-2d/scene  [_ _]
+(defmethod ig/init-key :rooij.interface.graphics-2d/scene  [_ _opts]
   (fn init-pixi-scene [scene-key]
     (state/init-scene! scene-key)))
 
-(defmethod ig/halt-key! :rooij.interface.graphics-2d/scene [_ _]
+(defmethod ig/halt-key! :rooij.interface.graphics-2d/scene [_ _opts]
   (fn halt-pixi-scene [scene-key]
-    (.destroy (state/get-scene scene-key))
-    (.clear state/renderer)
     (state/halt-scene! scene-key)))
 
-(defmethod ig/init-key :rooij.interface.graphics-2d/system [_ _]
+(defmethod ig/init-key :rooij.interface.graphics-2d/system [_ _opts]
   (fn [scene-key]
     (.render state/renderer (state/get-scene scene-key))))
 

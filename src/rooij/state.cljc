@@ -17,6 +17,10 @@
 
 (defonce ^:dynamic graphics-2d-scene {:init nil :halt! nil})
 
+(defonce ^:dynamic physics-2d (fn [_]))
+
+(defonce ^:dynamic physics-2d-scene {:init nil :halt! nil})
+
 (defonce ^:private state (atom {}))
 
 (defonce ^:private scenes (atom {}))
@@ -61,3 +65,9 @@
 
 (defn set-graphics-2d-scene! [v]
   (set! graphics-2d-scene v))
+
+(defn set-physics-2d! [v]
+  (set! physics-2d v))
+
+(defn set-physics-2d-scene! [v]
+  (set! physics-2d-scene v))

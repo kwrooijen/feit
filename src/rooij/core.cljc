@@ -18,13 +18,15 @@
    [rooij.system.entity]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
-   [rooij.interface.graphics-2d.core :as interface.graphics-2d]))
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
+   [rooij.interface.physics-2d.core :as interface.physics-2d]))
 
 (set! *print-meta* true)
 
 (defn- start [config]
   (system/start config)
   (interface.graphics-2d/init config)
+  (interface.physics-2d/init config)
   (rooij.loop.core/start!))
 
 (defn setup

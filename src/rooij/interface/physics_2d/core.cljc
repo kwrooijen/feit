@@ -1,5 +1,6 @@
 (ns rooij.interface.physics-2d.core
   (:require
+   [rooij.config]
    [rooij.state :as state]
    [integrant.core :as ig]
    [integrant-tools.core :as it]))
@@ -11,12 +12,12 @@
   :rooij.interface.physics-2d/scene)
 
 (defn physics-2d-enabled? []
-  (and (contains? ig/init-key system)
-       (contains? ig/init-key scene)))
+  (and (contains? (methods ig/init-key) system)
+       (contains? (methods ig/init-key) scene)))
 
-(defn init [config]
+(defn init []
   (when (physics-2d-enabled?)
-    (-> config
+    (-> @rooij.config/config
         (ig/prep [system])
         (ig/init [system])
         (it/find-derived-value system)
@@ -28,6 +29,3 @@
 
 (it/derive-hierarchy
  {:physics-2d.component/rectangle [:rooij/component]})
-
-(def config
-  {})

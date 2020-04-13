@@ -1,6 +1,6 @@
 # Rooij - Modular, Data driven Game Engine
 
-Heavily WIP, not for use yet, no documentation at the moment
+Heavily WIP, design phase. Not for use yet, no documentation at the moment
 
 ## Concept
 

@@ -5,19 +5,6 @@
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]))
 
-(defmethod ig/init-key :component/sprite
-  [_ {:sprite/keys [file x y]
-      :context/keys [scene-key]}]
-  (let [texture (-> state/loader .-resources (aget file) .-texture)
-        sprite (PIXI/Sprite. texture)]
-    (set! (.-x sprite) x)
-    (set! (.-y sprite) y)
-    (.addChild (state/get-scene scene-key)
-               sprite)
-    sprite))
-
-(def config {[:rooij/component :component/sprite] {}})
-
 (defn spritesheet-animated-sprite [{:spritesheet/keys [name animation]}]
   (let [textures (state/spritesheet-animation-texture name animation)
         sprite  (PIXI/AnimatedSprite. textures)]

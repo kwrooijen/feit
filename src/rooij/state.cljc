@@ -9,8 +9,6 @@
    (defn atom [v]
      (r/atom v)))
 
-(defonce config (atom {}))
-
 (defonce system (atom {}))
 
 ;; TODO Maybe create a protocol?
@@ -21,8 +19,6 @@
 (defonce ^:dynamic physics-2d (fn [_delta _scene-key]))
 
 (defonce ^:dynamic physics-2d-scene {:init identity :halt! identity})
-
-(defonce ^:private state (atom {}))
 
 (defonce ^:private scenes (atom {}))
 

@@ -1,5 +1,6 @@
 (ns rooij.system.core
   (:require
+   [rooij.config]
    [rooij.interface.graphics-2d.core :as interface.graphics-2d]
    [meta-merge.core :refer [meta-merge]]
    [taoensso.timbre :as timbre]
@@ -57,9 +58,9 @@
         (fn [_] nil))
     (fn [_] nil)))
 
-(defn start [config]
+(defn start []
   (timbre/info ::start)
-  (reset! state/config (prep config))
-  (-> @state/config
+  (rooij.config/reset-config! (prep @rooij.config/config))
+  (-> @rooij.config/config
       (init [:rooij/system])
       (->> (reset! state/system))))

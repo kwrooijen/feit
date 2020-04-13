@@ -1,8 +1,9 @@
 (ns rooij.dev
   (:require
+   [rooij.config]
    [rooij.core :refer [scenes]]
-   [rooij.module.matterjs :as matter]
-   [rooij.module.pixi.debug :as pixi.debug]
+   ;; [rooij.module.matterjs.core :as matter]
+   ;; [rooij.module.pixi.debug :as pixi.debug]
    [rooij.state :as state]
    [rooij.system.core :as system]
    [rooij.system.scene :as scene]
@@ -45,9 +46,8 @@
   (doseq [scene-key (scenes)]
     (scene/halt! scene-key)))
 
-(defn resume [config]
-  (reset! state/config (system/prep config))
-  (-> @state/config
+(defn resume []
+  (-> @rooij.config/config
       (system/init  [:rooij/scene])
       (->> (reset! state/system)))
   (doseq [scene-key @halted-scenes]

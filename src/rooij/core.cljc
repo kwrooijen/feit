@@ -2,6 +2,7 @@
   (:require
    [rooij.error]
    [rooij.logger]
+   [rooij.config]
    [taoensso.timbre :as timbre]
    [rooij.loop.core]
    [clojure.spec.alpha :as s]
@@ -23,21 +24,21 @@
 
 (set! *print-meta* true)
 
-(defn- start [config]
-  (system/start config)
-  (interface.graphics-2d/init config)
-  (interface.physics-2d/init config)
+(defn- start []
+  (system/start)
+  (interface.graphics-2d/init)
+  (interface.physics-2d/init)
   (rooij.loop.core/start!))
 
 (defn setup
-  [config]
+  []
   (rooij.logger/setup-logging!)
   (try
-    (timbre/debug ::setup config)
-    (start config)
+    (timbre/debug ::setup @rooij.config/config)
+    (start)
     (catch #?(:clj Throwable :cljs :default) e
       (rooij.error/handle-error e)
-      (start config))))
+      (start))))
 
 (defn scenes
   "Get all current running scenes as a set."

@@ -12,6 +12,9 @@
     (= (:type e) :malli.core/invalid-schema)
     :malli.core/invalid-schema
 
+    (= (:reason e) :rooij.system.scene/no-initial-scene)
+    :rooij.system.scene/no-initial-scene
+
     (= (:reason e) :integrant.core/build-threw-exception)
     :integrant.core/build-threw-exception))
 
@@ -28,6 +31,10 @@
   (timbre/error (str "The following key threw an error during initialization: "
                      (:key (ex-data e)) "\n\n" "With the following opts: \n"
                      (pp (:value (ex-data e))))))
+
+(defmethod handle-error :rooij.system.scene/no-initial-scene [e]
+  (timbre/error ::no-initial-scene (str "Configuration is missing `:rooij/initial-scenen` key."))
+  (throw e))
 
 (defmethod handle-error :default [e]
   (timbre/error ::unhandled-exception (str (ex-data e)))

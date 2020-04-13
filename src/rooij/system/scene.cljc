@@ -1,5 +1,6 @@
 (ns rooij.system.scene
   (:require
+   [rooij.config]
    [taoensso.timbre :as timbre]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [rooij.state :as state]
@@ -82,3 +83,8 @@
   (state/remove-scene! scene-key)
   ((:halt! state/graphics-2d-scene) scene-key)
   ((:halt! state/physics-2d-scene) scene-key))
+
+(defn start-initial-scene []
+  (if-let [scene-key (:rooij/initial-scene @rooij.config/config)]
+    (start! scene-key)
+    (throw (ex-info "No initial scene" {:reason ::no-initial-scene}))))

@@ -28,7 +28,8 @@
   (system/start)
   (interface.graphics-2d/init)
   (interface.physics-2d/init)
-  (rooij.loop.core/start!))
+  (rooij.loop.core/start!)
+  (scene/start-initial-scene))
 
 (defn setup
   ([] (setup {}))

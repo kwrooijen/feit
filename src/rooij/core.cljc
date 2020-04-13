@@ -35,7 +35,6 @@
   ([] (setup {}))
   ([config]
    (rooij.config/merge-user! config)
-   (rooij.logger/setup-logging!)
    (try
      (timbre/debug ::setup @rooij.config/config)
      (start)

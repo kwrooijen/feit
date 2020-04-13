@@ -21,5 +21,8 @@
     #?(:clj  (appenders/println-appender)
        :cljs (appenders/console-appender))}})
 
-(defn setup-logging! []
+(defn disable! []
+  (timbre/set-config! {}))
+
+(defn enable! []
   (timbre/set-config! timbre-config))

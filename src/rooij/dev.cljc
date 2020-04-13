@@ -47,8 +47,6 @@
     (scene/halt! scene-key)))
 
 (defn resume []
-  (-> @rooij.config/config
-      (system/init  [:rooij/scene])
-      (->> (reset! state/system)))
+  (system/start)
   (doseq [scene-key @halted-scenes]
     (scene/start! scene-key)))

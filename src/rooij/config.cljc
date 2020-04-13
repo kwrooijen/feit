@@ -2,7 +2,7 @@
   (:require
    [meta-merge.core :refer [meta-merge]]))
 
-(def config (atom {}))
+(defonce config (atom {}))
 
 (defonce default-config
   {:rooij.interface.physics-2d/system {}

@@ -20,6 +20,9 @@
   ([] (reset-config! (meta-merge default-config @extension-config @user-config)))
   ([c] (reset! config c)))
 
+(defn reset-user-config! []
+  (reset! user-config {}))
+
 (defn merge-extension! [config]
   (swap! extension-config meta-merge config)
   (reset-config!))

@@ -44,7 +44,8 @@
   (reset! halted-scenes (scenes))
   (ig/suspend! @state/system [:rooij/scene])
   (doseq [scene-key (scenes)]
-    (scene/halt! scene-key)))
+    (scene/halt! scene-key))
+  (rooij.config/reset-user-config!))
 
 (defn resume []
   (system/start)

@@ -38,29 +38,10 @@
 (defn add-routes [entity] []
   (assoc entity :entity/routes (routes entity)))
 
-(defn set-component-key [ref {:component/keys [key]}]
-  (if key
-    (assoc ref :component/key key)
-    ref))
-
-(defn set-component-opts [ref component]
-  (update ref :component/opts meta-merge (dissoc component :component/ref)))
-
-(defn merge-extra-opts [component]
-  (if-let [ref (:component/ref component)]
-    (-> ref
-        (set-component-key  component)
-        (set-component-opts  component))
-    component))
-
-(defn process-components [components]
-  (-> (mapv merge-extra-opts components)
-      (vec->map :component/key)))
-
 (defmethod system/init-key :rooij/entity [k opts]
   (timbre/debug ::init-key opts)
   (-> opts
-      (update :entity/components process-components)
+      (update :entity/components system/process-refs :component)
       (select-keys [:entity/components
                     :entity/dynamic])
       (assoc :entity/key (top-key k)

@@ -6,8 +6,9 @@
    [taoensso.timbre :as timbre]
    [rooij.methods :refer [assert-schema-key]]
    [rooij.state :as state]
-   [rooij.util :refer [derive-composite-all]]
+   [rooij.util :refer [derive-composite-all vec->map]]
    [integrant-tools.core :as it]
+   [integrant-tools.keyword :refer [make-child]]
    [integrant.core :as ig]))
 
 (it/derive-hierarchy
@@ -51,6 +52,34 @@
   (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]
     f
     (fn [_ opts] opts)))
+
+(def process-refs-keys
+  (memoize
+   (fn [ns]
+     {:key (keyword ns "key")
+      :opts (keyword ns "opts")
+      :ref (keyword ns "ref")
+      :dynamic (keyword ns "dynamic")})))
+
+(defn set-ref-dynamic-key [ref ks opts]
+  (if (get opts (:dynamic ks))
+    (update ref (:key ks) make-child)
+    ref))
+
+(defn set-component-opts [ref ks opts]
+  (update ref (:opts ks) meta-merge (dissoc opts (:ref ks))))
+
+(defn merge-extra-opts [ks opts]
+  (if-let [ref (get opts (:ref ks))]
+    (-> ref
+        (set-ref-dynamic-key ks opts)
+        (set-component-opts ks opts))
+    opts))
+
+(defn process-refs [ref-opts ns]
+  (let [ks (process-refs-keys ns)]
+    (-> (mapv (partial merge-extra-opts ks) ref-opts)
+        (vec->map (:key ks)))))
 
 (defn get-halt-key [derived-k entity-opts]
   (if-let [f (get-method ig/halt-key! (#'ig/normalize-key derived-k))]

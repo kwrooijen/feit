@@ -13,10 +13,11 @@
 
 (defmethod system/init-key :rooij/scene [k opts]
   (timbre/debug ::init-key opts)
-  (assoc opts
-         :scene/key (top-key k)
-         :scene/init (system/get-init-key k)
-         :scene/halt! (system/get-halt-key k opts)))
+  (-> opts
+      (update :scene/entities system/process-refs :entity)
+      (assoc :scene/key (top-key k)
+             :scene/init (system/get-init-key k)
+             :scene/halt! (system/get-halt-key k opts))))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
   (let [context {:context/scene-key scene-key
@@ -26,25 +27,13 @@
                         #(component/prep % context))
                   entity)))
 
-(defn make-dynamic-entity [entity]
-  (if (:entity/dynamic entity)
-    (update entity :entity/key make-child)
-    entity))
-
-(defn entities->map [entities]
-  (->> (flatten entities)
-       (map make-dynamic-entity)
-       (map (juxt :entity/key identity))
-       (into {})))
-
 (defn start-entities [opts scene-key]
   (let [context {:context/scene-key scene-key}]
-    (->> opts
-        (sp/transform [:scene/entities] entities->map)
-        (sp/transform [:scene/entities MAP-VALS]
-                      (comp entity/init
-                            #(update % :entity/opts merge context)
-                            (partial start-components scene-key))))))
+    (sp/transform [:scene/entities MAP-VALS]
+                  (comp entity/init
+                        #(update % :entity/opts merge context)
+                        (partial start-components scene-key))
+                  opts)))
 
 (defn apply-init [scene-opts scene-key opts]
   ((:scene/init scene-opts) scene-key (merge scene-opts opts)))

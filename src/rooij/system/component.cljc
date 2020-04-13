@@ -59,7 +59,6 @@
 (defn prep [component context]
   (-> component
       (merge (:component/opts component) context)
-      ;; TODO Should start all tickers/handlers/reactors/middleware with new opts
-      (update :component/tickers vec->map :ticker/key)
-      (update :component/handlers vec->map :handler/key)
-      (update :component/reactors vec->map :reactor/key)))
+      (update :component/tickers system/process-refs :ticker)
+      (update :component/handlers system/process-refs :handler)
+      (update :component/reactors system/process-refs :reactor)))

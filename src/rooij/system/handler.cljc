@@ -10,4 +10,4 @@
   (-> opts
       (assoc :handler/key (or (:handler/route opts) (top-key k))
              :handler/fn (ig/init-key k opts))
-      (update :handler/middleware vec->map :middleware/key)))
+      (update :handler/middleware system/process-refs :middleware)))

@@ -34,10 +34,7 @@
    (add-entity config entity-key {}))
   ([config entity-key entity-config]
    (let [scene-key (current-key config)
-         entity
-         ;; (merge entity-config {:entity/ref (ig/ref entity-key)})
-         ;; TODO
-         (ig/ref entity-key)]
+         entity (merge entity-config {:entity/ref (ig/ref (top-key entity-key))})]
      (when-not (#{:rooij/scene} (first scene-key))
        (throw (ex-info "You can only add entities to scenes" {:reason ::invalid-config})))
      (meta-merge config

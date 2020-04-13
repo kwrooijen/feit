@@ -31,14 +31,16 @@
   (rooij.loop.core/start!))
 
 (defn setup
-  []
-  (rooij.logger/setup-logging!)
-  (try
-    (timbre/debug ::setup @rooij.config/config)
-    (start)
-    (catch #?(:clj Throwable :cljs :default) e
-      (rooij.error/handle-error e)
-      (start))))
+  ([] (setup {}))
+  ([config]
+   (rooij.config/merge-user! config)
+   (rooij.logger/setup-logging!)
+   (try
+     (timbre/debug ::setup @rooij.config/config)
+     (start)
+     (catch #?(:clj Throwable :cljs :default) e
+       (rooij.error/handle-error e)
+       (start)))))
 
 (defn scenes
   "Get all current running scenes as a set."

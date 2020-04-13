@@ -7,4 +7,5 @@
 
 (defn process [[scene {:context/keys [handler event state] :as context}]]
   (let [state ((:handler/fn handler) context event state)]
-    [(assoc-in scene (path-entity-state context) state) context]))
+    [(assoc-in scene (path-entity-state context) state)
+     (assoc context :context/state state)]))

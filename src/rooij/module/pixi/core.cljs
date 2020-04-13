@@ -3,6 +3,7 @@
    [rooij.module.pixi.entity]
    [rooij.module.pixi.state :as state]
    [rooij.module.pixi.component.sprite]
+   [rooij.module.pixi.component.rectangle]
    [integrant.core :as ig]))
 
 (defn setup-event-listener-resize []

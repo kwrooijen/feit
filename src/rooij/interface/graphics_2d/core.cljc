@@ -33,7 +33,8 @@
  {:graphics-2d.entity/asset-loader [:rooij/entity]
   :graphics-2d.entity/spritesheet-loader [:rooij/entity]
 
-  :graphics-2d.component/sprite [:rooij/component]})
+  :graphics-2d.component/sprite [:rooij/component]
+  :graphics-2d.component/rectangle [:rooij/component]})
 
 (def config
   ;; TODO remove pixi

@@ -19,6 +19,26 @@
    {:description ""}])
 
 
+(define-schema! :shape/x
+  ['number?
+   {:description ""}])
+
+(define-schema! :shape/y
+  ['number?
+   {:description ""}])
+
+(define-schema! :shape/w
+  ['number?
+   {:description ""}])
+
+(define-schema! :shape/h
+  ['number?
+   {:description ""}])
+
+(define-schema! :shape/fill
+  ['number?
+   {:description ""}])
+
 (defmethod es/schema-key :graphics-2d.component/sprite [_]
   [:or
    [:map
@@ -28,3 +48,11 @@
 
    [:map
     :texture/name]])
+
+(defmethod es/schema-key :graphics-2d.component/rectangle [_]
+  [:map
+   :shape/x
+   :shape/y
+   :shape/w
+   :shape/h
+   :shape/fill])

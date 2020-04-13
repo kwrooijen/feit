@@ -13,13 +13,14 @@
 
 (defonce system (atom {}))
 
-(defonce ^:dynamic graphics-2d (fn [_]))
+;; TODO Maybe create a protocol?
+(defonce ^:dynamic graphics-2d (fn [_scene-key]))
 
-(defonce ^:dynamic graphics-2d-scene {:init nil :halt! nil})
+(defonce ^:dynamic graphics-2d-scene {:init identity :halt! identity})
 
-(defonce ^:dynamic physics-2d (fn [_]))
+(defonce ^:dynamic physics-2d (fn [_delta _scene-key]))
 
-(defonce ^:dynamic physics-2d-scene {:init nil :halt! nil})
+(defonce ^:dynamic physics-2d-scene {:init identity :halt! identity})
 
 (defonce ^:private state (atom {}))
 

@@ -30,5 +30,5 @@
                      (pp (:value (ex-data e))))))
 
 (defmethod handle-error :default [e]
-  (println (ex-data e))
+  (timbre/error ::unhandled-exception (str (ex-data e)))
   nil)

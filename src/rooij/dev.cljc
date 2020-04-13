@@ -19,7 +19,7 @@
    [:rooij/ticker :ticker.rooij.dev/wireframe] {}})
 
 ;; TODO Make this generic so we don't have to use pixi / matter
-(defmethod ig/init-key :entity.rooij.dev/wireframe [_ _opts] identity)
+(defmethod ig/init-key :entity.rooij.dev/wireframe [_ _opts] nil)
 
 (defmethod ig/init-key :component.rooij.dev/wireframe [_ _opts]
   {:wireframe/active? true})
@@ -27,7 +27,8 @@
 (defmethod ig/init-key :ticker.rooij.dev/wireframe
   [_k _opts]
   (fn ticker-rooij-dev--wireframe [{:context/keys [scene-key]} _state]
-    (pixi.debug/draw-wireframe (matter/points) scene-key)))
+    ;; (pixi.debug/draw-wireframe (matter/points) scene-key)
+    ))
 
 (defn underive-all-from
   "Underive all child keys starting from `k`"

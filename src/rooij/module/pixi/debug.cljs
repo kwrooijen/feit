@@ -8,8 +8,8 @@
 (defn ->PixiPoint [{:keys [x y]}]
   (PIXI/Point. x y))
 
-(defn draw-wireframe [wires scene]
-  (let [container (get-in @state/state [:pixi/stage scene :stage/container])
+(defn draw-wireframe [wires scene-key]
+  (let [container (state/get-scene scene-key)
         graphics (PIXI/Graphics.)]
     (set! (.-zOrder graphics) js/Number.MAX_SAFE_INTEGER)
     (.destroy @wireframe)

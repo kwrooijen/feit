@@ -2,7 +2,7 @@
   (:require
    [taoensso.timbre :as timbre]
    [integrant.core :as ig]
-   [rooij.util :refer [vec->map top-key spy]]
+   [rooij.util :refer [vec->map top-key]]
    [rooij.state :as state]
    [rooij.system.core :as system]))
 

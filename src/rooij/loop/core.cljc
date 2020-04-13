@@ -21,10 +21,10 @@
    scene
    (loop.event/event->contexts scene event)))
 
-(defn- threshold-reached [_key]
-  (println "THRESHOLD REACHED")
+(defn- threshold-reached [scene-key]
   ;; TODO add debugging info
-  :threshold-reached)
+  (timbre/error ::threshold-reached scene-key {})
+  ::threshold-reached)
 
 (defn run-scene [{:keys [scene/key] :as scene} delta time]
   (let [events (state/get-scene-events key)]
@@ -54,9 +54,8 @@
 (defn run-scenes [delta time]
   (doseq [scene-key (keys (state/get-scenes))]
     (swap! (get-scene scene-key) run-scene delta time)
-    (state/graphics-2d scene-key)
-    (when @physics
-      (@physics))))
+    (state/physics-2d delta scene-key)
+    (state/graphics-2d scene-key)))
 
 (declare game-loop)
 

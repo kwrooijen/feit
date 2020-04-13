@@ -39,7 +39,7 @@
        (throw (ex-info "You can only add entities to scenes" {:reason ::invalid-config})))
      (meta-merge config
                  {scene-key {:scene/entities [entity]}}
-                 {[:rooij/entity entity-key] {}}))))
+                 {[:rooij/entity entity-key] entity-config}))))
 
 (defn add-component
   ([config component-key]

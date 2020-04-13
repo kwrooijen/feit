@@ -2,8 +2,14 @@
   (:require
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
+   [integrant-tools.keyword :refer [make-child]]
    [rooij.util :refer [top-key]]
    [rooij.config]))
+
+(defn new-child-key [k]
+  (if (vector? k)
+    k
+    (make-child k)))
 
 (def current-key
   (comp :current-key
@@ -43,14 +49,13 @@
    (add-component config component-key {}))
   ([config component-key component-config]
    (let [entity-key (current-key config)
+         component-key (new-child-key component-key)
          component (merge component-config {:component/ref (ig/ref (top-key component-key))})]
      (when-not (#{:rooij/entity} (first entity-key))
        (throw (ex-info "You can only add components to entities" {:reason ::invalid-config})))
      (meta-merge config
                  {entity-key {:entity/components [component]}}
-                 (if (vector? component-key)
-                   {component-key component-config}
-                   {[:rooij/component component-key] {}})))))
+                 {component-key component-config}))))
 
 (defn initial-scene
   ([config]

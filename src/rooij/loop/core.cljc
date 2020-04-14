@@ -8,6 +8,8 @@
    [rooij.loop.reactor :as loop.reactor]
    [rooij.loop.ticker :as loop.ticker]
    [rooij.state :as state :refer [get-scene]]
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
+   [rooij.interface.physics-2d.core :as interface.physics-2d]
    [taoensso.timbre :as timbre]))
 
 (defn- apply-event [scene event]
@@ -55,7 +57,7 @@
   (doseq [scene-key (keys (state/get-scenes))]
     (swap! (get-scene scene-key) run-scene delta time)
     (state/physics-2d delta scene-key)
-    (state/graphics-2d scene-key)))
+    (interface.graphics-2d/step state/graphics-2d scene-key)))
 
 (declare game-loop)
 

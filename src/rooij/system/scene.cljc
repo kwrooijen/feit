@@ -1,12 +1,13 @@
 (ns rooij.system.scene
   (:require
    [rooij.config]
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
    [taoensso.timbre :as timbre]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [rooij.state :as state]
    [rooij.util :refer [top-key]]
    [integrant-tools.core :as it]
-   [integrant-tools.keyword :refer [make-child descendant?]]
+   [integrant-tools.keyword :refer [descendant?]]
    [rooij.system.entity :as entity]
    [rooij.system.core :as system]
    [rooij.system.component :as component]))
@@ -56,7 +57,7 @@
   ([scene-key opts]
    (timbre/debug ::start! opts)
    (validate-scene scene-key)
-   ((:init state/graphics-2d-scene) scene-key)
+   (interface.graphics-2d/scene-init state/graphics-2d scene-key)
    ((:init state/physics-2d-scene) scene-key)
    (state/reset-events! scene-key)
    (init scene-key opts)))
@@ -70,7 +71,7 @@
   (doseq [[_ entity] (:scene/entities @(state/get-scene scene-key))]
     (entity/halt! entity))
   (state/remove-scene! scene-key)
-  ((:halt! state/graphics-2d-scene) scene-key)
+  (interface.graphics-2d/scene-halt! state/graphics-2d scene-key)
   ((:halt! state/physics-2d-scene) scene-key))
 
 (defn start-initial-scene []

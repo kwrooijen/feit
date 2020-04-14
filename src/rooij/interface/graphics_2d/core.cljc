@@ -8,6 +8,19 @@
    [integrant.core :as ig]
    [integrant-tools.core :as it]))
 
+(defprotocol RooijGraphics2D
+  (scene-init [this scene-key])
+  (scene-halt! [this scene-key])
+  (step [this scene-key])
+  (draw-wireframe [this scene-key vectors]))
+
+(deftype DefaultGraphics2D []
+  RooijGraphics2D
+  (scene-init [this scene-key] nil)
+  (scene-halt! [this scene-key] nil)
+  (step [this scene-key] nil)
+  (draw-wireframe [this scene-key vectors] nil))
+
 (def system
   :rooij.interface.graphics-2d/system)
 
@@ -19,16 +32,12 @@
        (contains? (methods ig/init-key) scene)))
 
 (defn init []
-  (when (graphics-2d-enabled?)
-    (-> @rooij.config/config
-        (ig/prep [system])
-        (ig/init [system])
-        (it/find-derived-value system)
-        (state/set-graphics-2d!))
-
-    (state/set-graphics-2d-scene!
-     {:init (ig/init-key scene {})
-      :halt! (ig/halt-key! scene {})})))
+  (-> @rooij.config/config
+      (ig/prep [system])
+      (ig/init [system])
+      (it/find-derived-value system)
+      (or (DefaultGraphics2D.))
+      (state/set-graphics-2d!)))
 
 (defprotocol RooijSprite2D
   (play! [this spritesheet animation]))

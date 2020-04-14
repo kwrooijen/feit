@@ -11,10 +11,7 @@
 
 (defonce system (atom {}))
 
-;; TODO Maybe create a protocol?
-(defonce ^:dynamic graphics-2d (fn [_scene-key]))
-
-(defonce ^:dynamic graphics-2d-scene {:init identity :halt! identity})
+(defonce ^:dynamic graphics-2d nil)
 
 (defonce ^:dynamic physics-2d (fn [_delta _scene-key]))
 
@@ -59,9 +56,6 @@
 
 (defn set-graphics-2d! [v]
   (set! graphics-2d v))
-
-(defn set-graphics-2d-scene! [v]
-  (set! graphics-2d-scene v))
 
 (defn set-physics-2d! [v]
   (set! physics-2d v))

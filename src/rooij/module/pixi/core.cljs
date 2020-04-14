@@ -1,5 +1,6 @@
 (ns rooij.module.pixi.core
   (:require
+   [rooij.interface.graphics-2d.core :refer [RooijGraphics2D]]
    [rooij.module.pixi.entity]
    [rooij.module.pixi.state :as state]
    [rooij.module.pixi.component.sprite]
@@ -28,16 +29,19 @@
     ;; :resolution  resolution
     :autoDencity auto-dencity}))
 
-(defmethod ig/init-key :rooij.interface.graphics-2d/scene  [_ _opts]
-  (fn init-pixi-scene [scene-key]
-    (state/init-scene! scene-key)))
-
-(defmethod ig/halt-key! :rooij.interface.graphics-2d/scene [_ _opts]
-  (fn halt-pixi-scene [scene-key]
-    (state/halt-scene! scene-key)))
+(deftype PixiGraphics2D []
+  RooijGraphics2D
+  (scene-init [this scene-key]
+    (state/init-scene! scene-key))
+  (scene-halt! [this scene-key]
+    (state/halt-scene! scene-key) )
+  (step [this scene-key]
+    (.render state/renderer (state/get-scene scene-key)))
+  (draw-wireframe [this vectors]
+    ;; TODO
+    nil))
 
 (defmethod ig/init-key :rooij.interface.graphics-2d/system [_ opts]
   (setup-event-listener-resize)
   (setup-renderer opts)
-  (fn [scene-key]
-    (.render state/renderer (state/get-scene scene-key))))
+  (->PixiGraphics2D))

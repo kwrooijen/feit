@@ -1,7 +1,6 @@
 (ns rooij.system.core
   (:require
    [rooij.config]
-   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
    [meta-merge.core :refer [meta-merge]]
    [taoensso.timbre :as timbre]
    [rooij.methods :refer [assert-schema-key]]
@@ -29,17 +28,11 @@
 (defmethod init-key :default [k opts]
   (ig/init-key k opts))
 
-(defn merge-configs [config]
-  (meta-merge interface.graphics-2d/config
-              config))
-
 (defn init
   "Starts an rooij system (scene or entity). This is used internally by rooij
   and should not be called directly."
   [config key]
-  (-> config
-      merge-configs
-      (ig/build [key] init-key assert-schema-key ig/resolve-key)))
+  (ig/build config [key] init-key assert-schema-key ig/resolve-key))
 
 (defn prep
   "Prepares the config system with a composite derive on all keys. This is used

@@ -2,14 +2,16 @@
   (:require
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
-   [integrant-tools.keyword :refer [make-child]]
+   [integrant-tools.keyword :refer [make-child descendant?]]
    [rooij.util :refer [top-key]]
    [rooij.config]))
 
-(defn new-child-key [k]
-  (if (vector? k)
-    k
-    (make-child k)))
+(defn new-child-key
+  ([k d]
+   (cond
+     (vector? k) k
+     (descendant? k d) (make-child k)
+     :else [d (make-child k)])))
 
 (def current-key
   (comp :current-key
@@ -24,6 +26,29 @@
   (with-meta
     (meta-merge config {(->composite-key k system-key) {}})
     {:current-key [system-key k]}))
+
+(defn- add-system
+  [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
+  (let [parent-system-key (current-key config)
+        system-child-key (new-child-key system-child-key system-key)
+        system-map (merge system-config {system-ref (ig/ref (top-key system-child-key))})]
+    (when-not (#{parent} (first parent-system-key))
+      (throw (ex-info (str "You can only add " system-key " to " parent)
+                      {:reason ::invalid-config})))
+    (meta-merge config
+                {parent-system-key {parent-collection [system-map]}}
+                {system-child-key system-config})))
+
+(defn- ref-system
+  [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
+  (let [scene-key (current-key config)
+        system (merge system-config {system-ref (ig/ref (top-key system-child-key))})]
+    (when-not (keyword? system-key)
+      (throw (ex-info (str system-child-key "must be a keyword") {:reason ::invalid-ref-system-keyword})))
+    (when-not (#{parent} (first scene-key))
+      (throw (ex-info (str "You can only add " system-key " to " parent)
+                      {:reason ::invalid-config})))
+    (meta-merge config {scene-key {parent-collection [system]}})))
 
 (defn scene
   ([scene-key] (scene  {} scene-key))
@@ -64,114 +89,145 @@
   ([config entity-key]
    (add-entity config entity-key {}))
   ([config entity-key entity-config]
-   (let [scene-key (current-key config)
-         entity-key (new-child-key entity-key)
-         entity (merge entity-config {:entity/ref (ig/ref (top-key entity-key))})]
-     (when-not (#{:rooij/scene} (first scene-key))
-       (throw (ex-info "You can only add entities to scenes" {:reason ::invalid-config})))
-     (meta-merge config
-                 {scene-key {:scene/entities [entity]}}
-                 {entity-key entity-config}))))
+   (add-system config
+               {:system/system-child-key entity-key
+                :system/system-key :rooij/entity
+                :system/system-config entity-config
+                :system/system-ref :entity/ref
+                :system/parent :rooij/scene
+                :system/parent-collection :scene/entities})))
+
 (defn add-component
   ([config component-key]
    (add-component config component-key {}))
   ([config component-key component-config]
-   (let [entity-key (current-key config)
-         component-key (new-child-key component-key)
-         component (merge component-config {:component/ref (ig/ref (top-key component-key))})]
-     (when-not (#{:rooij/entity} (first entity-key))
-       (throw (ex-info "You can only add components to entities" {:reason ::invalid-config})))
-     (meta-merge config
-                 {entity-key {:entity/components [component]}}
-                 {component-key component-config}))))
+   (add-system config
+               {:system/system-child-key component-key
+                :system/system-key :rooij/component
+                :system/system-config component-config
+                :system/system-ref :component/ref
+                :system/parent :rooij/entity
+                :system/parent-collection :entity/components})))
 
 (defn add-handler
   ([config handler-key]
    (add-handler config handler-key {}))
   ([config handler-key handler-config]
-   (let [component-key (current-key config)
-         handler-key (new-child-key handler-key)
-         handler (merge handler-config {:handler/ref (ig/ref (top-key handler-key))})]
-     (when-not (#{:rooij/component} (first component-key))
-       (throw (ex-info "You can only add handlers to entities" {:reason ::invalid-config})))
-     (meta-merge config
-                 {component-key {:component/handlers [handler]}}
-                 {handler-key handler-config}))))
+   (add-system config
+               {:system/system-child-key handler-key
+                :system/system-key :rooij/handler
+                :system/system-config handler-config
+                :system/system-ref :handler/ref
+                :system/parent :rooij/component
+                :system/parent-collection :component/handlers})))
 
 (defn add-ticker
   ([config ticker-key]
    (add-ticker config ticker-key {}))
   ([config ticker-key ticker-config]
-   (let [component-key (current-key config)
-         ticker-key (new-child-key ticker-key)
-         ticker (merge ticker-config {:ticker/ref (ig/ref (top-key ticker-key))})]
-     (when-not (#{:rooij/component} (first component-key))
-       (throw (ex-info "You can only add tickers to entities" {:reason ::invalid-config})))
-     (meta-merge config
-                 {component-key {:component/tickers [ticker]}}
-                 {ticker-key ticker-config}))))
+   (add-system config
+               {:system/system-child-key ticker-key
+                :system/system-key :rooij/ticker
+                :system/system-config ticker-config
+                :system/system-ref :ticker/ref
+                :system/parent :rooij/component
+                :system/parent-collection :component/tickers})))
 
 (defn add-reactor
   ([config reactor-key]
    (add-reactor config reactor-key {}))
   ([config reactor-key reactor-config]
-   (let [component-key (current-key config)
-         reactor-key (new-child-key reactor-key)
-         reactor (merge reactor-config {:reactor/ref (ig/ref (top-key reactor-key))})]
-     (when-not (#{:rooij/component} (first component-key))
-       (throw (ex-info "You can only add reactors to entities" {:reason ::invalid-config})))
-     (meta-merge config
-                 {component-key {:component/reactors [reactor]}}
-                 {[:rooij/reactor reactor-key] reactor-config}))))
+   (add-system config
+               {:system/system-child-key reactor-key
+                :system/system-key :rooij/reactor
+                :system/system-config reactor-config
+                :system/system-ref :reactor/ref
+                :system/parent :rooij/component
+                :system/parent-collection :component/reactors})))
 
 (defn add-middleware
   ([config middleware-key]
    (add-middleware config middleware-key {}))
   ([config middleware-key middleware-config]
-   (let [handler-key (current-key config)
-         middleware-key (new-child-key middleware-key)
-         middleware (merge middleware-config {:middleware/ref (ig/ref (top-key middleware-key))})]
-     (when-not (#{:rooij/handler} (first handler-key))
-       (throw (ex-info "You can only add middlewares to entities" {:reason ::invalid-config})))
-     (meta-merge config
-                 {handler-key {:handler/middlewares [middleware]}}
-                 {middleware-key middleware-config}))))
+   (add-system config
+               {:system/system-child-key middleware-key
+                :system/system-key :rooij/middleware
+                :system/system-config middleware-config
+                :system/system-ref :middleware/ref
+                :system/parent :rooij/handler
+                :system/parent-collection :handler/middlewares})))
 
 (defn ref-entity
   ([config entity-key]
    (ref-entity config entity-key {}))
   ([config entity-key entity-config]
-   (let [scene-key (current-key config)
-         entity (merge entity-config {:entity/ref (ig/ref (top-key entity-key))})]
-     (when-not (keyword? entity-key)
-       (throw (ex-info "entity-key must be a keyword" {:reason ::invalid-ref-entity-keyword})))
-     (when-not (#{:rooij/scene} (first scene-key))
-       (throw (ex-info "You can only add entities to scenes" {:reason ::invalid-config})))
-     (meta-merge config {scene-key {:scene/entities [entity]}}))))
+   (ref-system config
+               {:system/system-child-key entity-key
+                :system/system-key :rooij/entity
+                :system/system-config entity-config
+                :system/system-ref :entity/ref
+                :system/parent :rooij/scene
+                :system/parent-collection :scene/entities})))
 
 (defn ref-component
   ([config component-key]
    (ref-component config component-key {}))
   ([config component-key component-config]
-   (let [entity-key (current-key config)
-         component (merge component-config {:component/ref (ig/ref component-key)})]
-     (when-not (keyword? component-key)
-       (throw (ex-info "component-key must be a keyword" {:reason ::invalid-ref-component-keyword})))
-     (when-not (#{:rooij/entity} (first entity-key))
-       (throw (ex-info "You can only add components to entities" {:reason ::invalid-config})))
-     (meta-merge config {entity-key {:entity/components [component]}}))))
+   (ref-system config
+               {:system/system-child-key component-key
+                :system/system-key :rooij/component
+                :system/system-config component-config
+                :system/system-ref :component/ref
+                :system/parent :rooij/entity
+                :system/parent-collection :entity/components})))
 
 (defn ref-handler
   ([config handler-key]
    (ref-handler config handler-key {}))
   ([config handler-key handler-config]
-   (let [component-key (current-key config)
-         handler (merge handler-config {:handler/ref (ig/ref handler-key)})]
-     (when-not (keyword? handler-key)
-       (throw (ex-info "handler-key must be a keyword" {:reason ::invalid-ref-handler-keyword})))
-     (when-not (#{:rooij/component} (first component-key))
-       (throw (ex-info "You can only add handlers to components" {:reason ::invalid-config})))
-     (meta-merge config {component-key {:component/handlers [handler]}}))))
+   (ref-system config
+               {:system/system-child-key handler-key
+                :system/system-key :rooij/handler
+                :system/system-config handler-config
+                :system/system-ref :handler/ref
+                :system/parent :rooij/component
+                :system/parent-collection :component/handlers})))
+
+(defn ref-ticker
+  ([config ticker-key]
+   (ref-ticker config ticker-key {}))
+  ([config ticker-key ticker-config]
+   (ref-system config
+               {:system/system-child-key ticker-key
+                :system/system-key :rooij/ticker
+                :system/system-config ticker-config
+                :system/system-ref :ticker/ref
+                :system/parent :rooij/component
+                :system/parent-collection :component/tickers})))
+
+(defn ref-reactor
+  ([config reactor-key]
+   (ref-reactor config reactor-key {}))
+  ([config reactor-key reactor-config]
+   (ref-system config
+               {:system/system-child-key reactor-key
+                :system/system-key :rooij/reactor
+                :system/system-config reactor-config
+                :system/system-ref :reactor/ref
+                :system/parent :rooij/component
+                :system/parent-collection :component/reactors})))
+
+(defn ref-middleware
+  ([config middleware-key]
+   (ref-middleware config middleware-key {}))
+  ([config middleware-key middleware-config]
+   (ref-system config
+               {:system/system-child-key middleware-key
+                :system/system-key :rooij/middleware
+                :system/system-config middleware-config
+                :system/system-ref :middleware/ref
+                :system/parent :rooij/handler
+                :system/parent-collection :handler/middlewares})))
 
 (defn initial-scene
   ([config]

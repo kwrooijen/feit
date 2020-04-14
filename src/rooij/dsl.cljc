@@ -25,10 +25,16 @@
     k
     [ck k]))
 
-(defn- system [config k system-key]
-  (with-meta
-    (meta-merge config {(->composite-key k system-key) {}})
-    {:current-key [system-key (->composite-key k system-key)]}))
+(defn- system
+  ([k system-key] (system {} k {} system-key))
+  ([component-key--config component-key--component-opts system-key]
+   (if (or (keyword? component-key--config) (vector? component-key--config))
+     (system {} component-key--config component-key--component-opts system-key)
+     (system component-key--config component-key--component-opts {} system-key)))
+  ([config k system-opts system-key]
+   (with-meta
+     (meta-merge config {(->composite-key k system-key) system-opts})
+     {:current-key [system-key (->composite-key k system-key)]})))
 
 (defn- add-system
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
@@ -53,40 +59,26 @@
                       {:reason ::invalid-config})))
     (meta-merge config {(second parent-system-key) {parent-collection [system]}})))
 
-(defn scene
-  ([scene-key] (scene  {} scene-key))
-  ([config scene-key]
-   (system config scene-key :rooij/scene)))
+(defn scene [& args]
+  (apply system (concat args [:rooij/scene])))
 
-(defn entity
-  ([entity-key] (entity {} entity-key))
-  ([config entity-key]
-   (system config entity-key :rooij/entity)))
+(defn entity [& args]
+  (apply system (concat args [:rooij/entity])))
 
-(defn component
-  ([component-key] (component {} component-key))
-  ([config component-key]
-   (system config component-key :rooij/component)))
+(defn component [& args]
+  (apply system (concat args [:rooij/component])))
 
-(defn handler
-  ([handler-key] (handler {} handler-key))
-  ([config handler-key]
-   (system config handler-key :rooij/handler)))
+(defn handler [& args]
+  (apply system (concat args [:rooij/handler])))
 
-(defn reactor
-  ([reactor-key] (reactor {} reactor-key))
-  ([config reactor-key]
-   (system config reactor-key :rooij/reactor)))
+(defn reactor [& args]
+  (apply system (concat args [:rooij/reactor])))
 
-(defn ticker
-  ([ticker-key] (ticker {} ticker-key))
-  ([config ticker-key]
-   (system config ticker-key :rooij/ticker)))
+(defn ticker [& args]
+  (apply system (concat args [:rooij/ticker])))
 
-(defn middleware
-  ([middleware-key] (middleware {} middleware-key))
-  ([config middleware-key]
-   (system config middleware-key :rooij/middleware)))
+(defn middleware [& args]
+  (apply system (concat args [:rooij/middleware])))
 
 (defn add-entity
   ([config entity-key]
@@ -241,9 +233,6 @@
      (initial-scene config scene-key)))
   ([config scene]
    (assoc config :rooij/initial-scene scene)))
-
-(defn add-opts [config opts]
-  (update config (config-key config) meta-merge opts))
 
 (defn persistent [config]
   (when-not (#{:rooij/component} (first (current-key config)))

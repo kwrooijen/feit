@@ -37,7 +37,7 @@
     (state/halt-scene! scene-key) )
   (step [this scene-key]
     (.render state/renderer (state/get-scene scene-key)))
-  (draw-wireframe [this vectors]
+  (draw-wireframe [this scene-key vectors]
     ;; TODO
     nil))
 

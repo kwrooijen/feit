@@ -14,7 +14,7 @@
                                 (.play sprite)))
   (.play sprite))
 
-(defrecord SpritePixi [sprite initial-textures]
+(defrecord PixiSprite [sprite initial-textures]
   RooijSprite2D
   (play! [this spritesheet animation]
     (-play! this spritesheet animation)))
@@ -23,20 +23,20 @@
   (let [textures (state/spritesheet-animation-texture name animation)
         sprite  (PIXI/AnimatedSprite. textures)]
     (.play sprite)
-    (map->SpritePixi
+    (map->PixiSprite
      {:sprite sprite
       :initial-textures textures})))
 
 (defn spritesheet-static-sprite [{:spritesheet/keys [name texture]}]
   (let [texture (state/spritesheet-static-texture name texture)]
 
-    (map->SpritePixi
+    (map->PixiSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
       :initial-textures [texture]})))
 
 (defn texture-static-sprite [{:texture/keys [name]}]
   (let [texture (-> state/loader .-resources (aget name) .-texture)]
-    (map->SpritePixi
+    (map->PixiSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
       :initial-textures [texture]})))
 

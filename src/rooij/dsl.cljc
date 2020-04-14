@@ -6,18 +6,21 @@
    [rooij.util :refer [top-key]]
    [rooij.config]))
 
-(defn new-child-key
-  ([k d]
-   (cond
-     (vector? k) k
-     (descendant? k d) (make-child k)
-     :else [d (make-child k)])))
+(defn- new-child-key [k d]
+  (cond
+    (vector? k) k
+    (descendant? k d) (make-child k)
+    :else [d (make-child k)]))
 
-(def current-key
+(def ^:private current-key
   (comp :current-key
         meta))
 
-(defn ->composite-key [k ck]
+(def ^:private config-key
+  (comp second
+        current-key))
+
+(defn- ->composite-key [k ck]
   (if (vector? k)
     k
     [ck k]))
@@ -25,7 +28,7 @@
 (defn- system [config k system-key]
   (with-meta
     (meta-merge config {(->composite-key k system-key) {}})
-    {:current-key [system-key k]}))
+    {:current-key [system-key (->composite-key k system-key)]}))
 
 (defn- add-system
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
@@ -36,19 +39,19 @@
       (throw (ex-info (str "You can only add " system-key " to " parent)
                       {:reason ::invalid-config})))
     (meta-merge config
-                {parent-system-key {parent-collection [system-map]}}
+                {(second parent-system-key) {parent-collection [system-map]}}
                 {system-child-key system-config})))
 
 (defn- ref-system
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
-  (let [scene-key (current-key config)
+  (let [parent-system-key (current-key config)
         system (merge system-config {system-ref (ig/ref (top-key system-child-key))})]
     (when-not (keyword? system-key)
       (throw (ex-info (str system-child-key "must be a keyword") {:reason ::invalid-ref-system-keyword})))
-    (when-not (#{parent} (first scene-key))
+    (when-not (#{parent} (first parent-system-key))
       (throw (ex-info (str "You can only add " system-key " to " parent)
                       {:reason ::invalid-config})))
-    (meta-merge config {scene-key {parent-collection [system]}})))
+    (meta-merge config {(second parent-system-key) {parent-collection [system]}})))
 
 (defn scene
   ([scene-key] (scene  {} scene-key))
@@ -231,24 +234,13 @@
 
 (defn initial-scene
   ([config]
-   (let [[key-type scene-key] (current-key config)]
+   (let [[key-type [_ scene-key]] (current-key config)]
      (when-not (#{:rooij/scene} key-type)
        (throw (ex-info "You can only mark scenes as intial-scene"
                        {:reason ::invalid-scene-key})))
      (initial-scene config scene-key)))
   ([config scene]
    (assoc config :rooij/initial-scene scene)))
-
-(defn config-key [config]
-  ;; This is to cover the case of:
-  ;; [:rooij/entity :some/entity]
-  ;; [:rooij/entity [:parent/entity :some/entity]]
-  ;; Maybe we should change `:some/entity` to `[:rooij/entity :some/entity]`
-  (let [current (current-key config)
-        k (second current)]
-    (if (keyword? k)
-      current
-      k)))
 
 (defn add-opts [config opts]
   (update config (config-key config) meta-merge opts))

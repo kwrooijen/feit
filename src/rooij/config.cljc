@@ -4,11 +4,8 @@
 
 (defonce config (atom {}))
 
-(defonce default-config
-  {:rooij.interface.physics-2d/system {}
-   :rooij.interface.physics-2d/scene {}
-   :rooij.interface.graphics-2d/system {}
-   :rooij.interface.graphics-2d/scene {}})
+(defonce interface-config
+  (atom {}))
 
 (defonce extension-config
   (atom {}))
@@ -17,11 +14,15 @@
   (atom {}))
 
 (defn reset-config!
-  ([] (reset-config! (meta-merge default-config @extension-config @user-config)))
+  ([] (reset-config! (meta-merge @interface-config @extension-config @user-config)))
   ([c] (reset! config c)))
 
 (defn reset-user-config! []
   (reset! user-config {}))
+
+(defn merge-interface! [config]
+  (swap! interface-config meta-merge config)
+  (reset-config!))
 
 (defn merge-extension! [config]
   (swap! extension-config meta-merge config)

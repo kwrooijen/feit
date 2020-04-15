@@ -3,7 +3,7 @@
    [rooij.module.pixi.state :as state]
    ["pixi.js" :as PIXI]
    [integrant.core :as ig]
-   [rooij.interface.graphics-2d.core :refer [RooijSprite2D]]))
+   [rooij.interface.graphics-2d.core :refer [RooijGraphics2DSprite]]))
 
 (defn -play! [{:keys [sprite initial-textures]} spritesheet animation]
   (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
@@ -15,7 +15,7 @@
   (.play sprite))
 
 (defrecord PixiSprite [sprite initial-textures]
-  RooijSprite2D
+  RooijGraphics2DSprite
   (play! [this spritesheet animation]
     (-play! this spritesheet animation)))
 
@@ -29,7 +29,6 @@
 
 (defn spritesheet-static-sprite [{:spritesheet/keys [name texture]}]
   (let [texture (state/spritesheet-static-texture name texture)]
-
     (map->PixiSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
       :initial-textures [texture]})))

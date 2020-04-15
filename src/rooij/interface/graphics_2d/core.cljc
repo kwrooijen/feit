@@ -14,6 +14,9 @@
   (step [this scene-key])
   (draw-wireframe [this scene-key vectors]))
 
+(defprotocol RooijGraphics2DSprite
+  (play! [this spritesheet animation]))
+
 (deftype DefaultGraphics2D []
   RooijGraphics2D
   (scene-init [this scene-key] nil)
@@ -24,23 +27,14 @@
 (def system
   :rooij.interface.graphics-2d/system)
 
-(def scene
-  :rooij.interface.graphics-2d/scene)
-
-(defn graphics-2d-enabled? []
-  (and (contains? (methods ig/init-key) system)
-       (contains? (methods ig/init-key) scene)))
-
 (defn init []
   (-> @rooij.config/config
+      (meta-merge {system {}})
       (ig/prep [system])
       (ig/init [system])
       (it/find-derived-value system)
       (or (DefaultGraphics2D.))
       (state/set-graphics-2d!)))
-
-(defprotocol RooijSprite2D
-  (play! [this spritesheet animation]))
 
 (defmethod ig/prep-key :graphics-2d.component/sprite [_ opts]
   (meta-merge
@@ -60,5 +54,5 @@
   :graphics-2d.component/sprite [:rooij/component]
   :graphics-2d.component/rectangle [:rooij/component]})
 
-(rooij.config/merge-extension!
+(rooij.config/merge-interface!
  {[:rooij/handler :graphics-2d.handler.sprite/play] {}})

@@ -29,3 +29,7 @@
 
 (it/derive-hierarchy
  {:physics-2d.component/rectangle [:rooij/component]})
+
+(rooij.config/merge-interface!
+ {:rooij.interface.physics-2d/system {}
+  :rooij.interface.physics-2d/scene {}})

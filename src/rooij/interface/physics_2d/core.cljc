@@ -9,7 +9,9 @@
 (defprotocol RooijPhysics2D
   (scene-init [this scene-key])
   (scene-halt! [this scene-key])
-  (step [this scene-key delta]))
+  (step [this scene-key delta])
+  (make-rectangle [this opts])
+  (get-wireframe-vectors [this scene-key]))
 
 (defprotocol RooijPhysics2DRectangle)
 
@@ -31,9 +33,24 @@
       (or (DefaultPhysics2D.))
       (state/set-physics-2d!)))
 
+(defmethod ig/prep-key :physics-2d.component/rectangle [_ opts]
+  (meta-merge
+   {:component/tickers [{:ticker/ref (ig/ref :physics-2d.ticker.rectangle/position)}]}
+   opts))
+
+(defmethod ig/init-key :physics-2d.component/rectangle [_ opts]
+  (make-rectangle state/physics-2d opts))
+
+(defmethod ig/init-key :physics-2d.ticker.rectangle/position [_ opts]
+  (fn [context state]
+    ;; (println (.-position (:body state)))
+    ))
+
 (it/derive-hierarchy
- {:physics-2d.component/rectangle [:rooij/component]})
+ {:physics-2d.component/rectangle [:rooij/component]
+  :physics-2d.ticker.rectangle/position [:rooij/ticker]})
 
 (rooij.config/merge-interface!
  {:rooij.interface.physics-2d/system {}
-  :rooij.interface.physics-2d/scene {}})
+  :rooij.interface.physics-2d/scene {}
+  :physics-2d.ticker.rectangle/position {}})

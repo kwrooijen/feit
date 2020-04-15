@@ -4,6 +4,8 @@
    [rooij.core :refer [scenes]]
    ;; [rooij.module.matterjs.core :as matter]
    ;; [rooij.module.pixi.debug :as pixi.debug]
+   [rooij.interface.graphics-2d.core :refer [draw-wireframe]]
+   [rooij.interface.physics-2d.core :refer [get-wireframe-vectors]]
    [rooij.state :as state]
    [rooij.system.core :as system]
    [rooij.system.scene :as scene]
@@ -28,8 +30,8 @@
 (defmethod ig/init-key :ticker.rooij.dev/wireframe
   [_k _opts]
   (fn ticker-rooij-dev--wireframe [{:context/keys [scene-key]} _state]
-    ;; (pixi.debug/draw-wireframe (matter/points) scene-key)
-    ))
+    (draw-wireframe state/graphics-2d scene-key
+                    (get-wireframe-vectors state/physics-2d scene-key))))
 
 (defn underive-all-from
   "Underive all child keys starting from `k`"

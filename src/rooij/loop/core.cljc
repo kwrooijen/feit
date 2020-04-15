@@ -84,7 +84,7 @@
      ([] (fn [time] (game-loop time time)))
      ([old-time] (fn [time] (game-loop old-time time)))
      ([old-time time]
-      (let [delta  (/ (- time old-time) 1000)]
+      (let [delta (- time old-time)]
         (run-scenes delta time))
       (.requestAnimationFrame js/window (game-loop time)))))
 

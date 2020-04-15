@@ -22,15 +22,14 @@
          height      (.-innerHeight js/window)
          auto-dencity true}}]
   (state/set-renderer!
-   {:view (js/document.getElementById view)
+   {:view        (js/document.getElementById view)
     :width       width
     :height      height
     :transparent true
-    ;; For some reason this resolution doubles screen width
-    ;; :resolution  resolution
-    :autoDencity auto-dencity}))
+    ;; :autoDencity auto-dencity
+    }))
 
-(deftype PixiGraphics2D []
+(deftype PixiGraphics2D [init-opts]
   RooijGraphics2D
   (scene-init [this scene-key]
     (state/init-scene! scene-key))
@@ -42,7 +41,7 @@
     (pixi.debug/draw-wireframe scene-key vectors))
   (make-sprite [this opts] (component.sprite/make-sprite opts)))
 
-(defmethod ig/init-key :rooij.interface.graphics-2d/system [_ opts]
+(defmethod ig/init-key :rooij.interface.graphics-2d/system [_ init-opts]
   (setup-event-listener-resize)
-  (setup-renderer opts)
-  (->PixiGraphics2D))
+  (setup-renderer init-opts)
+  (->PixiGraphics2D init-opts))

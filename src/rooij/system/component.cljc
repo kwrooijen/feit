@@ -6,6 +6,15 @@
    [rooij.state :as state]
    [rooij.system.core :as system]))
 
+(def init-dissocs
+  [:component/init
+   :component/alpha-key
+   :component/key
+   :component/state
+   :component/handlers
+   :component/tickers
+   :component/opts])
+
 (defmulti persistent-resume
   (fn [key _opts _state]
     (#'ig/normalize-key key)))
@@ -53,7 +62,7 @@
   (-> component
       (assoc :component/state
              (or (get-persistent-state component)
-                 (init key component)))
+                 (init key (reduce dissoc component init-dissocs))))
       (save-persistent-component!)))
 
 (defn prep [component context]

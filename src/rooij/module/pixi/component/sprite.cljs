@@ -2,7 +2,6 @@
   (:require
    [rooij.module.pixi.state :as state]
    ["pixi.js" :as PIXI]
-   [integrant.core :as ig]
    [rooij.interface.graphics-2d.core :refer [RooijGraphics2DSprite]]))
 
 (defn -play! [{:keys [sprite initial-textures]} spritesheet animation]
@@ -45,8 +44,7 @@
     (:spritesheet/texture opts)   (spritesheet-static-sprite opts)
     (:texture/name opts)          (texture-static-sprite opts)))
 
-(defmethod ig/init-key :graphics-2d.component/sprite
-  [_ {:context/keys [scene-key] :as opts}]
+(defn make-sprite [{:context/keys [scene-key] :as opts}]
   (let [{:keys [sprite] :as state} (->sprite opts)]
     (set! (.-animationSpeed sprite) 0.167)
     (set! (.-x sprite) 100)

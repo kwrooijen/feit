@@ -1,9 +1,10 @@
 (ns rooij.module.pixi.core
   (:require
    [rooij.interface.graphics-2d.core :refer [RooijGraphics2D]]
+   [rooij.module.pixi.debug :as pixi.debug]
    [rooij.module.pixi.entity]
    [rooij.module.pixi.state :as state]
-   [rooij.module.pixi.component.sprite]
+   [rooij.module.pixi.component.sprite :as component.sprite]
    [rooij.module.pixi.component.rectangle]
    [integrant.core :as ig]))
 
@@ -38,8 +39,8 @@
   (step [this scene-key]
     (.render state/renderer (state/get-scene scene-key)))
   (draw-wireframe [this scene-key vectors]
-    ;; TODO
-    nil))
+    (pixi.debug/draw-wireframe scene-key vectors))
+  (make-sprite [this opts] (component.sprite/make-sprite opts)))
 
 (defmethod ig/init-key :rooij.interface.graphics-2d/system [_ opts]
   (setup-event-listener-resize)

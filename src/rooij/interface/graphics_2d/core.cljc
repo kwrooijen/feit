@@ -12,7 +12,8 @@
   (scene-init [this scene-key])
   (scene-halt! [this scene-key])
   (step [this scene-key])
-  (draw-wireframe [this scene-key vectors]))
+  (draw-wireframe [this scene-key vectors])
+  (make-sprite [this opts]))
 
 (defprotocol RooijGraphics2DSprite
   (play! [this spritesheet animation]))
@@ -46,6 +47,9 @@
     [_context {:event/keys [spritesheet animation]} state]
     (play! state spritesheet animation)
     state))
+
+(defmethod ig/init-key :graphics-2d.component/sprite [_ opts]
+  (make-sprite state/graphics-2d opts))
 
 (it/derive-hierarchy
  {:graphics-2d.entity/asset-loader [:rooij/entity]

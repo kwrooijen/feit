@@ -11,6 +11,8 @@
   (scene-halt! [this scene-key])
   (step [this scene-key delta]))
 
+(defprotocol RooijPhysics2DRectangle)
+
 (deftype DefaultPhysics2D []
   RooijPhysics2D
   (scene-init [this scene-key] nil)

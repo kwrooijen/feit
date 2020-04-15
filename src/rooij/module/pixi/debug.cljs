@@ -5,16 +5,12 @@
 
 (defonce wireframe (atom (PIXI/Graphics.)))
 
-(defn ->PixiPoint [{:keys [x y]}]
-  (PIXI/Point. x y))
-
-(defn draw-wireframe [wires scene-key]
-  (let [container (state/get-scene scene-key)
-        graphics (PIXI/Graphics.)]
+(defn draw-wireframe [scene-key vectors]
+  (let [graphics (PIXI/Graphics.)]
     (set! (.-zOrder graphics) js/Number.MAX_SAFE_INTEGER)
     (.destroy @wireframe)
     (.lineStyle graphics 1 0xFF0000)
-    (doseq [wire wires]
-      (.drawPolygon graphics (clj->js (map ->PixiPoint wire))))
-    (.addChild container graphics)
+    (doseq [[x y] vectors]
+      (.drawPolygon graphics (clj->js (PIXI/Point. x y))))
+    (.addChild (state/get-scene scene-key) graphics)
     (reset! wireframe graphics)))

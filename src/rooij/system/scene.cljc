@@ -2,6 +2,7 @@
   (:require
    [rooij.config]
    [rooij.interface.graphics-2d.core :as interface.graphics-2d]
+   [rooij.interface.physics-2d.core :as interface.physics-2d]
    [taoensso.timbre :as timbre]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [rooij.state :as state]
@@ -58,7 +59,7 @@
    (timbre/debug ::start! opts)
    (validate-scene scene-key)
    (interface.graphics-2d/scene-init state/graphics-2d scene-key)
-   ((:init state/physics-2d-scene) scene-key)
+   (interface.physics-2d/scene-init state/physics-2d scene-key)
    (state/reset-events! scene-key)
    (init scene-key opts)))
 
@@ -72,7 +73,7 @@
     (entity/halt! entity))
   (state/remove-scene! scene-key)
   (interface.graphics-2d/scene-halt! state/graphics-2d scene-key)
-  ((:halt! state/physics-2d-scene) scene-key))
+  (interface.physics-2d/scene-halt! state/physics-2d scene-key))
 
 (defn start-initial-scene []
   (if-let [scene-key (:rooij/initial-scene @rooij.config/config)]

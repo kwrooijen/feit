@@ -56,7 +56,7 @@
 (defn run-scenes [delta time]
   (doseq [scene-key (keys (state/get-scenes))]
     (swap! (get-scene scene-key) run-scene delta time)
-    (state/physics-2d delta scene-key)
+    (interface.physics-2d/step state/physics-2d scene-key delta)
     (interface.graphics-2d/step state/graphics-2d scene-key)))
 
 (declare game-loop)

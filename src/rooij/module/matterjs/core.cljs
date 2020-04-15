@@ -2,16 +2,17 @@
   (:require
    ["matter-js" :as Matter :refer [Engine]]
    [integrant.core :as ig]
+   [rooij.interface.physics-2d.core :refer [RooijPhysics2D]]
    [rooij.module.matterjs.state :as state]))
 
-(defmethod ig/init-key :rooij.interface.physics-2d/scene [_ _opts]
-  (fn interface-physics-2d--scene-init  [scene-key]
-    (state/init-engine! scene-key)))
-
-(defmethod ig/halt-key! :rooij.interface.physics-2d/scene [_ _opts]
-  (fn interface-physics-2d--scene-halt! [scene-key]
-    (state/halt-engine! scene-key)))
+(deftype MatterPhysics2D []
+  RooijPhysics2D
+  (scene-init [this scene-key]
+    (state/init-engine! scene-key))
+  (scene-halt! [this scene-key]
+    (state/halt-engine! scene-key))
+  (step [this scene-key delta]
+    (.update Engine (state/get-engine scene-key) delta 1)))
 
 (defmethod ig/init-key :rooij.interface.physics-2d/system [_ _opts]
-  (fn [delta scene-key]
-    (.update Engine (state/get-engine scene-key) delta 1)))
+  (->MatterPhysics2D))

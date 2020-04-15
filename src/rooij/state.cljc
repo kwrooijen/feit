@@ -13,9 +13,7 @@
 
 (defonce ^:dynamic graphics-2d nil)
 
-(defonce ^:dynamic physics-2d (fn [_delta _scene-key]))
-
-(defonce ^:dynamic physics-2d-scene {:init identity :halt! identity})
+(defonce ^:dynamic physics-2d nil)
 
 (defonce ^:private scenes (atom {}))
 
@@ -59,6 +57,3 @@
 
 (defn set-physics-2d! [v]
   (set! physics-2d v))
-
-(defn set-physics-2d-scene! [v]
-  (set! physics-2d-scene v))

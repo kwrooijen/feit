@@ -2,7 +2,7 @@
   (:require
    ["matter-js" :as Matter :refer [Bodies World Body]]
    [rooij.interface.general-2d.position :refer [RooijGeneral2DPosition]]
-   [rooij.interface.physics-2d.core :refer [RooijPhysics2DRectangle]]
+   [rooij.interface.physics-2d.rectangle :refer [RooijPhysics2DRectangle]]
    [rooij.module.matterjs.state :as state]))
 
 (defrecord MatterPhysics2DRectangle [body x y w h]

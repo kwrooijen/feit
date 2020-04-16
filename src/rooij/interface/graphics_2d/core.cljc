@@ -33,9 +33,3 @@
       (it/find-derived-value system)
       (or (DefaultGraphics2D.))
       (state/set-graphics-2d!)))
-
-(it/derive-hierarchy
- {})
-
-(rooij.config/merge-interface!
- {})

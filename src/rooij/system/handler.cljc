@@ -9,5 +9,9 @@
   (timbre/debug ::init-key opts)
   (-> opts
       (assoc :handler/key (or (:handler/route opts) (top-key k))
-             :handler/fn (ig/init-key k opts))
+             :reactor/init (system/get-init-key k)
+             :reactor/fn nil)
       (update :handler/middleware system/process-refs :middleware)))
+
+(defn init [{:handler/keys [key opts] :as handler}]
+  (assoc handler :handler/fn (ig/init-key key opts)))

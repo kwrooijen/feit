@@ -1,10 +1,13 @@
 (ns rooij.system.component
   (:require
-   [taoensso.timbre :as timbre]
-   [integrant.core :as ig]
-   [rooij.util :refer [vec->map top-key]]
+   [com.rpl.specter :as sp :refer [MAP-VALS]]
+   [rooij.system.ticker :as ticker]
+   [rooij.system.handler :as handler]
+   [rooij.system.reactor :as reactor]
    [rooij.state :as state]
-   [rooij.system.core :as system]))
+   [rooij.system.core :as system]
+   [rooij.util :refer [top-key]]
+   [taoensso.timbre :as timbre]))
 
 (def init-dissocs
   [:component/init
@@ -64,4 +67,7 @@
       (merge (:component/opts component) context)
       (update :component/tickers system/process-refs :ticker)
       (update :component/handlers system/process-refs :handler)
-      (update :component/reactors system/process-refs :reactor)))
+      (update :component/reactors system/process-refs :reactor)
+      (update :component/tickers #(sp/transform [MAP-VALS] ticker/init %))
+      (update :component/handlers #(sp/transform [MAP-VALS] handler/init %))
+      (update :component/reactors #(sp/transform [MAP-VALS] reactor/init %))))

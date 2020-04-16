@@ -29,6 +29,9 @@
             {:ticker/key ticker
              :ticker/fn (ig/init-key ticker opts)}))))
 
+(defn init [{:ticker/keys [key opts] :as ticker}]
+  (assoc ticker :ticker/fn (ig/init-key key opts)))
+
 (defn remove!
   ([{:context/keys [scene-key entity-key component]} ticker]
    (remove! scene-key entity-key component ticker))
@@ -39,5 +42,7 @@
 (defmethod system/init-key :rooij/ticker [k opts]
   (timbre/debug ::init-key opts)
   (assoc opts
+         :ticker/opts opts
          :ticker/key (top-key k)
-         :ticker/fn (ig/init-key k opts)))
+         :ticker/init (system/get-init-key k)
+         :ticker/fn nil))

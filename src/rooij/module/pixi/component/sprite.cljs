@@ -14,8 +14,7 @@
                                 (.play sprite)))
   (.play sprite))
 
-;; TODO Rename to PixiGraphics2DSprite
-(defrecord PixiSprite [sprite initial-textures x y]
+(defrecord PixiGraphics2DSprite [sprite initial-textures x y]
   RooijGraphics2DSprite
   (play! [this spritesheet animation]
     (-play! this spritesheet animation)))
@@ -24,7 +23,7 @@
   RooijGraphics2DRectangle)
 
 (extend-protocol RooijGeneral2DPosition
-  PixiSprite
+  PixiGraphics2DSprite
   (set-position [this x y angle]
     (set! (.. this -position -x) x)
     (set! (.. this -position -y) y)
@@ -35,19 +34,19 @@
   (let [textures (state/spritesheet-animation-texture name animation)
         sprite  (PIXI/AnimatedSprite. textures)]
     (.play sprite)
-    (map->PixiSprite
+    (map->PixiGraphics2DSprite
      {:sprite sprite
       :initial-textures textures})))
 
 (defn spritesheet-static-sprite [{:spritesheet/keys [name texture]}]
   (let [texture (state/spritesheet-static-texture name texture)]
-    (map->PixiSprite
+    (map->PixiGraphics2DSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
       :initial-textures [texture]})))
 
 (defn texture-static-sprite [{:texture/keys [name]}]
   (let [texture (-> state/loader .-resources (aget name) .-texture)]
-    (map->PixiSprite
+    (map->PixiGraphics2DSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
       :initial-textures [texture]})))
 

@@ -21,6 +21,8 @@
     (map->MatterPhysics2DRectangle
      {:body rectangle})))
 
+(def target-fps (/ 1000 60))
+
 (defrecord MatterPhysics2D [init-opts]
   RooijPhysics2D
   (scene-init [this scene-key]
@@ -28,7 +30,10 @@
   (scene-halt! [this scene-key]
     (state/halt-engine! scene-key))
   (step [this scene-key delta]
-    (.update Engine (state/get-engine scene-key) delta 1))
+    (let [engine (state/get-engine scene-key)]
+      (doseq [_ (doall (range 0 (Math/floor (/ delta target-fps))))]
+        (.update Engine engine target-fps 1))
+      (.update Engine engine (rem delta target-fps) 1)))
   (get-wireframe-vectors [this scene-key]
     (matterjs.debug/wireframe-vectors scene-key))
   (make-rectangle [this opts]

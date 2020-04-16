@@ -10,16 +10,29 @@
   RooijPhysics2DRectangle)
 
 (extend-protocol IPrintWithWriter
+  ;; If a MatterJS body is printed using `println` a `too much recursion` error
+  ;; occurs. We implement `IPrintWithWriter` to prevent this.
   MatterPhysics2DRectangle
   (-pr-writer [this writer _]
     (write-all writer (into {} (assoc this :body (symbol "#MatterJs/Body"))))))
 
-(defn -make-rectangle [{:context/keys [scene-key] :keys [x y w h static]}]
-  (let [rectangle (.rectangle Bodies (+ x (/ w 2)) (+ y (/ h 2)) w h
-                              #js {:isStatic static})]
+(defn- opts->rectangle [{:keys [x y w h static]}]
+  (.rectangle Bodies (+ x (/ w 2)) (+ y (/ h 2)) w h #js {:isStatic static}))
+
+(defn- new-rectangle [{:context/keys [scene-key] :as opts}]
+  (let [rectangle (opts->rectangle opts)]
     (.add World (state/get-world scene-key) rectangle)
     (map->MatterPhysics2DRectangle
      {:body rectangle})))
+
+(defn- existing-rectangle [{:context/keys [scene-key state]}]
+  (.add World (state/get-world scene-key) (:body state))
+  state)
+
+(defn -make-rectangle [opts]
+  (if (:context/state opts)
+    (existing-rectangle opts)
+    (new-rectangle opts)))
 
 (def target-fps (/ 1000 60))
 

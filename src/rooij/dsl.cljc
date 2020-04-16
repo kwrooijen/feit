@@ -6,11 +6,13 @@
    [rooij.util :refer [top-key]]
    [rooij.config]))
 
-(defn- new-child-key [k d]
-  (cond
-    (vector? k) k
-    (descendant? k d) (make-child k)
-    :else [d (make-child k)]))
+(def new-child-key
+  (memoize
+   (fn [_system-config k d]
+     (cond
+       (vector? k) k
+       (descendant? k d) (make-child k)
+       :else [d (make-child k)]))))
 
 (def ^:private current-key
   (comp :current-key
@@ -39,7 +41,7 @@
 (defn- add-system
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
   (let [parent-system-key (current-key config)
-        system-child-key (new-child-key system-child-key system-key)
+        system-child-key (new-child-key system-config system-child-key system-key)
         system-map (merge system-config {system-ref (ig/ref (top-key system-child-key))})]
     (when-not (#{parent} (first parent-system-key))
       (throw (ex-info (str "You can only add " system-key " to " parent)
@@ -234,11 +236,26 @@
   ([config scene]
    (assoc config :rooij/initial-scene scene)))
 
-(defn persistent [config]
+(defn persistent
+  "Make a component persistent. When a persistent component is initialized they
+  will receive an extra key; `context/state`. This holds the persisted state of
+  the component. If no state has been persisted yet (first initialization) then
+  this key will be nil"
+  [config]
   (when-not (#{:rooij/component} (first (current-key config)))
     (throw (ex-info "You can only make components persistent"
                     {:reason ::invalid-persistent-key})))
   (update config (config-key config) assoc :component/persistent true))
+
+(defn auto-persistent
+  "Make a component auto-persistent. If an auto-persistent component has any
+  persisted state (if it has already been initiated before) then the component
+  will not be initiated, and instead return the persisted state immediately."
+  [config]
+  (when-not (#{:rooij/component} (first (current-key config)))
+    (throw (ex-info "You can only make components auto-persistent"
+                    {:reason ::invalid-auto-persistent-key})))
+  (update config (config-key config) assoc :component/auto-persistent true))
 
 (defn save! [config]
   (rooij.config/merge-user! config))

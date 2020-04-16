@@ -14,7 +14,8 @@
     ((:reactor/fn reactor) ctx old-state state)))
 
 (defn- save-component! [{:context/keys [entity-key component component-key state]}]
-  (when ^boolean (:component/persistent component false)
+  (when ^boolean (or (:component/persistent component false)
+                     (:component/auto-persistent component false))
     (state/save-component! state entity-key component-key)))
 
 (defn process [[scene {:context/keys [old-state] :as ctx}] ]

@@ -8,18 +8,10 @@
 
 (def init-dissocs
   [:component/init
-   :component/alpha-key
    :component/key
-   :component/state
    :component/handlers
    :component/tickers
    :component/opts])
-
-(defmulti persistent-resume
-  (fn [key _opts _state]
-    (#'ig/normalize-key key)))
-
-(defmethod persistent-resume :default [_key _opts state] state)
 
 (defn path
   ([entity]
@@ -29,13 +21,10 @@
    [:scene/entities entity
     :entity/components component]))
 
-(defn get-persistent-state [{:context/keys [entity-key] :component/keys [key alpha-key] :as opts}]
-  (when-let [state (state/get-component entity-key key)]
-    (persistent-resume alpha-key opts state)))
-
 (defn save-persistent-component!
   [{:component/keys [key opts state] :context/keys [entity-key] :as component}]
-  (when (:component/persistent opts)
+  (when (or (:component/persistent opts)
+            (:component/auto-persistent opts))
     (state/save-component! state entity-key key))
   component)
 
@@ -47,7 +36,6 @@
                     :component/reactors
                     :component/persistent])
       (assoc :component/key (top-key k)
-             :component/alpha-key (top-key k)
              :component/init (system/get-init-key k)
              :component/state nil
              :component/halt! (system/get-halt-key k opts)
@@ -56,13 +44,19 @@
                                      :component/tickers
                                      :component/reactors))))
 
+(defn get-init-state
+  [{:component/keys [auto-persistent init key] :context/keys [entity-key] :as component}]
+  (let [persistent-state (state/get-component entity-key key)
+        component (assoc component :context/state persistent-state)]
+    (if (and auto-persistent persistent-state)
+      persistent-state
+      (init key (reduce dissoc component init-dissocs)))))
+
 (defn init
-  [{:component/keys [key init] :as component}]
-  (timbre/debug ::start component)
+  [{:component/keys [key] :as component}]
+  (timbre/debug [::start key] component)
   (-> component
-      (assoc :component/state
-             (or (get-persistent-state component)
-                 (init key (reduce dissoc component init-dissocs))))
+      (assoc :component/state (get-init-state component))
       (save-persistent-component!)))
 
 (defn prep [component context]

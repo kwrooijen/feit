@@ -43,6 +43,7 @@
        (rooij.error/handle-error e)
        (start)))))
 
+;; TODO Remove all the below from core
 (defn scenes
   "Get all current running scenes as a set."
   []

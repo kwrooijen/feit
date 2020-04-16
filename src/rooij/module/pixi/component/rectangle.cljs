@@ -10,9 +10,10 @@
 
 (extend-protocol RooijGeneral2DPosition
   PixiGraphics2DRectangle
-  (set-position [{:keys [body] :as this} x y]
+  (set-position [{:keys [body] :as this} x y angle]
     (set! (.. body -position -x) x)
     (set! (.. body -position -y) y)
+    (set! (.. body -rotation) angle)
     (assoc this :x y :y y)))
 
 (defn make-rectangle

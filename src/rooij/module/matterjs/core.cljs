@@ -12,11 +12,13 @@
 
 (extend-protocol RooijGeneral2DPosition
   MatterPhysics2DRectangle
-  (set-position [{:keys [body] :as this} x y]
+  (set-position [{:keys [body] :as this} x y angle]
+    (.setAngle Body body angle)
     (assoc this :x x :y y))
   (get-position [{:keys [body w h] :as this}]
     {:x (int (.. body -position -x))
-     :y (int (.. body -position -y))}))
+     :y (int (.. body -position -y))
+     :angle (.. body -angle)}))
 
 (extend-protocol IPrintWithWriter
   ;; If a MatterJS body is printed using `println` a `too much recursion` error

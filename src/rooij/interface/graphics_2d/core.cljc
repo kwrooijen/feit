@@ -35,14 +35,7 @@
       (state/set-graphics-2d!)))
 
 (it/derive-hierarchy
- {:graphics-2d.entity/asset-loader [:rooij/entity]
-  :graphics-2d.entity/spritesheet-loader [:rooij/entity]
-
-  :graphics-2d.component/sprite    [:rooij/component :rooij/position]
-  :graphics-2d.component/rectangle [:rooij/component :rooij/position]})
+ {})
 
 (rooij.config/merge-interface!
- {[:rooij/handler :graphics-2d.handler.sprite/play] {}
-  [:rooij/handler :graphics-2d.handler.loader/load-complete] {}
-  [:rooij/handler :graphics-2d.handler.loader/load-texture] {}
-  [:rooij/handler :graphics-2d.handler.loader/load-spritesheet] {}})
+ {})

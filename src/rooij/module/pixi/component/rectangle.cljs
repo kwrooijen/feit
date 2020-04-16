@@ -1,16 +1,30 @@
 (ns rooij.module.pixi.component.rectangle
   (:require
-   [integrant.core :as ig]
+   [rooij.interface.graphics-2d.core :refer [RooijGraphics2DRectangle]]
+   [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
    [rooij.module.pixi.state :as state]
    ["pixi.js" :as PIXI]))
 
-(defmethod ig/init-key :graphics-2d.component/rectangle
-  [_ {:shape/keys [x y w h fill] :context/keys [scene-key]}]
+(defrecord PixiGraphics2DRectangle [body x y w h]
+  RooijGraphics2DRectangle)
+
+(extend-protocol RooijGeneral2DPosition
+  PixiGraphics2DRectangle
+  (set-position [{:keys [body] :as this} x y]
+    (set! (.. body -position -x) x)
+    (set! (.. body -position -y) y)
+    (assoc this :x y :y y)))
+
+(defn make-rectangle
+  [{:shape/keys [x y w h fill] :context/keys [scene-key]}]
   (let [rectangle (.from PIXI/Sprite  PIXI/Texture.WHITE)]
     (set! (.-x rectangle) x)
     (set! (.-y rectangle) y)
     (set! (.-width rectangle) w)
     (set! (.-height rectangle) h)
     (set! (.-tint rectangle) fill)
+    (set! (.. rectangle -anchor -x) 0.5)
+    (set! (.. rectangle -anchor -y) 0.5)
     (.addChild (state/get-scene scene-key) rectangle)
-    rectangle))
+    (map->PixiGraphics2DRectangle
+     {:body rectangle :x x :y y :w w :h h})))

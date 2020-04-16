@@ -1,29 +1,38 @@
 (ns rooij.module.matterjs.core
   (:require
-   ["matter-js" :as Matter :refer [Engine Bodies World Events Mouse MouseConstraint]]
+   ["matter-js" :as Matter :refer [Engine Bodies World Body]]
    [integrant.core :as ig]
+   [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
    [rooij.interface.physics-2d.core :refer [RooijPhysics2D RooijPhysics2DRectangle]]
-   [rooij.module.matterjs.state :as state]
-   [rooij.module.matterjs.debug :as matterjs.debug]))
+   [rooij.module.matterjs.debug :as matterjs.debug]
+   [rooij.module.matterjs.state :as state]))
 
-(defrecord MatterPhysics2DRectangle [body]
+(defrecord MatterPhysics2DRectangle [body x y w h]
   RooijPhysics2DRectangle)
+
+(extend-protocol RooijGeneral2DPosition
+  MatterPhysics2DRectangle
+  (set-position [{:keys [body] :as this} x y]
+    (assoc this :x x :y y))
+  (get-position [{:keys [body w h] :as this}]
+    {:x (int (.. body -position -x))
+     :y (int (.. body -position -y))}))
 
 (extend-protocol IPrintWithWriter
   ;; If a MatterJS body is printed using `println` a `too much recursion` error
   ;; occurs. We implement `IPrintWithWriter` to prevent this.
   MatterPhysics2DRectangle
   (-pr-writer [this writer _]
-    (write-all writer (into {} (assoc this :body (symbol "#MatterJs/Body"))))))
+    (write-all writer (str "MatterPhysics2DRectangle#" (into {} (assoc this :body (symbol "#MatterJs/Body")))))))
 
 (defn- opts->rectangle [{:keys [x y w h static]}]
-  (.rectangle Bodies (+ x (/ w 2)) (+ y (/ h 2)) w h #js {:isStatic static}))
+  (.rectangle Bodies x y w h #js {:isStatic static}))
 
-(defn- new-rectangle [{:context/keys [scene-key] :as opts}]
+(defn- new-rectangle [{:context/keys [scene-key] :keys [x y w h] :as opts}]
   (let [rectangle (opts->rectangle opts)]
     (.add World (state/get-world scene-key) rectangle)
     (map->MatterPhysics2DRectangle
-     {:body rectangle})))
+     {:body rectangle :x x :y y :w w :h h})))
 
 (defn- existing-rectangle [{:context/keys [scene-key state]}]
   (.add World (state/get-world scene-key) (:body state))

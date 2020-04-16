@@ -5,7 +5,7 @@
    [rooij.module.pixi.entity]
    [rooij.module.pixi.state :as state]
    [rooij.module.pixi.component.sprite :as component.sprite]
-   [rooij.module.pixi.component.rectangle]
+   [rooij.module.pixi.component.rectangle :as component.rectangle]
    [integrant.core :as ig]))
 
 (defn setup-event-listener-resize []
@@ -39,7 +39,8 @@
     (.render state/renderer (state/get-scene scene-key)))
   (draw-wireframe [this scene-key vectors]
     (pixi.debug/draw-wireframe scene-key vectors))
-  (make-sprite [this opts] (component.sprite/make-sprite opts)))
+  (make-sprite [this opts] (component.sprite/make-sprite opts))
+  (make-rectangle [this opts] (component.rectangle/make-rectangle opts)))
 
 (defmethod ig/init-key :rooij.interface.graphics-2d/system [_ init-opts]
   (setup-event-listener-resize)

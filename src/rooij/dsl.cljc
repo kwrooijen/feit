@@ -22,6 +22,10 @@
   (comp second
         current-key))
 
+(def ^:private last-added-system
+  (comp :last-added-system
+        meta))
+
 (defn- ->composite-key [k ck]
   (if (vector? k)
     k
@@ -46,9 +50,11 @@
     (when-not (#{parent} (first parent-system-key))
       (throw (ex-info (str "You can only add " system-key " to " parent)
                       {:reason ::invalid-config})))
-    (meta-merge config
-                {(second parent-system-key) {parent-collection [system-map]}}
-                {system-child-key system-config})))
+    (vary-meta
+     (meta-merge config
+                 {(second parent-system-key) {parent-collection [system-map]}}
+                 {system-child-key system-config})
+     merge {:last-added-system {system-key system-child-key}})))
 
 (defn- ref-system
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
@@ -256,6 +262,12 @@
     (throw (ex-info "You can only make components auto-persistent"
                     {:reason ::invalid-auto-persistent-key})))
   (update config (config-key config) assoc :component/auto-persistent true))
+
+(defn position-emitter [config]
+  (if-let [last-added-component (:rooij/component (last-added-system config))]
+    (assoc-in config [last-added-component :component.position/emitter] true)
+    (throw (ex-info (str "You can only make components position-emitters: " (last-added-system config))
+                    {:reason ::invalid-position-emitter}))))
 
 (defn save! [config]
   (rooij.config/merge-user! config))

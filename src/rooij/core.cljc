@@ -1,26 +1,27 @@
 (ns rooij.core
   (:require
-   [rooij.error]
-   [rooij.logger]
-   [rooij.config]
-   [taoensso.timbre :as timbre]
-   [rooij.loop.core]
    [clojure.spec.alpha :as s]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
+   [integrant-tools.core :as it]
+   [integrant.core :as ig]
+   [rooij.config]
+   [rooij.error]
+   [rooij.interface.general-2d.core]
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
+   [rooij.interface.physics-2d.core :as interface.physics-2d]
+   [rooij.logger]
+   [rooij.loop.core]
    [rooij.state :as state]
-   [rooij.system.core :as system]
    [rooij.system.component]
+   [rooij.system.core :as system]
+   [rooij.system.entity]
    [rooij.system.handler]
    [rooij.system.keyboard]
    [rooij.system.middleware]
    [rooij.system.reactor]
    [rooij.system.scene :as scene]
    [rooij.system.ticker]
-   [rooij.system.entity]
-   [integrant-tools.core :as it]
-   [integrant.core :as ig]
-   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
-   [rooij.interface.physics-2d.core :as interface.physics-2d]))
+   [taoensso.timbre :as timbre]))
 
 (set! *print-meta* true)
 

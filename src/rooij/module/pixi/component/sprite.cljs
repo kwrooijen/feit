@@ -1,8 +1,9 @@
 (ns rooij.module.pixi.component.sprite
   (:require
-   [rooij.module.pixi.state :as state]
    ["pixi.js" :as PIXI]
-   [rooij.interface.graphics-2d.core :refer [RooijGraphics2DSprite]]))
+   [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
+   [rooij.interface.graphics-2d.core :refer [RooijGraphics2DSprite RooijGraphics2DRectangle]]
+   [rooij.module.pixi.state :as state]))
 
 (defn -play! [{:keys [sprite initial-textures]} spritesheet animation]
   (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
@@ -13,10 +14,27 @@
                                 (.play sprite)))
   (.play sprite))
 
-(defrecord PixiSprite [sprite initial-textures]
+;; TODO Rename to PixiGraphics2DSprite
+(defrecord PixiSprite [sprite initial-textures x y]
   RooijGraphics2DSprite
   (play! [this spritesheet animation]
     (-play! this spritesheet animation)))
+
+(defrecord PixiGraphics2DRectangle [x y w h]
+  RooijGraphics2DRectangle)
+
+(extend-protocol RooijGeneral2DPosition
+  PixiSprite
+  (set-position [this x y]
+    (set! (.. this -position -x) x)
+    (set! (.. this -position -y) y)
+    (assoc this :x y :y y))
+
+  PixiGraphics2DRectangle
+  (set-position [this x y]
+    (set! (.. this -position -x) x)
+    (set! (.. this -position -y) y)
+    (assoc this :x y :y y)))
 
 (defn spritesheet-animated-sprite [{:spritesheet/keys [name animation]}]
   (let [textures (state/spritesheet-animation-texture name animation)

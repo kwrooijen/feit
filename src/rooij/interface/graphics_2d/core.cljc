@@ -13,10 +13,13 @@
   (scene-halt! [this scene-key])
   (step [this scene-key])
   (draw-wireframe [this scene-key vectors])
-  (make-sprite [this opts]))
+  (make-sprite [this opts])
+  (make-rectangle [this opts]))
 
 (defprotocol RooijGraphics2DSprite
   (play! [this spritesheet animation]))
+
+(defprotocol RooijGraphics2DRectangle)
 
 (deftype DefaultGraphics2D []
   RooijGraphics2D
@@ -48,15 +51,29 @@
     (play! state spritesheet animation)
     state))
 
+(defmethod ig/prep-key :graphics-2d.component/sprite [_ opts]
+  (meta-merge
+   {:component/handlers [{:handler/ref (ig/ref :general-2d.handler.position/set)}]}
+   opts))
+
 (defmethod ig/init-key :graphics-2d.component/sprite [_ opts]
   (make-sprite state/graphics-2d opts))
+
+(defmethod ig/prep-key :graphics-2d.component/rectangle [_ opts]
+  (meta-merge
+   {:component/handlers [{:handler/ref (ig/ref :general-2d.handler.position/set)}]}
+   opts))
+
+(defmethod ig/init-key :graphics-2d.component/rectangle
+  [_ opts]
+  (make-rectangle state/graphics-2d opts))
 
 (it/derive-hierarchy
  {:graphics-2d.entity/asset-loader [:rooij/entity]
   :graphics-2d.entity/spritesheet-loader [:rooij/entity]
 
-  :graphics-2d.component/sprite [:rooij/component]
-  :graphics-2d.component/rectangle [:rooij/component]})
+  :graphics-2d.component/sprite    [:rooij/component :rooij/position]
+  :graphics-2d.component/rectangle [:rooij/component :rooij/position]})
 
 (rooij.config/merge-interface!
  {[:rooij/handler :graphics-2d.handler.sprite/play] {}})

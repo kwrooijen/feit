@@ -71,7 +71,7 @@
 
 (defn process-refs [ref-opts ns]
   (let [ks (process-refs-keys ns)]
-    (-> (mapv (partial merge-extra-opts ks) ref-opts)
+    (-> (mapv (partial merge-extra-opts ks) (remove nil? ref-opts))
         (vec->map (:key ks)))))
 
 (defn get-halt-key [derived-k entity-opts]

@@ -1,6 +1,7 @@
 (ns rooij.interface.physics-2d.core
   (:require
    [integrant-tools.core :as it]
+   [integrant-tools.keyword :refer [descendant?]]
    [integrant.core :as ig]
    [meta-merge.core :refer [meta-merge]]
    [rooij.config]
@@ -33,24 +34,19 @@
       (or (DefaultPhysics2D.))
       (state/set-physics-2d!)))
 
-(defmethod ig/prep-key :physics-2d.component/rectangle [_ opts]
+(defmethod ig/prep-key :physics-2d.component/rectangle
+  [k {:component.position/keys [emitter] :as opts}]
   (meta-merge
-   {:component/tickers [{:ticker/ref (ig/ref :physics-2d.ticker.rectangle/position)}]}
+   {:component/tickers [(when emitter {:ticker/ref (ig/ref :general-2d.ticker.position/emitter)})]
+    :component/handlers [{:handler/ref (ig/ref :general-2d.handler.position/set)}]}
    opts))
 
 (defmethod ig/init-key :physics-2d.component/rectangle [_ opts]
   (make-rectangle state/physics-2d opts))
 
-(defmethod ig/init-key :physics-2d.ticker.rectangle/position [_ opts]
-  (fn [context state]
-    ;; (println (.-position (:body state)))
-    ))
-
 (it/derive-hierarchy
- {:physics-2d.component/rectangle [:rooij/component]
-  :physics-2d.ticker.rectangle/position [:rooij/ticker]})
+ {:physics-2d.component/rectangle [:rooij/component :rooij/position]})
 
 (rooij.config/merge-interface!
  {:rooij.interface.physics-2d/system {}
-  :rooij.interface.physics-2d/scene {}
-  :physics-2d.ticker.rectangle/position {}})
+  :rooij.interface.physics-2d/scene {}})

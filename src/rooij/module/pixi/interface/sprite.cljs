@@ -1,23 +1,21 @@
-(ns rooij.module.pixi.component.sprite
+(ns rooij.module.pixi.interface.sprite
   (:require
    ["pixi.js" :as PIXI]
    [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
    [rooij.interface.graphics-2d.core :refer [RooijGraphics2DSprite RooijGraphics2DRectangle]]
    [rooij.module.pixi.state :as state]))
 
-(defn -play! [{:keys [sprite initial-textures]} spritesheet animation]
-  (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
-  (set! (.-loop sprite) false)
-  (set! (.-onComplete sprite) (fn []
-                                (set! (.-textures sprite) initial-textures)
-                                (set! (.-loop sprite) true)
-                                (.play sprite)))
-  (.play sprite))
-
 (defrecord PixiGraphics2DSprite [sprite initial-textures x y]
   RooijGraphics2DSprite
   (play! [this spritesheet animation]
-    (-play! this spritesheet animation)))
+    (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
+    (set! (.-loop sprite) false)
+    (set! (.-onComplete sprite)
+          (fn []
+            (set! (.-textures sprite) initial-textures)
+            (set! (.-loop sprite) true)
+            (.play sprite)))
+    (.play sprite)))
 
 (defrecord PixiGraphics2DRectangle [x y w h]
   RooijGraphics2DRectangle)
@@ -56,7 +54,7 @@
     (:spritesheet/texture opts)   (spritesheet-static-sprite opts)
     (:texture/name opts)          (texture-static-sprite opts)))
 
-(defn make-sprite [{:context/keys [scene-key] :as opts}]
+(defn make [{:context/keys [scene-key] :as opts}]
   (let [{:keys [sprite] :as state} (->sprite opts)]
     (set! (.-animationSpeed sprite) 0.167)
     (set! (.-x sprite) 100)

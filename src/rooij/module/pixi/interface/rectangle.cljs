@@ -1,9 +1,9 @@
-(ns rooij.module.pixi.component.rectangle
+(ns rooij.module.pixi.interface.rectangle
   (:require
-   [rooij.interface.graphics-2d.core :refer [RooijGraphics2DRectangle]]
+   ["pixi.js" :as PIXI]
    [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
-   [rooij.module.pixi.state :as state]
-   ["pixi.js" :as PIXI]))
+   [rooij.interface.graphics-2d.core :refer [RooijGraphics2DRectangle]]
+   [rooij.module.pixi.state :as state]))
 
 (defrecord PixiGraphics2DRectangle [body x y w h]
   RooijGraphics2DRectangle)
@@ -16,7 +16,7 @@
     (set! (.. body -rotation) angle)
     (assoc this :x y :y y)))
 
-(defn make-rectangle
+(defn make
   [{:shape/keys [x y w h fill] :context/keys [scene-key]}]
   (let [rectangle (.from PIXI/Sprite  PIXI/Texture.WHITE)]
     (set! (.-x rectangle) x)

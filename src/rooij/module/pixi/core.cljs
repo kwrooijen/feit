@@ -1,12 +1,9 @@
 (ns rooij.module.pixi.core
   (:require
-   [rooij.interface.graphics-2d.core :refer [RooijGraphics2D]]
-   [rooij.module.pixi.debug :as pixi.debug]
    [rooij.module.pixi.entity]
    [rooij.module.pixi.state :as state]
-   [rooij.module.pixi.component.sprite :as component.sprite]
-   [rooij.module.pixi.component.rectangle :as component.rectangle]
-   [integrant.core :as ig]))
+   [integrant.core :as ig]
+   [rooij.module.pixi.interface :refer [->PixiGraphics2D]]))
 
 (defn setup-event-listener-resize []
   (let [handler #(.resize state/renderer
@@ -26,21 +23,7 @@
     :width       width
     :height      height
     :transparent true
-    ;; :autoDencity auto-dencity
-    }))
-
-(deftype PixiGraphics2D [init-opts]
-  RooijGraphics2D
-  (scene-init [this scene-key]
-    (state/init-scene! scene-key))
-  (scene-halt! [this scene-key]
-    (state/halt-scene! scene-key) )
-  (step [this scene-key]
-    (.render state/renderer (state/get-scene scene-key)))
-  (draw-wireframe [this scene-key vectors]
-    (pixi.debug/draw-wireframe scene-key vectors))
-  (make-sprite [this opts] (component.sprite/make-sprite opts))
-  (make-rectangle [this opts] (component.rectangle/make-rectangle opts)))
+    :autoDencity auto-dencity}))
 
 (defmethod ig/init-key :rooij.interface.graphics-2d/system [_ init-opts]
   (setup-event-listener-resize)

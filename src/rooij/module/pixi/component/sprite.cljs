@@ -24,10 +24,10 @@
 
 (extend-protocol RooijGeneral2DPosition
   PixiGraphics2DSprite
-  (set-position [this x y angle]
-    (set! (.. this -position -x) x)
-    (set! (.. this -position -y) y)
-    (set! (.. this -rotation) angle)
+  (set-position [{:keys [sprite] :as this} x y angle]
+    (set! (.. sprite -position -x) x)
+    (set! (.. sprite -position -y) y)
+    (set! (.. sprite -rotation) angle)
     (assoc this :x y :y y)))
 
 (defn spritesheet-animated-sprite [{:spritesheet/keys [name animation]}]

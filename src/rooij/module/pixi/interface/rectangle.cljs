@@ -1,7 +1,7 @@
 (ns rooij.module.pixi.interface.rectangle
   (:require
    ["pixi.js" :as PIXI]
-   [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
+   [rooij.interface.general-2d.position :refer [RooijGeneral2DPosition]]
    [rooij.interface.graphics-2d.rectangle :refer [RooijGraphics2DRectangle]]
    [rooij.module.pixi.state :as state]))
 

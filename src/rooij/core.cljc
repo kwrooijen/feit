@@ -4,7 +4,6 @@
    [integrant.core :as ig]
    [rooij.config]
    [rooij.error]
-   [rooij.interface.general-2d.core]
    [rooij.interface.graphics-2d.core :as interface.graphics-2d]
    [rooij.interface.physics-2d.core :as interface.physics-2d]
    [rooij.logger]

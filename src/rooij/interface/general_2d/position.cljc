@@ -1,4 +1,4 @@
-(ns rooij.interface.general-2d.core
+(ns rooij.interface.general-2d.position
   (:require
    [rooij.query :refer [emit!]]
    [integrant-tools.core :as it]

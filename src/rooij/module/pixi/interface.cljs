@@ -1,6 +1,6 @@
 (ns rooij.module.pixi.interface
   (:require
-   [rooij.interface.graphics-2d.interface :refer [RooijGraphics2D]]
+   [rooij.interface.graphics-2d.core :refer [RooijGraphics2D]]
    [rooij.module.pixi.debug :as pixi.debug]
    [rooij.module.pixi.interface.loader :as interface.loader]
    [rooij.module.pixi.state :as state]

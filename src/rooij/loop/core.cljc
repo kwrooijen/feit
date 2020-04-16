@@ -8,7 +8,7 @@
    [rooij.loop.reactor :as loop.reactor]
    [rooij.loop.ticker :as loop.ticker]
    [rooij.state :as state :refer [get-scene]]
-   [rooij.interface.graphics-2d.interface :as interface.graphics-2d]
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
    [rooij.interface.physics-2d.core :as interface.physics-2d]
    [taoensso.timbre :as timbre]))
 

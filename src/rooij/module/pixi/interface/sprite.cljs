@@ -1,8 +1,8 @@
 (ns rooij.module.pixi.interface.sprite
   (:require
    ["pixi.js" :as PIXI]
+   [rooij.interface.graphics-2d.sprite :refer [RooijGraphics2DSprite]]
    [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
-   [rooij.interface.graphics-2d.interface :refer [RooijGraphics2DSprite]]
    [rooij.module.pixi.state :as state]))
 
 (defrecord PixiGraphics2DSprite [sprite initial-textures x y]

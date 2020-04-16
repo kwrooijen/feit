@@ -2,7 +2,7 @@
   (:require
    [rooij.config]
    [rooij.core :refer [scenes]]
-   [rooij.interface.graphics-2d.interface :refer [draw-wireframe]]
+   [rooij.interface.graphics-2d.core :refer [draw-wireframe]]
    [rooij.interface.physics-2d.core :refer [get-wireframe-vectors]]
    [rooij.state :as state]
    [rooij.system.core :as system]

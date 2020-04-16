@@ -1,7 +1,7 @@
 (ns rooij.system.scene
   (:require
    [rooij.config]
-   [rooij.interface.graphics-2d.interface :as interface.graphics-2d]
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
    [rooij.interface.physics-2d.core :as interface.physics-2d]
    [taoensso.timbre :as timbre]
    [com.rpl.specter :as sp :refer [MAP-VALS]]

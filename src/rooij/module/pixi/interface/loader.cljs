@@ -1,7 +1,7 @@
 (ns rooij.module.pixi.interface.loader
   (:require
    ["pixi.js" :as PIXI]
-   [rooij.interface.graphics-2d.interface.loader :as interface.loader :refer [RooijGraphics2DLoader]]
+   [rooij.interface.graphics-2d.loader :as interface.loader :refer [RooijGraphics2DLoader]]
    [rooij.module.pixi.state :as state]))
 
 (defn- spritesheet-loaded

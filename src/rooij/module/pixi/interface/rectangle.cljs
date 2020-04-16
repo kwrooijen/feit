@@ -2,7 +2,7 @@
   (:require
    ["pixi.js" :as PIXI]
    [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
-   [rooij.interface.graphics-2d.interface :refer [RooijGraphics2DRectangle]]
+   [rooij.interface.graphics-2d.rectangle :refer [RooijGraphics2DRectangle]]
    [rooij.module.pixi.state :as state]))
 
 (defrecord PixiGraphics2DRectangle [body x y w h]

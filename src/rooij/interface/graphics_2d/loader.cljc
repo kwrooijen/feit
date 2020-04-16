@@ -1,10 +1,12 @@
-(ns rooij.interface.graphics-2d.interface.loader
+(ns rooij.interface.graphics-2d.loader
   (:require
-   [meta-merge.core :refer [meta-merge]]
+   [integrant-tools.core :as it]
    [integrant.core :as ig]
-   [rooij.interface.graphics-2d.interface :refer [make-loader]]
-   [rooij.state :as state]
-   [rooij.query :refer [emit! transition-scene]]))
+   [meta-merge.core :refer [meta-merge]]
+   [rooij.config]
+   [rooij.interface.graphics-2d.core :refer [make-loader]]
+   [rooij.query :refer [emit! transition-scene]]
+   [rooij.state :as state]))
 
 (defprotocol RooijGraphics2DLoader
   (load-spritesheet [this context file name])
@@ -58,3 +60,12 @@
       (if (>= (:loader/loaded new-state) to-load)
         (transition-scene scene-key next-scene)
         new-state))))
+
+(it/derive-hierarchy
+ {:graphics-2d.entity/asset-loader [:rooij/entity]
+  :graphics-2d.entity/spritesheet-loader [:rooij/entity]})
+
+(rooij.config/merge-interface!
+ {[:rooij/handler :graphics-2d.handler.loader/load-complete] {}
+  [:rooij/handler :graphics-2d.handler.loader/load-texture] {}
+  [:rooij/handler :graphics-2d.handler.loader/load-spritesheet] {}})

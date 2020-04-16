@@ -1,7 +1,6 @@
 (ns rooij.interface.physics-2d.core
   (:require
    [integrant-tools.core :as it]
-   [integrant-tools.keyword :refer [descendant?]]
    [integrant.core :as ig]
    [meta-merge.core :refer [meta-merge]]
    [rooij.config]

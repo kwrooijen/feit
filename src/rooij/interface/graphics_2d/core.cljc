@@ -1,32 +1,14 @@
 (ns rooij.interface.graphics-2d.core
   (:require
-   [rooij.config]
-   [rooij.interface.graphics-2d.entity]
-   [rooij.interface.graphics-2d.component]
-   [rooij.state :as state]
-   [meta-merge.core :refer [meta-merge]]
+   [integrant-tools.core :as it]
    [integrant.core :as ig]
-   [integrant-tools.core :as it]))
-
-(defprotocol RooijGraphics2D
-  (scene-init [this scene-key])
-  (scene-halt! [this scene-key])
-  (step [this scene-key])
-  (draw-wireframe [this scene-key vectors])
-  (make-sprite [this opts])
-  (make-rectangle [this opts]))
-
-(defprotocol RooijGraphics2DSprite
-  (play! [this spritesheet animation]))
-
-(defprotocol RooijGraphics2DRectangle)
-
-(deftype DefaultGraphics2D []
-  RooijGraphics2D
-  (scene-init [this scene-key] nil)
-  (scene-halt! [this scene-key] nil)
-  (step [this scene-key] nil)
-  (draw-wireframe [this scene-key vectors] nil))
+   [meta-merge.core :refer [meta-merge]]
+   [rooij.config]
+   [rooij.interface.graphics-2d.component]
+   [rooij.interface.graphics-2d.entity]
+   [rooij.interface.graphics-2d.interface :refer [DefaultGraphics2D play! make-rectangle make-sprite]]
+   [rooij.interface.graphics-2d.interface.loader]
+   [rooij.state :as state]))
 
 (def system
   :rooij.interface.graphics-2d/system)
@@ -71,4 +53,7 @@
   :graphics-2d.component/rectangle [:rooij/component :rooij/position]})
 
 (rooij.config/merge-interface!
- {[:rooij/handler :graphics-2d.handler.sprite/play] {}})
+ {[:rooij/handler :graphics-2d.handler.sprite/play] {}
+  [:rooij/handler :graphics-2d.handler.loader/load-complete] {}
+  [:rooij/handler :graphics-2d.handler.loader/load-texture] {}
+  [:rooij/handler :graphics-2d.handler.loader/load-spritesheet] {}})

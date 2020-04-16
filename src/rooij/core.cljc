@@ -1,8 +1,6 @@
 (ns rooij.core
   (:require
-   [clojure.spec.alpha :as s]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
-   [integrant-tools.core :as it]
    [integrant.core :as ig]
    [rooij.config]
    [rooij.error]

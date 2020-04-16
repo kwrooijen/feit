@@ -46,7 +46,7 @@
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
   (let [parent-system-key (current-key config)
         system-child-key (new-child-key system-config system-child-key system-key)
-        system-map (merge system-config {system-ref (ig/ref (top-key system-child-key))})]
+        system-map {system-ref (ig/ref (top-key system-child-key))}]
     (when-not (#{parent} (first parent-system-key))
       (throw (ex-info (str "You can only add " system-key " to " parent)
                       {:reason ::invalid-config})))

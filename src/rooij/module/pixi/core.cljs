@@ -1,6 +1,6 @@
 (ns rooij.module.pixi.core
   (:require
-   [rooij.module.pixi.entity]
+   [rooij.module.pixi.interface.loader]
    [rooij.module.pixi.state :as state]
    [integrant.core :as ig]
    [rooij.module.pixi.interface :refer [->PixiGraphics2D]]))

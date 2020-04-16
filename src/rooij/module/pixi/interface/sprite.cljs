@@ -2,7 +2,7 @@
   (:require
    ["pixi.js" :as PIXI]
    [rooij.interface.general-2d.core :refer [RooijGeneral2DPosition]]
-   [rooij.interface.graphics-2d.core :refer [RooijGraphics2DSprite RooijGraphics2DRectangle]]
+   [rooij.interface.graphics-2d.interface :refer [RooijGraphics2DSprite]]
    [rooij.module.pixi.state :as state]))
 
 (defrecord PixiGraphics2DSprite [sprite initial-textures x y]
@@ -16,9 +16,6 @@
             (set! (.-loop sprite) true)
             (.play sprite)))
     (.play sprite)))
-
-(defrecord PixiGraphics2DRectangle [x y w h]
-  RooijGraphics2DRectangle)
 
 (extend-protocol RooijGeneral2DPosition
   PixiGraphics2DSprite

@@ -1,9 +1,19 @@
 (ns rooij.module.matterjs.interface.rectangle
   (:require
+   [clojure.core.matrix :as m]
    ["matter-js" :as Matter :refer [Bodies World Body]]
    [rooij.interface.general-2d.position :refer [RooijGeneral2DPosition]]
    [rooij.interface.physics-2d.rectangle :refer [RooijPhysics2DRectangle]]
+   [rooij.interface.physics-2d.shape :refer [RooijPhysics2DShape]]
    [rooij.module.matterjs.state :as state]))
+
+(defn matrix->matter-vector [[x y]]
+  #js {:x x :y y})
+
+(defn -get-velocity [{:keys [body]}]
+  (let [velocity (.-velocity body)]
+    [(.-x velocity)
+     (.-y velocity)]))
 
 (defrecord MatterPhysics2DRectangle [body x y w h]
   RooijPhysics2DRectangle)
@@ -17,6 +27,20 @@
     {:x (int (.. body -position -x))
      :y (int (.. body -position -y))
      :angle (.. body -angle)}))
+
+(extend-protocol RooijPhysics2DShape
+  MatterPhysics2DRectangle
+  (get-velocity [this]
+    (-get-velocity this))
+
+  (set-velocity! [{:keys [body]} xy]
+    (.setVelocity Body body (matrix->matter-vector xy)))
+
+  (add-velocity! [{:keys [body] :as this} xy]
+    (.setVelocity Body body
+                  (-> (-get-velocity this)
+                      (m/add xy)
+                      (matrix->matter-vector)))))
 
 (extend-protocol IPrintWithWriter
   ;; If a MatterJS body is printed using `println` a `too much recursion` error

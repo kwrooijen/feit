@@ -3,7 +3,7 @@
    #?(:clj [clojure.core.async :as async])
    [rooij.loop.event :as loop.event]
    [rooij.loop.handler :as loop.handler]
-   [rooij.loop.key :as loop.key]
+   [rooij.loop.keyboard :as loop.keyboard]
    [rooij.loop.middleware :as loop.middleware]
    [rooij.loop.reactor :as loop.reactor]
    [rooij.loop.ticker :as loop.ticker]
@@ -30,7 +30,7 @@
 
 (defn run-scene [{:keys [scene/key] :as scene} delta time]
   (let [events (state/get-scene-events key)]
-    (loop.key/process scene)
+    (loop.keyboard/process scene)
     (loop.ticker/process scene delta time)
     (loop [scene scene
            todo-events @events
@@ -47,12 +47,6 @@
 (defn run [scene-key delta time]
   (swap! (get-scene scene-key) run-scene delta time))
 
-;; TODO find a proper solution for this
-(def physics (atom nil))
-
-(defn add! [p]
-  (reset! physics p))
-
 (defn run-scenes [delta time]
   (doseq [scene-key (keys (state/get-scenes))]
     (swap! (get-scene scene-key) run-scene delta time)
@@ -67,6 +61,7 @@
    (def optimal-time (/ 1000000 target-fps)))
 
 #?(:clj
+   ;; TODO Actually implement this.
    (defn game-loop []
      (async/go-loop [delta 0
                      start-time (System/nanoTime)]

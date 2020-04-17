@@ -1,4 +1,4 @@
-(ns rooij.loop.key
+(ns rooij.loop.keyboard
   (:require
    [integrant.core :as ig]
    [rooij.state :as state]))

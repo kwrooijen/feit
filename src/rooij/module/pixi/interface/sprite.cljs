@@ -5,17 +5,63 @@
    [rooij.interface.graphics-2d.sprite :refer [RooijGraphics2DSprite]]
    [rooij.module.pixi.state :as state]))
 
-(defrecord PixiGraphics2DSprite [sprite initial-textures x y]
-  RooijGraphics2DSprite
-  (play! [this spritesheet animation]
-    (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
-    (set! (.-loop sprite) false)
+(defn -play [{:keys [sprite initial-textures] :as this} spritesheet [animation & chain]]
+  (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
+  (set! (.-running-animation sprite) animation)
+  (set! (.-loop sprite) false)
+  (set! (.-onComplete sprite)
+        (fn []
+          (if (seq chain)
+            (-play this spritesheet chain)
+            (do
+              (set! (.-textures sprite) initial-textures)
+              (set! (.-loop sprite) true)
+              (set! (.-running-animation sprite) :initial)
+              (.play sprite)))))
+  (.play sprite))
+
+(defn -play-loop [{:keys [sprite] :as this} spritesheet [animation & chain]]
+  (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
+  (set! (.-running-animation sprite) animation)
+  (set! (.-loop sprite) (not (boolean (seq chain))))
+  (when (seq chain)
     (set! (.-onComplete sprite)
           (fn []
-            (set! (.-textures sprite) initial-textures)
-            (set! (.-loop sprite) true)
-            (.play sprite)))
-    (.play sprite)))
+            (-play-loop this spritesheet chain))))
+  (.play sprite))
+
+(defn ->vec [v]
+  (if (vector? v) v [v]))
+
+(defrecord PixiGraphics2DSprite [sprite initial-textures x y flip]
+  RooijGraphics2DSprite
+  (play [this spritesheet animations]
+    (-play this spritesheet (->vec animations))
+    this)
+
+  (play-loop [this spritesheet animation opts]
+    (when-not (= (.-running-animation sprite) animation)
+      (-play-loop this spritesheet (->vec animation)))
+    this)
+
+  (stop-loop [this animation]
+    (when (= (.-running-animation sprite) animation)
+      (set! (.-textures sprite) initial-textures)
+      (set! (.-loop sprite) true)
+      (set! (.-running-animation sprite) :initial)
+      (.play sprite))
+    this)
+
+  (flip [this x y]
+    (when (or (and x (pos-int? (.. sprite -scale -x)))
+              (and (not x) (neg-int? (.. sprite -scale -x))))
+      (set! (.. sprite -scale -x) (* -1 (.. sprite -scale -x))))
+    (when (or (and y (pos-int? (.. sprite -scale -y)))
+              (and (not y) (neg-int? (.. sprite -scale -y))))
+      (set! (.. sprite -scale -y) (* -1 (.. sprite -scale -y))))
+    (-> this
+        (assoc-in [:flip :x] x)
+        (assoc-in [:flip :y] y))))
 
 (extend-protocol RooijGeneral2DPosition
   PixiGraphics2DSprite
@@ -31,19 +77,22 @@
     (.play sprite)
     (map->PixiGraphics2DSprite
      {:sprite sprite
-      :initial-textures textures})))
+      :initial-textures textures
+      :flip {:x false :y false}})))
 
 (defn spritesheet-static-sprite [{:spritesheet/keys [name texture]}]
   (let [texture (state/spritesheet-static-texture name texture)]
     (map->PixiGraphics2DSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
-      :initial-textures [texture]})))
+      :initial-textures [texture]
+      :flip {:x false :y false}})))
 
 (defn texture-static-sprite [{:texture/keys [name]}]
   (let [texture (-> state/loader .-resources (aget name) .-texture)]
     (map->PixiGraphics2DSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
-      :initial-textures [texture]})))
+      :initial-textures [texture]
+      :flip {:x false :y false}})))
 
 (defn ->sprite [opts]
   (cond

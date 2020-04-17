@@ -6,6 +6,7 @@
    [rooij.error]
    [rooij.interface.graphics-2d.core :as interface.graphics-2d]
    [rooij.interface.physics-2d.core :as interface.physics-2d]
+   [rooij.interface.keyboard.core :as interface.keyboard]
    [rooij.logger]
    [rooij.loop.core]
    [rooij.state :as state]
@@ -26,6 +27,7 @@
   (system/start)
   (interface.graphics-2d/init)
   (interface.physics-2d/init)
+  (interface.keyboard/init)
   (rooij.loop.core/start!)
   (scene/start-initial-scene))
 

@@ -164,6 +164,32 @@
                 :system/parent :rooij/handler
                 :system/parent-collection :handler/middlewares})))
 
+(defn add-keydown
+  ([config keyboard-key keyboard-down-key]
+   (add-keydown config keyboard-key keyboard-down-key {}))
+  ([config keyboard-key keyboard-down-key subs]
+   (add-system config
+               {:system/system-child-key keyboard-key
+                :system/system-key :rooij/keyboard
+                :system/system-config {:keyboard-down/key keyboard-down-key
+                                       :keyboard/subs subs}
+                :system/system-ref :keyboard/ref
+                :system/parent :rooij/scene
+                :system/parent-collection :scene/keyboard})))
+
+(defn add-keyup
+  ([config keyboard-key keyboard-up-key]
+   (add-keyup config keyboard-key keyboard-up-key {}))
+  ([config keyboard-key keyboard-up-key subs]
+   (add-system config
+               {:system/system-child-key keyboard-key
+                :system/system-key :rooij/keyboard
+                :system/system-config {:keyboard-up/key keyboard-up-key
+                                       :keyboard/subs subs}
+                :system/system-ref :keyboard/ref
+                :system/parent :rooij/scene
+                :system/parent-collection :scene/keyboard})))
+
 (defn ref-entity
   ([config entity-key]
    (ref-entity config entity-key {}))

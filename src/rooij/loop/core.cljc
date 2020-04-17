@@ -28,9 +28,19 @@
   (timbre/error ::threshold-reached scene-key {})
   ::threshold-reached)
 
+(defn- process-keyboard-events [{:keys [scene/key] :as scene}]
+  (let [keyboard-events @(state/get-input-events key)
+        context {:context/scene-key key
+                 :context/scene scene
+                 ;; TODO ADD SUBS
+                 :context/subs []}]
+    (reset! (state/get-input-events key) [])
+    (doseq [keyboard-event keyboard-events]
+      (loop.keyboard/process context keyboard-event))))
+
 (defn run-scene [{:keys [scene/key] :as scene} delta time]
   (let [events (state/get-scene-events key)]
-    (loop.keyboard/process scene)
+    (process-keyboard-events scene)
     (loop.ticker/process scene delta time)
     (loop [scene scene
            todo-events @events

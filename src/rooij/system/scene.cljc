@@ -9,14 +9,28 @@
    [rooij.util :refer [top-key]]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [descendant?]]
+   [rooij.system.keyboard :as keyboard]
    [rooij.system.entity :as entity]
    [rooij.system.core :as system]
    [rooij.system.component :as component]))
+
+(defn change-keyboard-identifier
+  "Regular systems identify by their integrant key. It's different for keyboard
+  events because we look them up by their keycode. Use [:key/down keycode] or
+  [:key/up keycode] as the identifier instead."
+  [keyboard]
+  (into {}
+        (for [[_ v] keyboard]
+          (if (:keyboard-down/key v)
+            [[:key/down (:keyboard-down/key v)] v]
+            [[:key/up (:keyboard-up/key v)] v]))))
 
 (defmethod system/init-key :rooij/scene [k opts]
   (timbre/debug ::init-key opts)
   (-> opts
       (update :scene/entities system/process-refs :entity)
+      (update :scene/keyboard system/process-refs :keyboard)
+      (update :scene/keyboard change-keyboard-identifier)
       (assoc :scene/key (top-key k)
              :scene/init (system/get-init-key k)
              :scene/halt! (system/get-halt-key k opts))))
@@ -40,12 +54,16 @@
 (defn apply-init [scene-opts scene-key opts]
   ((:scene/init scene-opts) scene-key (merge scene-opts opts)))
 
+(defn start-keyboard [system]
+  (update system :scene/keyboard #(sp/transform [MAP-VALS] keyboard/init %)))
+
 (defn init [scene-key opts]
   (timbre/debug ::init opts)
   (-> @state/system
       (it/find-derived-value scene-key)
       (apply-init scene-key opts)
       (start-entities scene-key)
+      (start-keyboard)
       (assoc :scene/key scene-key)
       (state/save-scene!)))
 

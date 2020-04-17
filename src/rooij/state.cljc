@@ -15,6 +15,8 @@
 
 (defonce ^:dynamic physics-2d nil)
 
+(defonce ^:dynamic keyboard nil)
+
 (defonce ^:private scenes (atom {}))
 
 (defonce ^:private events (atom {}))
@@ -57,3 +59,6 @@
 
 (defn set-physics-2d! [v]
   (set! physics-2d v))
+
+(defn set-keyboard! [v]
+  (set! keyboard v))

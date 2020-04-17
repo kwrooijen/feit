@@ -1,6 +1,8 @@
-(ns rooij.module.cljs.keyboard
+(ns rooij.module.cljs-keyboard.core
   (:require
-   [rooij.keyboard]))
+   [integrant.core :as ig]
+   [rooij.keyboard]
+   [rooij.module.cljs-keyboard.interface :refer [->CljsKeyboard]]))
 
 (defn- body-active?
   "Check if the user is currently focused on the body. use `identical?` to
@@ -53,3 +55,8 @@
   (let [tab-key 9]
     (set! (.-onkeydown js/document)
           #(not= tab-key (.-which %)))))
+
+(defmethod ig/init-key :rooij.interface.keyboard/system [_ init-opts]
+  (add-event-listeners!)
+  (disable-tabbing!)
+  (->CljsKeyboard init-opts))

@@ -30,6 +30,8 @@
 
 (defn- new-rectangle [{:context/keys [scene-key] :keys [x y w h] :as opts}]
   (let [rectangle (opts->rectangle opts)]
+    (when (false? (:auto-rotate opts))
+      (.setInertia Body rectangle js/Infinity))
     (.add World (state/get-world scene-key) rectangle)
     (map->MatterPhysics2DRectangle
      {:body rectangle :x x :y y :w w :h h})))

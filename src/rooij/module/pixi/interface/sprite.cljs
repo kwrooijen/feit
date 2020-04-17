@@ -25,9 +25,7 @@
   (set! (.-running-animation sprite) animation)
   (set! (.-loop sprite) (not (boolean (seq chain))))
   (when (seq chain)
-    (set! (.-onComplete sprite)
-          (fn []
-            (-play-loop this spritesheet chain))))
+    (set! (.-onComplete sprite) #(-play-loop this spritesheet chain)))
   (.play sprite))
 
 (defn ->vec [v]

@@ -178,40 +178,43 @@
   ([config keyboard-key keyboard-down-key]
    (add-keydown config keyboard-key keyboard-down-key {}))
   ([config keyboard-key keyboard-down-key subs]
-   (add-system config
-               {:system/system-child-key keyboard-key
-                :system/system-key :rooij/keyboard
-                :system/system-config {:keyboard-down/key keyboard-down-key
-                                       :keyboard/subs subs}
-                :system/system-ref :keyboard/ref
-                :system/parent :rooij/scene
-                :system/parent-collection :scene/keyboard})))
+   (-> config
+       (add-system {:system/system-child-key keyboard-key
+                    :system/system-key :rooij/keyboard
+                    :system/system-config {:keyboard-down/key keyboard-down-key
+                                           :keyboard/subs subs}
+                    :system/system-ref :keyboard/ref
+                    :system/parent :rooij/scene
+                    :system/parent-collection :scene/keyboard})
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
 
 (defn add-keyup
   ([config keyboard-key keyboard-up-key]
    (add-keyup config keyboard-key keyboard-up-key {}))
   ([config keyboard-key keyboard-up-key subs]
-   (add-system config
-               {:system/system-child-key keyboard-key
-                :system/system-key :rooij/keyboard
-                :system/system-config {:keyboard-up/key keyboard-up-key
-                                       :keyboard/subs subs}
-                :system/system-ref :keyboard/ref
-                :system/parent :rooij/scene
-                :system/parent-collection :scene/keyboard})))
+   (-> config
+       (add-system {:system/system-child-key keyboard-key
+                    :system/system-key :rooij/keyboard
+                    :system/system-config {:keyboard-up/key keyboard-up-key
+                                           :keyboard/subs subs}
+                    :system/system-ref :keyboard/ref
+                    :system/parent :rooij/scene
+                    :system/parent-collection :scene/keyboard})
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
 
 (defn add-while-keydown
   ([config keyboard-key keyboard-down-key]
    (add-while-keydown config keyboard-key keyboard-down-key {}))
   ([config keyboard-key keyboard-down-key subs]
-   (add-system config
-               {:system/system-child-key keyboard-key
-                :system/system-key :rooij/keyboard
-                :system/system-config {:keyboard-while-down/key keyboard-down-key
-                                       :keyboard/subs subs}
-                :system/system-ref :keyboard/ref
-                :system/parent :rooij/scene
-                :system/parent-collection :scene/keyboard})))
+   (-> config
+       (add-system {:system/system-child-key keyboard-key
+                    :system/system-key :rooij/keyboard
+                    :system/system-config {:keyboard-while-down/key keyboard-down-key
+                                           :keyboard/subs subs}
+                    :system/system-ref :keyboard/ref
+                    :system/parent :rooij/scene
+                    :system/parent-collection :scene/keyboard})
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
 
 (defn ref-entity
   ([config entity-key]

@@ -3,4 +3,6 @@
 (defprotocol RooijPhysics2DShape
   (get-velocity [this])
   (set-velocity! [this xy])
+  (set-velocity-x! [this x])
+  (set-velocity-y! [this y])
   (add-velocity! [this xy]))

@@ -23,6 +23,8 @@
 
 (defonce ^:private input-events (atom {}))
 
+(defonce ^:private down-keys (atom #{}))
+
 (defonce ^:private persistent-components (atom {}))
 
 (defn reset-events! [scene-key]
@@ -53,6 +55,15 @@
 (defn get-input-events
   ([] @input-events)
   ([scene-key] (get @input-events scene-key)))
+
+(defn get-down-keys []
+  @down-keys)
+
+(defn add-down-key! [key]
+  (swap! down-keys conj key))
+
+(defn remove-down-key! [key]
+  (swap! down-keys disj key))
 
 (defn set-graphics-2d! [v]
   (set! graphics-2d v))

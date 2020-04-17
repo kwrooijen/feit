@@ -31,12 +31,13 @@
 (defn- process-keyboard-events [{:keys [scene/key] :as scene}]
   (let [keyboard-events @(state/get-input-events key)
         context {:context/scene-key key
-                 :context/scene scene
-                 ;; TODO ADD SUBS
-                 :context/subs []}]
+                 :context/scene scene}]
     (reset! (state/get-input-events key) [])
     (doseq [keyboard-event keyboard-events]
-      (loop.keyboard/process context keyboard-event))))
+      (loop.keyboard/process context keyboard-event))
+    (doseq [keyboard-down-key (state/get-down-keys)]
+      (loop.keyboard/process context {:input-event/key keyboard-down-key
+                                      :input-event/type :key/while-down}))))
 
 (defn run-scene [{:keys [scene/key] :as scene} delta time]
   (let [events (state/get-scene-events key)]

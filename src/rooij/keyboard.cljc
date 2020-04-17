@@ -5,6 +5,7 @@
 
 ;; TODO Maybe we can optimize the creation of the input-event map with memoize
 (defn emit-keydown! [key]
+  (state/add-down-key! key)
   (let [tag (keyword "down" (name (or key "unknown")))]
     (doseq [[_ scene] (state/get-input-events)]
       (swap! scene conj
@@ -13,6 +14,7 @@
               :input-event/tag tag}))))
 
 (defn emit-keyup! [key]
+  (state/remove-down-key! key)
   (let [tag (keyword "up" (name (or key "unknown")))]
     (doseq [[_ scene] (state/get-input-events)]
       (swap! scene conj

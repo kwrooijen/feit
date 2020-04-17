@@ -21,9 +21,10 @@
   [keyboard]
   (into {}
         (for [[_ v] keyboard]
-          (if (:keyboard-down/key v)
-            [[:key/down (:keyboard-down/key v)] v]
-            [[:key/up (:keyboard-up/key v)] v]))))
+          (cond
+            (:keyboard-down/key v)       [[:key/down       (:keyboard-down/key v)] v]
+            (:keyboard-up/key v)         [[:key/up         (:keyboard-up/key v)] v]
+            (:keyboard-while-down/key v) [[:key/while-down (:keyboard-while-down/key v)] v]))))
 
 (defmethod system/init-key :rooij/scene [k opts]
   (timbre/debug ::init-key opts)

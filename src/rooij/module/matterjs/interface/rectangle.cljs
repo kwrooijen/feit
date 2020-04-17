@@ -36,6 +36,12 @@
   (set-velocity! [{:keys [body]} xy]
     (.setVelocity Body body (matrix->matter-vector xy)))
 
+  (set-velocity-x! [{:keys [body]} x]
+    (.setVelocity Body body #js {:x x :y (.. body -velocity -y)}))
+
+  (set-velocity-y! [{:keys [body]} y]
+    (.setVelocity Body body #js {:x (.. body -velocity -x) :y y}))
+
   (add-velocity! [{:keys [body] :as this} xy]
     (.setVelocity Body body
                   (-> (-get-velocity this)

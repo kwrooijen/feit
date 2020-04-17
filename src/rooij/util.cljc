@@ -16,7 +16,11 @@
   [m]
   (let [f (fn [[k v]]
             (when (coll? k)
-              (it/derive-composite k))
+              (try (it/derive-composite k)
+                   (catch #?(:clj Throwable :cljs :default) _
+                     ;; This means this key already derives from the parent
+                     nil)))
             [k v])]
     (doall
-     (postwalk (fn [x] (if ^boolean (map? x) (into {} (map f x)) x)) m))))
+     (doall
+      (postwalk (fn [x] (if ^boolean (map? x) (into {} (map f x)) x)) m)))))

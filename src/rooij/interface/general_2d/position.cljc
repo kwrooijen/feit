@@ -21,7 +21,7 @@
 (defn- update-old-position! [old-position new-position]
   (reset! old-position (update new-position :angle (comp int #(* 100 %)))))
 
-(defmethod ig/init-key :general-2d.ticker.position/emitter [_ opts]
+(defmethod ig/init-key :general-2d.ticker.position/emitter [_ _opts]
   (let [old-position (atom {:x 0 :y 0 :angle 0})]
     (fn [{:context/keys [scene-key entity-key]} state]
       (let [new-position (get-position state)]

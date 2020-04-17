@@ -11,7 +11,7 @@
    (fn [_system-config k d]
      (cond
        (vector? k) k
-       (descendant? k d) (make-child k)
+       (descendant? k d) [k (make-child k)]
        :else [d (make-child k)]))))
 
 (def ^:private current-key
@@ -43,6 +43,7 @@
      {:current-key [system-key (->composite-key k system-key)]})))
 
 (defn- add-system
+  "Adds a system to `config` and reference that from the `parent-system-key`. "
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
   (let [parent-system-key (current-key config)
         system-child-key (new-child-key system-config system-child-key system-key)
@@ -57,6 +58,9 @@
      merge {:last-added-system {system-key system-child-key}})))
 
 (defn- ref-system
+  "Adds a reference to `system-child-key` to `parent-system-key`. Does not add
+  the `system-child-key` to `config`. This is meant to reuse premade system. If
+  you want to create a new system, use `add-system` instead."
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
   (let [parent-system-key (current-key config)
         system (merge system-config {system-ref (ig/ref (top-key system-child-key))})]

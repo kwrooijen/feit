@@ -12,7 +12,7 @@
      (cond
        (vector? k) k
        (descendant? k d) [k (make-child k)]
-       :else [d (make-child k)]))))
+       :else [d k]))))
 
 (def ^:private current-key
   (comp :current-key
@@ -42,15 +42,25 @@
      (meta-merge config {(->composite-key k system-key) system-opts})
      {:current-key [system-key (->composite-key k system-key)]})))
 
+(defn- get-add-system-parent-system-key
+  "Gets the parent key which the new system-key will be embedded in. The parent
+  key is either a top level system (e.g. `(entity :foo/bar)`) or the last added
+  entity (e.g. `(add-entity :foo/bar)`. Top level systems have priority."
+  [config parent system-child-key]
+  (cond (#{parent} (first (current-key config)))
+        (current-key config)
+        (get (last-added-system config) parent)
+        (apply vec (last-added-system config))
+        :else
+        (throw (ex-info (str "You can only add " system-child-key " to " parent)
+                        {:reason ::invalid-config}))))
+
 (defn- add-system
   "Adds a system to `config` and reference that from the `parent-system-key`. "
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
-  (let [parent-system-key (current-key config)
+  (let [parent-system-key (get-add-system-parent-system-key config parent system-child-key)
         system-child-key (new-child-key system-config system-child-key system-key)
         system-map {system-ref (ig/ref (top-key system-child-key))}]
-    (when-not (#{parent} (first parent-system-key))
-      (throw (ex-info (str "You can only add " system-key " to " parent)
-                      {:reason ::invalid-config})))
     (vary-meta
      (meta-merge config
                  {(second parent-system-key) {parent-collection [system-map]}}

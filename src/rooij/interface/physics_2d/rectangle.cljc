@@ -16,8 +16,8 @@
     :component/handlers [{:handler/ref (ig/ref :general-2d.handler.position/set)}]}
    opts))
 
-(defmethod ig/init-key :physics-2d.component/rectangle [_ opts]
-  (make-rectangle state/physics-2d opts))
+(defmethod ig/init-key :physics-2d.component/rectangle [k opts]
+  (make-rectangle state/physics-2d k opts))
 
 (it/derive-hierarchy
  {:physics-2d.component/rectangle [:rooij/component :rooij/position]})

@@ -14,7 +14,7 @@
    {:component/handlers [{:handler/ref (ig/ref :general-2d.handler.position/set)}]}
    opts))
 
-(defmethod ig/init-key :graphics-2d.component/rectangle [_ opts]
+(defmethod ig/init-key :graphics-2d.component/rectangle [k opts]
   (make-rectangle state/graphics-2d opts))
 
 (it/derive-hierarchy

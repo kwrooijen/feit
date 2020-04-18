@@ -25,5 +25,5 @@
   (get-wireframe-vectors [this scene-key]
     (matterjs.debug/wireframe-vectors scene-key))
 
-  (make-rectangle [this opts]
-    (interface.rectangle/make opts)))
+  (make-rectangle [this k opts]
+    (interface.rectangle/make k opts)))

@@ -58,11 +58,12 @@
 (defn- opts->rectangle [{:keys [x y w h static]}]
   (.rectangle Bodies x y w h #js {:isStatic static}))
 
-(defn- new-rectangle [{:context/keys [scene-key] :keys [x y w h] :as opts}]
+(defn- new-rectangle [k {:context/keys [scene-key] :keys [x y w h] :as opts}]
   (let [rectangle (opts->rectangle opts)]
     (when (false? (:auto-rotate opts))
       (.setInertia Body rectangle js/Infinity))
     (.add World (state/get-world scene-key) rectangle)
+    (set! (.-component-key rectangle) k)
     (map->MatterPhysics2DRectangle
      {:body rectangle :x x :y y :w w :h h})))
 
@@ -70,7 +71,7 @@
   (.add World (state/get-world scene-key) (:body state))
   state)
 
-(defn make [opts]
+(defn make [k opts]
   (if (:context/state opts)
     (existing-rectangle opts)
-    (new-rectangle opts)))
+    (new-rectangle k opts)))

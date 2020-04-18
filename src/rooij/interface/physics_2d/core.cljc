@@ -10,7 +10,7 @@
   (scene-init [this scene-key])
   (scene-halt! [this scene-key])
   (step [this scene-key delta])
-  (make-rectangle [this opts])
+  (make-rectangle [this k opts])
   (get-wireframe-vectors [this scene-key]))
 
 (deftype DefaultPhysics2D []

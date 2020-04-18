@@ -216,6 +216,54 @@
                     :system/parent-collection :scene/keyboard})
        (vary-meta merge {:last-added-system (last-added-system config)}))))
 
+(defn add-entity!
+  ([config entity-key]
+   (add-entity! config entity-key {}))
+  ([config entity-key entity-config]
+   (-> config
+       (add-entity entity-key entity-config)
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
+
+(defn add-component!
+  ([config component-key]
+   (add-component! config component-key {}))
+  ([config component-key component-config]
+   (-> config
+       (add-component component-key component-config)
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
+
+(defn add-handler!
+  ([config handler-key]
+   (add-handler! config handler-key {}))
+  ([config handler-key handler-config]
+   (-> config
+       (add-handler handler-key handler-config)
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
+
+(defn add-reactor!
+  ([config reactor-key]
+   (add-reactor! config reactor-key {}))
+  ([config reactor-key reactor-config]
+   (-> config
+       (add-reactor reactor-key reactor-config)
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
+
+(defn add-ticker!
+  ([config ticker-key]
+   (add-ticker! config ticker-key {}))
+  ([config ticker-key ticker-config]
+   (-> config
+       (add-ticker ticker-key ticker-config)
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
+
+(defn add-middleware!
+  ([config middleware-key]
+   (add-middleware! config middleware-key {}))
+  ([config middleware-key middleware-config]
+   (-> config
+       (add-middleware middleware-key middleware-config)
+       (vary-meta merge {:last-added-system (last-added-system config)}))))
+
 (defn ref-entity
   ([config entity-key]
    (ref-entity config entity-key {}))

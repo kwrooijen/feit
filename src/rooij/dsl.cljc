@@ -38,9 +38,9 @@
      (system {} component-key--config component-key--component-opts system-key)
      (system component-key--config component-key--component-opts {} system-key)))
   ([config k system-opts system-key]
-   (with-meta
+   (vary-meta
      (meta-merge config {(->composite-key k system-key) system-opts})
-     {:current-key [system-key (->composite-key k system-key)]})))
+     assoc :current-key [system-key (->composite-key k system-key)])))
 
 (defn- get-add-system-parent-system-key
   "Gets the parent key which the new system-key will be embedded in. The parent
@@ -65,7 +65,7 @@
      (meta-merge config
                  {(second parent-system-key) {parent-collection [system-map]}}
                  {system-child-key system-config})
-     merge {:last-added-system {system-key system-child-key}})))
+     assoc-in [:last-added-system system-key] system-child-key)))
 
 (defn- ref-system
   "Adds a reference to `system-child-key` to `parent-system-key`. Does not add
@@ -73,9 +73,11 @@
   you want to create a new system, use `add-system` instead."
   [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
   (let [parent-system-key (current-key config)
-        system (merge system-config {system-ref (ig/ref (top-key system-child-key))})]
+        system (merge system-config
+                      {system-ref (ig/ref (top-key system-child-key))})]
     (when-not (keyword? system-key)
-      (throw (ex-info (str system-child-key "must be a keyword") {:reason ::invalid-ref-system-keyword})))
+      (throw (ex-info (str system-child-key "must be a keyword")
+                      {:reason ::invalid-ref-system-keyword})))
     (when-not (#{parent} (first parent-system-key))
       (throw (ex-info (str "You can only add " system-key " to " parent)
                       {:reason ::invalid-config})))
@@ -186,7 +188,7 @@
                     :system/system-ref :keyboard/ref
                     :system/parent :rooij/scene
                     :system/parent-collection :scene/keyboard})
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-keyup
   ([config keyboard-key keyboard-up-key]
@@ -200,7 +202,7 @@
                     :system/system-ref :keyboard/ref
                     :system/parent :rooij/scene
                     :system/parent-collection :scene/keyboard})
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-while-keydown
   ([config keyboard-key keyboard-down-key]
@@ -214,7 +216,7 @@
                     :system/system-ref :keyboard/ref
                     :system/parent :rooij/scene
                     :system/parent-collection :scene/keyboard})
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-entity!
   ([config entity-key]
@@ -222,7 +224,7 @@
   ([config entity-key entity-config]
    (-> config
        (add-entity entity-key entity-config)
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-component!
   ([config component-key]
@@ -230,7 +232,7 @@
   ([config component-key component-config]
    (-> config
        (add-component component-key component-config)
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-handler!
   ([config handler-key]
@@ -238,7 +240,7 @@
   ([config handler-key handler-config]
    (-> config
        (add-handler handler-key handler-config)
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-reactor!
   ([config reactor-key]
@@ -246,7 +248,7 @@
   ([config reactor-key reactor-config]
    (-> config
        (add-reactor reactor-key reactor-config)
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-ticker!
   ([config ticker-key]
@@ -254,9 +256,17 @@
   ([config ticker-key ticker-config]
    (-> config
        (add-ticker ticker-key ticker-config)
-       (vary-meta merge {:last-added-system (last-added-system config)}))))
+       (with-meta (meta config)))))
 
 (defn add-middleware!
+  ([config middleware-key]
+   (add-middleware! config middleware-key {}))
+  ([config middleware-key middleware-config]
+   (-> config
+       (add-middleware middleware-key middleware-config)
+       (with-meta (meta config)))))
+
+(defn add-collision-handler!
   ([config middleware-key]
    (add-middleware! config middleware-key {}))
   ([config middleware-key middleware-config]
@@ -374,4 +384,5 @@
                     {:reason ::invalid-position-emitter}))))
 
 (defn save! [config]
-  (rooij.config/merge-user! config))
+  (rooij.config/merge-user! config)
+  config)

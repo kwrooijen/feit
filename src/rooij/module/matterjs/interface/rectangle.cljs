@@ -21,6 +21,7 @@
 (extend-protocol RooijGeneral2DPosition
   MatterPhysics2DRectangle
   (set-position [{:keys [body] :as this} x y angle]
+    (.setPosition Body body #js {:x x :y y})
     (.setAngle Body body angle)
     (assoc this :x x :y y))
   (get-position [{:keys [body w h] :as this}]

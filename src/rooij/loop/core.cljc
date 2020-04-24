@@ -8,8 +8,8 @@
    [rooij.loop.reactor :as loop.reactor]
    [rooij.loop.ticker :as loop.ticker]
    [rooij.state :as state :refer [get-scene]]
-   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
-   [rooij.interface.physics-2d.core :as interface.physics-2d]
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d :refer [draw-wireframe]]
+   [rooij.interface.physics-2d.core :as interface.physics-2d :refer [get-wireframe-vectors]]
    [taoensso.timbre :as timbre]))
 
 (defn- apply-event [scene event]
@@ -58,10 +58,16 @@
 (defn run [scene-key delta time]
   (swap! (get-scene scene-key) run-scene delta time))
 
+(defn debug-draw-wireframe [scene-key]
+  (->>
+    (get-wireframe-vectors state/physics-2d scene-key)
+    (draw-wireframe state/graphics-2d scene-key)))
+
 (defn run-scenes [delta time]
   (doseq [scene-key (keys (state/get-scenes))]
-    (swap! (get-scene scene-key) run-scene delta time)
     (interface.physics-2d/step state/physics-2d scene-key delta)
+    (swap! (get-scene scene-key) run-scene delta time)
+    (debug-draw-wireframe scene-key)
     (interface.graphics-2d/step state/graphics-2d scene-key)))
 
 (declare game-loop)
@@ -81,7 +87,7 @@
        (async/<! (async/timeout 0))
        (let [current-time (System/nanoTime)
              extra-d (if (>= delta 1) (dec delta) delta)
-             new-delta (+ extra-d (/ (- current-time start-time) optimal-time) )]
+             new-delta (+ extra-d (/ (- current-time start-time) optimal-time))]
          (recur new-delta current-time)))))
 
 #?(:cljs

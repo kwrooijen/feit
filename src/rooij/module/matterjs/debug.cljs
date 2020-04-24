@@ -13,4 +13,5 @@
   (.map (.-bodies (.-world engine)) body->points))
 
 (defn wireframe-vectors [scene-key]
-  (js->clj (engine->points (state/get-engine scene-key))))
+  (when-let [engine (state/get-engine scene-key)]
+    (js->clj (engine->points engine))))

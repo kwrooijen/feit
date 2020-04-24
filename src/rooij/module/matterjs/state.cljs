@@ -30,10 +30,8 @@
     :gravity {:x 0
               :y 1
               :scale 0.001}
-    :bounds {:min {:x ##-Inf
-                   :y ##-Inf}
-             :max {:x ##Inf
-                   :y ##Inf}}}})
+    :bounds {:min {:x ##-Inf :y ##-Inf}
+             :max {:x ##Inf :y ##Inf}}}})
 
 (defn add-mouse-constraint! [scene-key]
   (let [engine (get-engine scene-key)

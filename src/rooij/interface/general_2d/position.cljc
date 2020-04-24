@@ -23,13 +23,14 @@
 
 (defmethod ig/init-key :general-2d.ticker.position/emitter [_ _opts]
   (let [old-position (atom {:x 0 :y 0 :angle 0})]
-    (fn [{:context/keys [scene-key entity-key]} state]
+    (fn [{:context/keys [scene-key entity-key component-key]} state]
       (let [new-position (get-position state)]
         (when (position-changed? @old-position new-position)
           (update-old-position! old-position new-position)
           (emit!
            {:event/scene scene-key
             :event/entity entity-key
+            :event/excludes [component-key]
             :event/handler :general-2d.handler.position/set
             :event/content new-position}))))))
 

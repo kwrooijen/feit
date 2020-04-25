@@ -1,10 +1,9 @@
 (ns rooij.system.entity
   (:require
    [taoensso.timbre :as timbre]
-   [meta-merge.core :refer [meta-merge]]
    [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
    [rooij.system.core :as system]
-   [rooij.util :refer [vec->map top-key]]
+   [rooij.util :refer [top-key]]
    [integrant.core :as ig]))
 
 (defn path-state
@@ -49,11 +48,21 @@
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))
 
+(defn entity-component-state [{:entity/keys [components]}]
+  (sp/transform [MAP-VALS] :component/state components))
+
+(defn insert-new-component-state [entity [component-key component-state]]
+  (assoc-in entity
+            [:entity/components component-key :component/state]
+            component-state))
+
 ;; TODO Create prep function (like component)
 (defn init [{entity-key :entity/key opts :entity/opts :as entity}]
   (timbre/debug ::start entity)
-  ((:entity/init entity) entity-key opts)
-  (add-routes entity))
+  (->> (entity-component-state entity)
+       ((:entity/init entity) entity-key)
+       (reduce insert-new-component-state entity)
+       (add-routes)))
 
 (defn halt! [{:entity/keys [components] :as entity}]
   ;; TODO remove dynamic entity

@@ -48,7 +48,7 @@
   (let [context {:context/scene-key scene-key}]
     (sp/transform [:scene/entities MAP-VALS]
                   (comp entity/init
-                        #(update % :entity/opts merge context)
+                        (partial merge context)
                         (partial start-components scene-key))
                   opts)))
 

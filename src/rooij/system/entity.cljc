@@ -57,12 +57,14 @@
             component-state))
 
 ;; TODO Create prep function (like component)
-(defn init [{entity-key :entity/key opts :entity/opts :as entity}]
+(defn init [{entity-key :entity/key scene-key :context/scene-key :as entity}]
   (timbre/debug ::start entity)
-  (->> (entity-component-state entity)
-       ((:entity/init entity) entity-key)
-       (reduce insert-new-component-state entity)
-       (add-routes)))
+  (-> (entity-component-state entity)
+      (assoc :context/scene-key scene-key)
+      (->> ((:entity/init entity) entity-key))
+      (dissoc :context/scene-key)
+      (->> (reduce insert-new-component-state entity))
+      (add-routes)))
 
 (defn halt! [{:entity/keys [components] :as entity}]
   ;; TODO remove dynamic entity

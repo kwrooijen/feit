@@ -7,18 +7,16 @@
   [components acc component]
   (assoc acc component (get-in components [component :component/state])))
 
-(defn- subs-states [entities subs]
+(defn- subs-states [{:scene/keys [entities]} {:ticker/keys [subs]}]
   (apply merge
+         {}
          (for [[key components] subs
                [derived-key opts] (ig/find-derived entities key)]
            (->> components
                 (reduce (partial add-component (:entity/components opts)) {})
                 (assoc {} derived-key)))))
 
-(defn- get-subs [entity entities]
-  (subs-states entities (get-in entities [entity :entity/subs])))
-
-(defn process [{:scene/keys [key entities]} delta time]
+(defn process [{:scene/keys [key entities] :as scene} delta time]
   (doseq [[entity-key {:entity/keys [components] :as entity}] entities
           [component-key {:component/keys [tickers state]}] components
           [_ticker-key ticker-v] tickers]
@@ -27,6 +25,6 @@
                    :context/component-key component-key
                    :context/delta delta
                    :context/time time
-                   :context/subs (get-subs entity-key entities)
+                   :context/subs (subs-states scene ticker-v)
                    :context/entity (entity/state entity)}]
       ((:ticker/fn ticker-v) context state))))

@@ -55,7 +55,8 @@
       :dynamic (keyword ns "dynamic")})))
 
 (defn set-ref-dynamic-key [ref ks opts]
-  (if (get opts (:dynamic ks))
+  (if (or (get ref (:dynamic ks))
+          (get opts (:dynamic ks)))
     (update ref (:key ks) make-child)
     ref))
 

@@ -38,11 +38,6 @@
 (defn add-routes [entity] []
   (assoc entity :entity/routes (routes entity)))
 
-(defn- get-top-key [k opts]
-  (if (:entity/dynamic opts)
-    (make-child (top-key k))
-    (top-key k)))
-
 (defmethod system/init-key :rooij/entity [k opts]
   (timbre/debug ::init-key opts)
   (-> opts
@@ -50,7 +45,7 @@
       (select-keys [:entity/components
                     :entity/dynamic
                     :entity/subs])
-      (assoc :entity/key (get-top-key k opts)
+      (assoc :entity/key (top-key k)
              :entity/opts (dissoc opts :entity/components)
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))

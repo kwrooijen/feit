@@ -2,7 +2,7 @@
   (:require
    ["pixi.js" :as PIXI]
    [rooij.interface.general-2d.position :refer [RooijGeneral2DPosition]]
-   [rooij.interface.graphics-2d.sprite :refer [RooijGraphics2DSprite]]
+   [rooij.interface.graphics-2d.sprite :refer [RooijGraphics2DSprite flip]]
    [rooij.module.pixi.state :as state]))
 
 (defn -play [{:keys [sprite initial-textures] :as this} spritesheet [animation & chain]]
@@ -98,13 +98,19 @@
     (:spritesheet/texture opts)   (spritesheet-static-sprite opts)
     (:texture/name opts)          (texture-static-sprite opts)))
 
-(defn make [{:context/keys [scene-key] :as opts}]
+(defn make [{:context/keys [scene-key]
+             :position/keys [x y]
+             flip-x :flip/x
+             flip-y :flip/y
+             :as opts}]
   (let [{:keys [sprite] :as state} (->sprite opts)]
     (set! (.-animationSpeed sprite) 0.167)
-    (set! (.-x sprite) 100)
-    (set! (.-y sprite) 100)
+    (set! (.-x sprite) x)
+    (set! (.-y sprite) y)
+    (set! (.-y sprite) y)
     (set! (.. sprite -scale -x) 2)
     (set! (.. sprite -scale -y) 2)
+    (flip state flip-x flip-y)
     (.set (.-anchor sprite) 0.5)
     (.addChild (state/get-scene scene-key) sprite)
     state))

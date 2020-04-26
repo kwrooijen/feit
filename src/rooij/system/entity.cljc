@@ -4,6 +4,7 @@
    [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
    [rooij.system.core :as system]
    [rooij.util :refer [top-key]]
+   [integrant-tools.keyword :refer [make-child]]
    [integrant.core :as ig]))
 
 (defn path-state
@@ -37,13 +38,19 @@
 (defn add-routes [entity] []
   (assoc entity :entity/routes (routes entity)))
 
+(defn- get-top-key [k opts]
+  (if (:entity/dynamic opts)
+    (make-child (top-key k))
+    (top-key k)))
+
 (defmethod system/init-key :rooij/entity [k opts]
   (timbre/debug ::init-key opts)
   (-> opts
       (update :entity/components system/process-refs :component)
       (select-keys [:entity/components
-                    :entity/dynamic])
-      (assoc :entity/key (top-key k)
+                    :entity/dynamic
+                    :entity/subs])
+      (assoc :entity/key (get-top-key k opts)
              :entity/opts (dissoc opts :entity/components)
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))

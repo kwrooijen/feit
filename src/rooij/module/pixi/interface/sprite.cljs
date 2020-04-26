@@ -5,19 +5,14 @@
    [rooij.interface.graphics-2d.sprite :refer [RooijGraphics2DSprite flip]]
    [rooij.module.pixi.state :as state]))
 
-(defn -play [{:keys [sprite initial-textures] :as this} spritesheet [animation & chain]]
+(defn -play [{:keys [sprite] :as this} spritesheet [animation & chain]]
   (set! (.-textures sprite) (state/spritesheet-animation-texture spritesheet animation))
   (set! (.-running-animation sprite) animation)
   (set! (.-loop sprite) false)
   (set! (.-onComplete sprite)
         (fn []
-          (if (seq chain)
-            (-play this spritesheet chain)
-            (do
-              (set! (.-textures sprite) initial-textures)
-              (set! (.-loop sprite) true)
-              (set! (.-running-animation sprite) :initial)
-              (.play sprite)))))
+          (when (seq chain)
+            (-play this spritesheet chain))))
   (.play sprite))
 
 (defn -play-loop [{:keys [sprite] :as this} spritesheet [animation & chain]]
@@ -29,7 +24,7 @@
   (.play sprite))
 
 (defn ->vec [v]
-  (if (vector? v) v [v]))
+  (if (coll? v) v [v]))
 
 (defrecord PixiGraphics2DSprite [sprite initial-textures x y flip]
   RooijGraphics2DSprite

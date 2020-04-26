@@ -10,7 +10,7 @@
 
 (defn- subs-states [{:scene/keys [entities]} {:keyboard/keys [subs]}]
   (apply merge
-         []
+         {}
          (for [[key components] subs
                [derived-key opts] (ig/find-derived entities key)]
            (->> components

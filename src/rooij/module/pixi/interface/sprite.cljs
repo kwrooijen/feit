@@ -62,7 +62,7 @@
     (set! (.. sprite -position -x) x)
     (set! (.. sprite -position -y) y)
     (set! (.. sprite -rotation) angle)
-    (assoc this :x y :y y)))
+    (assoc this :x x :y y)))
 
 (defn spritesheet-animated-sprite [{:spritesheet/keys [name animation]}]
   (let [textures (state/spritesheet-animation-texture name animation)

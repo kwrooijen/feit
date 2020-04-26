@@ -59,12 +59,17 @@
             component-state))
 
 ;; TODO Create prep function (like component)
-(defn init [{entity-key :entity/key scene-key :context/scene-key :as entity}]
+(defn init [{entity-key :entity/key
+             entity-opts :entity/opts
+             scene-key :context/scene-key
+             :as entity}]
   (timbre/debug ::start entity)
-  (-> (entity-component-state entity)
-      (assoc :context/scene-key scene-key)
+  (-> {:entity/components (entity-component-state entity)}
+      (assoc :context/scene-key scene-key
+             :context/entity-key entity-key
+             :entity/opts entity-opts)
       (->> ((:entity/init entity) entity-key))
-      (dissoc :context/scene-key)
+      (get :entity/components)
       (->> (reduce insert-new-component-state entity))
       (add-routes)))
 

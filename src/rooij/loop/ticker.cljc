@@ -16,7 +16,7 @@
                 (assoc {} derived-key)))))
 
 (defn- get-subs [entity entities]
-  (subs-states entities (-> entities entity :entity/subs)))
+  (subs-states entities (get-in entities [entity :entity/subs])))
 
 (defn process [{:scene/keys [key entities]} delta time]
   (doseq [[entity-key {:entity/keys [components] :as entity}] entities
@@ -27,6 +27,6 @@
                    :context/component-key component-key
                    :context/delta delta
                    :context/time time
-                   :context/subs (get-subs entity-key key)
+                   :context/subs (get-subs entity-key entities)
                    :context/entity (entity/state entity)}]
       ((:ticker/fn ticker-v) context state))))

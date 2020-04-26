@@ -11,8 +11,8 @@
 (defn pprint-middleware [data]
   (update data :vargs (partial mapv format-pprint)))
 
-(def timbre-config
-  {:level :debug
+(defn timbre-config [level]
+  {:level level
    :ns-whitelist  []
    :ns-blacklist  []
    :middleware [pprint-middleware]
@@ -24,5 +24,7 @@
 (defn disable! []
   (timbre/set-config! {}))
 
-(defn enable! []
-  (timbre/set-config! timbre-config))
+(defn enable!
+  ([] (enable! :error))
+  ([level]
+   (timbre/set-config! (timbre-config level))))

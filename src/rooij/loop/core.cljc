@@ -14,14 +14,18 @@
 
 (defn- apply-event [scene event]
   (timbre/debug ::event scene event)
-  (reduce
-   (fn [acc context]
-     (-> [acc context]
-         (loop.middleware/process)
-         (loop.handler/process)
-         (loop.reactor/process)))
-   scene
-   (loop.event/event->contexts scene event)))
+  (try
+    (reduce
+     (fn [acc context]
+       (-> [acc context]
+           (loop.middleware/process)
+           (loop.handler/process)
+           (loop.reactor/process)))
+     scene
+     (loop.event/event->contexts scene event))
+    (catch #?(:clj Throwable :cljs :default) e
+      (timbre/error ::event-failed (str "Failed to process event " event) e)
+      scene)))
 
 (defn- threshold-reached [scene-key]
   ;; TODO add debugging info

@@ -75,8 +75,7 @@
   [scene-key entity-key]
   (->> (ig/find-derived (:scene/entities @(state/get-scene scene-key)) entity-key)
        (into {})
-       (sp/transform [MAP-VALS] :entity/components)
-       (sp/transform [MAP-VALS MAP-VALS] :component/state)))
+       (sp/transform [MAP-VALS] :entity/state)))
 
 (defn entity [scene-key entity-key]
   (-> (entities scene-key entity-key)

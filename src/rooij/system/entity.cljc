@@ -4,17 +4,7 @@
    [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
    [rooij.system.core :as system]
    [rooij.util :refer [top-key]]
-   [integrant-tools.keyword :refer [make-child]]
    [integrant.core :as ig]))
-
-(defn path-state
-  [entity component]
-  [:scene/entities entity
-   :entity/components (:component/key component)
-   :component/state])
-
-(defn state [{:entity/keys [components]}]
-  (sp/transform [MAP-VALS] :component/state components))
 
 (defn has-handler? [handler-key component]
   ((set (sp/select [:component/handlers MAP-VALS :handler/key] component))
@@ -50,27 +40,23 @@
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))
 
-(defn entity-component-state [{:entity/keys [components]}]
+(defn- entity-component-state [{:entity/keys [components]}]
   (sp/transform [MAP-VALS] :component/state components))
-
-(defn insert-new-component-state [entity [component-key component-state]]
-  (assoc-in entity
-            [:entity/components component-key :component/state]
-            component-state))
 
 ;; TODO Create prep function (like component)
 (defn init [{entity-key :entity/key
              entity-opts :entity/opts
+             components :entity/components
              scene-key :context/scene-key
              :as entity}]
   (timbre/debug ::start entity)
-  (-> {:entity/components (entity-component-state entity)}
+  (-> entity
       (assoc :context/scene-key scene-key
              :context/entity-key entity-key
-             :entity/opts entity-opts)
+             :entity/opts entity-opts
+             :entity/components components
+             :entity/state (entity-component-state entity))
       (->> ((:entity/init entity) entity-key))
-      (get :entity/components)
-      (->> (reduce insert-new-component-state entity))
       (add-routes)))
 
 (defn halt! [{:entity/keys [components] :as entity}]

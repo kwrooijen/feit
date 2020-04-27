@@ -1,11 +1,7 @@
 (ns rooij.loop.handler)
 
-(defn- path-entity-state [{:context/keys [entity-key component-key]}]
-  [:scene/entities entity-key
-   :entity/components component-key
-   :component/state])
-
-(defn process [[scene {:context/keys [handler event state] :as context}]]
-  (let [state ((:handler/fn handler) context event state)]
-    [(assoc-in scene (path-entity-state context) state)
-     (assoc context :context/state state)]))
+(defn process
+  [[scene {:context/keys [handler event state entity-key component-key] :as context}]]
+  (let [new-state ((:handler/fn handler) context event state)]
+    [(assoc-in scene [:scene/entities entity-key :entity/state component-key] new-state)
+     (assoc context :context/state new-state)]))

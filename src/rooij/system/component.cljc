@@ -11,9 +11,12 @@
 
 (def init-dissocs
   [:component/init
+   :component/halt!
    :component/key
    :component/handlers
    :component/tickers
+   :component/reactors
+   :component/state
    :component/opts])
 
 (defn path
@@ -53,7 +56,11 @@
         component (assoc component :context/state persistent-state)]
     (if (and auto-persistent persistent-state)
       persistent-state
-      (init key (reduce dissoc component init-dissocs)))))
+      (-> key
+          (init (reduce dissoc component init-dissocs))
+          (dissoc :context/scene-key
+                  :context/entity-key
+                  :context/state)))))
 
 (defn init
   [{:component/keys [key] :as component}]

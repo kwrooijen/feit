@@ -5,8 +5,7 @@
 (defn- path-entity-state [{:context/keys [entity-key component-key]}]
   [:context/scene
    :scene/entities entity-key
-   :entity/components component-key
-   :component/state])
+   :entity/state component-key])
 
 (defn- apply-reactors!
   [{:context/keys [component old-state state] :as ctx}]

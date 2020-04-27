@@ -3,13 +3,13 @@
 (defn- middlewares [{:context/keys [component handler-key]} ]
   (get-in component [:component/handlers handler-key :handler/middleware]))
 
-(defn- process-event-content-reducer [ctx event [_ middleware]]
-  ((:middleware/fn middleware) ctx event))
+(defn- process-event-content-reducer [context event [_ middleware]]
+  ((:middleware/fn middleware) context event))
 
-(defn- process-event-content [content ctx]
-  (reduce (partial process-event-content-reducer ctx)
+(defn- process-event-content [content context]
+  (reduce (partial process-event-content-reducer context)
           content
-          (middlewares ctx)))
+          (middlewares context)))
 
-(defn process [[scene ctx]]
-  [scene (update ctx :context/event process-event-content ctx)])
+(defn process [[scene context]]
+  [scene (update context :context/event process-event-content context)])

@@ -111,7 +111,7 @@
    (add-system config
                {:system/system-child-key entity-key
                 :system/system-key :rooij/entity
-                :system/system-config entity-config
+                :system/system-config (assoc entity-config :entity/original-key entity-key)
                 :system/system-ref :entity/ref
                 :system/parent :rooij/scene
                 :system/parent-collection :scene/entities})))
@@ -123,7 +123,7 @@
    (add-system config
                {:system/system-child-key component-key
                 :system/system-key :rooij/component
-                :system/system-config component-config
+                :system/system-config (assoc component-config :component/original-key component-key)
                 :system/system-ref :component/ref
                 :system/parent :rooij/entity
                 :system/parent-collection :entity/components})))
@@ -135,7 +135,7 @@
    (add-system config
                {:system/system-child-key handler-key
                 :system/system-key :rooij/handler
-                :system/system-config handler-config
+                :system/system-config (assoc handler-config :handler/original-key handler-key)
                 :system/system-ref :handler/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/handlers})))
@@ -147,7 +147,7 @@
    (add-system config
                {:system/system-child-key ticker-key
                 :system/system-key :rooij/ticker
-                :system/system-config ticker-config
+                :system/system-config (assoc ticker-config :ticker/original-key ticker-key)
                 :system/system-ref :ticker/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/tickers})))
@@ -159,7 +159,7 @@
    (add-system config
                {:system/system-child-key reactor-key
                 :system/system-key :rooij/reactor
-                :system/system-config reactor-config
+                :system/system-config (assoc reactor-config :reactor/original-key reactor-key)
                 :system/system-ref :reactor/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/reactors})))
@@ -171,7 +171,7 @@
    (add-system config
                {:system/system-child-key middleware-key
                 :system/system-key :rooij/middleware
-                :system/system-config middleware-config
+                :system/system-config (assoc middleware-config :middleware/original-key middleware-key)
                 :system/system-ref :middleware/ref
                 :system/parent :rooij/handler
                 :system/parent-collection :handler/middlewares})))
@@ -281,7 +281,7 @@
    (ref-system config
                {:system/system-child-key entity-key
                 :system/system-key :rooij/entity
-                :system/system-config entity-config
+                :system/system-config (assoc entity-config :entity/original-key entity-key)
                 :system/system-ref :entity/ref
                 :system/parent :rooij/scene
                 :system/parent-collection :scene/entities})))
@@ -293,7 +293,7 @@
    (ref-system config
                {:system/system-child-key component-key
                 :system/system-key :rooij/component
-                :system/system-config component-config
+                :system/system-config (assoc component-config :component/original-key component-key)
                 :system/system-ref :component/ref
                 :system/parent :rooij/entity
                 :system/parent-collection :entity/components})))
@@ -305,7 +305,7 @@
    (ref-system config
                {:system/system-child-key handler-key
                 :system/system-key :rooij/handler
-                :system/system-config handler-config
+                :system/system-config (assoc handler-config :handler/original-key handler-key)
                 :system/system-ref :handler/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/handlers})))
@@ -317,7 +317,7 @@
    (ref-system config
                {:system/system-child-key ticker-key
                 :system/system-key :rooij/ticker
-                :system/system-config ticker-config
+                :system/system-config (assoc ticker-config :ticker/original-key ticker-key)
                 :system/system-ref :ticker/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/tickers})))
@@ -329,7 +329,7 @@
    (ref-system config
                {:system/system-child-key reactor-key
                 :system/system-key :rooij/reactor
-                :system/system-config reactor-config
+                :system/system-config (assoc reactor-config :reactor/original-key reactor-key)
                 :system/system-ref :reactor/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/reactors})))
@@ -341,7 +341,7 @@
    (ref-system config
                {:system/system-child-key middleware-key
                 :system/system-key :rooij/middleware
-                :system/system-config middleware-config
+                :system/system-config (assoc middleware-config :middleware/original-key middleware-key)
                 :system/system-ref :middleware/ref
                 :system/parent :rooij/handler
                 :system/parent-collection :handler/middlewares})))

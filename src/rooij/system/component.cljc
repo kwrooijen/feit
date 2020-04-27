@@ -40,7 +40,8 @@
       (select-keys [:component/tickers
                     :component/handlers
                     :component/reactors
-                    :component/persistent])
+                    :component/persistent
+                    :component/original-key])
       (assoc :component/key (top-key k)
              :component/init (system/get-init-key k)
              :component/state nil
@@ -48,6 +49,7 @@
              :component/opts (dissoc opts
                                      :component/handlers
                                      :component/tickers
+                                     :component/original-key
                                      :component/reactors))))
 
 (defn get-init-state

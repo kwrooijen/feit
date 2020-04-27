@@ -52,7 +52,8 @@
      {:key (keyword ns "key")
       :opts (keyword ns "opts")
       :ref (keyword ns "ref")
-      :dynamic (keyword ns "dynamic")})))
+      :dynamic (keyword ns "dynamic")
+      :original-key (keyword ns "original-key")})))
 
 (defn set-ref-dynamic-key [ref ks opts]
   (if (or (get ref (:dynamic ks))
@@ -70,9 +71,15 @@
         (set-component-opts ks opts))
     opts))
 
+(defn update-key [ks m]
+  (if-let [original-key (get m (:original-key ks))]
+    (assoc m (:key ks) original-key)
+    m))
+
 (defn process-refs [ref-opts ns]
   (let [ks (process-refs-keys ns)]
     (-> (mapv (partial merge-extra-opts ks) (remove nil? ref-opts))
+        (->> (mapv (partial update-key ks)))
         (vec->map (:key ks)))))
 
 (defn get-halt-key [derived-k entity-opts]

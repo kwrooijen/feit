@@ -35,8 +35,11 @@
       (select-keys [:entity/components
                     :entity/dynamic
                     :entity/subs])
+      (update :entity/subs merge (-> opts :entity/opts :entity/subs))
       (assoc :entity/key (top-key k)
-             :entity/opts (dissoc opts :entity/components)
+             :entity/opts (dissoc opts
+                                  :entity/components
+                                  :entity/subs)
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))
 

@@ -108,4 +108,4 @@
     (flip state flip-x flip-y)
     (.set (.-anchor sprite) 0.5)
     (.addChild (state/get-scene scene-key) sprite)
-    state))
+    (assoc state :x x :y y)))

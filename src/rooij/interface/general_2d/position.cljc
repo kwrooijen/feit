@@ -36,7 +36,10 @@
 
 (defmethod ig/init-key :general-2d.handler.position/set [_ opts]
   (fn [_context {:keys [x y angle]} state]
-    (set-position state x y angle)))
+    (set-position state
+                  (or x (:x state))
+                  (or y (:y state))
+                  (or angle (:angle state)))))
 
 (it/derive-hierarchy
  {:general-2d.handler.position/set [:rooij/handler]

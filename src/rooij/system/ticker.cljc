@@ -1,10 +1,11 @@
 (ns rooij.system.ticker
   (:require
-   [taoensso.timbre :as timbre]
-   [rooij.util :refer [top-key]]
-   [rooij.system.core :as system]
+   [integrant.core :as ig]
+   [meta-merge.core :refer [meta-merge]]
    [rooij.state :refer [get-scene]]
-   [integrant.core :as ig]))
+   [rooij.system.core :as system]
+   [rooij.util :refer [top-key]]
+   [taoensso.timbre :as timbre]))
 
 (defn path
   ([entity-key component-key]
@@ -30,7 +31,9 @@
              :ticker/fn (ig/init-key ticker opts)}))))
 
 (defn init [{:ticker/keys [key opts] :as ticker}]
-  (assoc ticker :ticker/fn (ig/init-key key opts)))
+  (-> ticker
+      (assoc :ticker/fn (ig/init-key key opts))
+      (update :ticker/subs meta-merge (:ticker/subs opts))))
 
 (defn remove!
   ([{:context/keys [scene-key entity-key component]} ticker]

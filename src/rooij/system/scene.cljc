@@ -28,13 +28,10 @@
 
 (defmethod system/init-key :rooij/scene [k opts]
   (timbre/debug ::init-key opts)
-  (-> opts
-      (update :scene/entities system/process-refs :entity)
-      (update :scene/keyboard system/process-refs :keyboard)
-      (update :scene/keyboard change-keyboard-identifier)
-      (assoc :scene/key (top-key k)
-             :scene/init (system/get-init-key k)
-             :scene/halt! (system/get-halt-key k opts))))
+  (assoc opts
+         :scene/key (top-key k)
+         :scene/init (system/get-init-key k)
+         :scene/halt! (system/get-halt-key k opts)))
 
 (defn start-components [scene-key {entity-key :entity/key :as entity}]
   (let [context {:context/scene-key scene-key
@@ -63,6 +60,9 @@
   (-> @state/system
       (it/find-derived-value scene-key)
       (apply-init scene-key opts)
+      (update :scene/entities system/process-refs :entity)
+      (update :scene/keyboard system/process-refs :keyboard)
+      (update :scene/keyboard change-keyboard-identifier)
       (start-entities scene-key)
       (start-keyboard)
       (assoc :scene/key scene-key)

@@ -1,15 +1,16 @@
 (ns rooij.util
   (:require
    [clojure.walk :refer [postwalk]]
-   [integrant-tools.core :as it]
-   [clojure.string :as string]
-   [meta-merge.core :refer [meta-merge]]))
+   [integrant-tools.core :as it]))
 
 (defn vec->map [v k]
   (reduce #(assoc %1 (get %2 k) %2) {} (flatten v)))
 
 (defn top-key [k]
   (if ^boolean (coll? k) (last k) k))
+
+(defn bottom-key [k]
+  (if ^boolean (coll? k) (first k) k))
 
 (defn derive-composite-all
   "Recursively apply `it/derive-composite` on all map keys."

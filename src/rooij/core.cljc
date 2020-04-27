@@ -1,5 +1,7 @@
 (ns rooij.core
   (:require
+   [rooij.util :refer [top-key bottom-key]]
+   [integrant-tools.core :as it]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [integrant.core :as ig]
    [rooij.config]
@@ -82,6 +84,12 @@
       (get entity-key)
       (vals)
       (->> (apply merge))))
+
+(defn ref-entity [scene entity-key opts]
+  (it/derive-composite entity-key)
+  (update scene :scene/entities conj
+          (merge {:entity/ref (it/find-derived-value @state/system (bottom-key entity-key))}
+                 opts)))
 
 (defn transition-scene
   "Transition from `scene-from` to `scene-to`. Halts `scene-from` before

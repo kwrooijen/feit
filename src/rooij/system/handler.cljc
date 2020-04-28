@@ -7,10 +7,10 @@
 
 (defmethod system/init-key :rooij/handler [k opts]
   (timbre/debug ::init-key opts)
-  (-> opts
-      (assoc :handler/key (or (:handler/route opts) (top-key k))
-             :handler/init (system/get-init-key k)
-             :handler/fn nil)))
+  (assoc opts
+         :handler/key (or (:handler/route opts) (top-key k))
+         :handler/init (system/get-init-key k)
+         :handler/fn nil))
 
 (defn init [{:handler/keys [key opts] :as handler}]
   (assoc handler :handler/fn (ig/init-key key opts)))

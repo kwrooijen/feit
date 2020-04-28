@@ -7,6 +7,7 @@
    [rooij.loop.middleware :as loop.middleware]
    [rooij.loop.reactor :as loop.reactor]
    [rooij.loop.ticker :as loop.ticker]
+   [rooij.system.scene :as system.scene]
    [rooij.state :as state :refer [get-scene]]
    [rooij.interface.graphics-2d.core :as interface.graphics-2d :refer [draw-wireframe]]
    [rooij.interface.physics-2d.core :as interface.physics-2d :refer [get-wireframe-vectors]]
@@ -59,8 +60,18 @@
               new-scene
               (recur new-scene @events (dec threshold)))))))))
 
-(defn run [scene-key delta time]
-  (swap! (get-scene scene-key) run-scene delta time))
+(defn handle-post-event [scene event]
+  (condp = (:event/type event)
+    :scene/start! (do (system.scene/start! (:scene/key event)) scene)
+    :scene/halt! (do (system.scene/halt! (:scene/key event)) scene)
+    :remove/ticker (update-in scene (:remove/path event) dissoc (:remove/key event))
+    :remove/middleware (update-in scene (:remove/path event) dissoc (:remove/key event))))
+
+(defn post-events [{:scene/keys [key] :as scene}]
+  (let [events (state/get-scene-post-events key)
+        events-todo @events]
+    (reset! events [])
+    (reduce handle-post-event scene events-todo)))
 
 (defn debug-draw-wireframe [scene-key]
   (->>
@@ -72,7 +83,8 @@
     (interface.physics-2d/step state/physics-2d scene-key delta)
     (swap! (get-scene scene-key) run-scene delta time)
     (debug-draw-wireframe scene-key)
-    (interface.graphics-2d/step state/graphics-2d scene-key)))
+    (interface.graphics-2d/step state/graphics-2d scene-key)
+    (swap! (get-scene scene-key) post-events)))
 
 (declare game-loop)
 

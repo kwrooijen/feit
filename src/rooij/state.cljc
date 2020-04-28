@@ -21,6 +21,8 @@
 
 (defonce ^:private events (atom {}))
 
+(defonce ^:private post-events (atom {}))
+
 (defonce ^:private input-events (atom {}))
 
 (defonce ^:private down-keys (atom #{}))
@@ -29,6 +31,7 @@
 
 (defn reset-events! [scene-key]
   (swap! events assoc scene-key (atom []))
+  (swap! post-events assoc scene-key (atom []))
   (swap! input-events assoc scene-key (atom [])))
 
 (defn get-scenes []
@@ -39,6 +42,9 @@
 
 (defn get-scene-events [scene-key]
   (get @events scene-key))
+
+(defn get-scene-post-events [scene-key]
+  (get @post-events scene-key))
 
 (defn save-scene! [scene]
   (swap! scenes assoc (:scene/key scene) (atom scene)))

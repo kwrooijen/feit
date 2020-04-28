@@ -77,6 +77,6 @@
       (update :component/tickers system/process-refs :ticker)
       (update :component/handlers system/process-refs :handler)
       (update :component/reactors system/process-refs :reactor)
-      (update :component/tickers #(sp/transform [MAP-VALS] ticker/init %))
+      (update :component/tickers  #(sp/transform [MAP-VALS] ticker/init %))
       (update :component/handlers #(sp/transform [MAP-VALS] handler/init %))
       (update :component/reactors #(sp/transform [MAP-VALS] reactor/init %))))

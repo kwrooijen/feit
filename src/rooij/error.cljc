@@ -19,8 +19,8 @@
     :integrant.core/build-threw-exception))
 
 (defmulti handle-error
-  (comp
-   translate-error ex-data))
+  (comp translate-error
+        ex-data))
 
 (defmethod handle-error :malli.core/invalid-schema [e]
   (timbre/error "There was an eror in the Malli schema:"
@@ -28,7 +28,9 @@
   (throw e))
 
 (defmethod handle-error :integrant.core/build-threw-exception [e]
-  (timbre/error (str "The following key threw an error during initialization: "
+  (timbre/error (str "The following key threw an error during initialization: \n\n"
+                     ;; TODO How do you get .-cause in Clojure?
+                     (.-cause e) "\n\n"
                      (:key (ex-data e)) "\n\n" "With the following opts: \n"
                      (pp (:value (ex-data e))))))
 

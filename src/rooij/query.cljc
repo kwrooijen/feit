@@ -41,5 +41,9 @@
   "Transition from `scene-from` to `scene-to`. Halts `scene-from` before
   initializing `scene-to`."
   [scene-from scene-to]
-  (scene/halt! scene-from)
-  (scene/start! scene-to))
+  (swap! (state/get-scene-post-events scene-from) conj
+         {:scene/key scene-to
+          :event/type :scene/start!})
+  (swap! (state/get-scene-post-events scene-from) conj
+         {:scene/key scene-from
+          :event/type :scene/halt!}))

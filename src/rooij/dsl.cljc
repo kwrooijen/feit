@@ -1,4 +1,4 @@
- (ns rooij.dsl
+(ns rooij.dsl
   (:require
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
@@ -7,12 +7,11 @@
    [rooij.config]))
 
 (def new-child-key
-  (memoize
-   (fn [_system-config k d]
-     (cond
-       (vector? k) k
-       (descendant? k d) [k (make-child k)]
-       :else [d k]))))
+  (fn [_system-config k d]
+    (cond
+      (vector? k) k
+      (descendant? k d) [k (make-child k)]
+      :else [d k])))
 
 (def ^:private current-key
   (comp :current-key
@@ -165,16 +164,18 @@
                 :system/parent-collection :component/reactors})))
 
 (defn add-middleware
-  ([config middleware-key]
-   (add-middleware config middleware-key {}))
-  ([config middleware-key middleware-config]
+  ([config middleware-key handlers]
+   (add-middleware config middleware-key handlers {}))
+  ([config middleware-key handlers middleware-config]
    (add-system config
                {:system/system-child-key middleware-key
                 :system/system-key :rooij/middleware
-                :system/system-config (assoc middleware-config :middleware/original-key middleware-key)
+                :system/system-config (assoc middleware-config
+                                             :middleware/original-key middleware-key
+                                             :middleware/handlers handlers)
                 :system/system-ref :middleware/ref
-                :system/parent :rooij/handler
-                :system/parent-collection :handler/middlewares})))
+                :system/parent :rooij/component
+                :system/parent-collection :component/middlewares})))
 
 (defn add-keydown
   ([config keyboard-key keyboard-down-key]
@@ -335,16 +336,18 @@
                 :system/parent-collection :component/reactors})))
 
 (defn ref-middleware
-  ([config middleware-key]
-   (ref-middleware config middleware-key {}))
-  ([config middleware-key middleware-config]
+  ([config middleware-key handlers]
+   (ref-middleware config middleware-key handlers {}))
+  ([config middleware-key handlers middleware-config]
    (ref-system config
                {:system/system-child-key middleware-key
                 :system/system-key :rooij/middleware
-                :system/system-config (assoc middleware-config :middleware/original-key middleware-key)
+                :system/system-config (assoc middleware-config
+                                             :middleware/original-key middleware-key
+                                             :middleware/handlers handlers)
                 :system/system-ref :middleware/ref
-                :system/parent :rooij/handler
-                :system/parent-collection :handler/middlewares})))
+                :system/parent :rooij/component
+                :system/parent-collection :component/middlewares})))
 
 (defn initial-scene
   ([config]

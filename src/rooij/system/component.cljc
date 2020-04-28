@@ -4,6 +4,7 @@
    [rooij.system.ticker :as ticker]
    [rooij.system.handler :as handler]
    [rooij.system.reactor :as reactor]
+   [rooij.system.middleware :as middleware]
    [rooij.state :as state]
    [rooij.system.core :as system]
    [rooij.util :refer [top-key]]
@@ -16,6 +17,7 @@
    :component/handlers
    :component/tickers
    :component/reactors
+   :component/middleware
    :component/state
    :component/opts])
 
@@ -40,6 +42,7 @@
       (select-keys [:component/tickers
                     :component/handlers
                     :component/reactors
+                    :component/middleware
                     :component/persistent
                     :component/original-key])
       (assoc :component/key (top-key k)
@@ -50,7 +53,8 @@
                                      :component/handlers
                                      :component/tickers
                                      :component/original-key
-                                     :component/reactors))))
+                                     :component/reactors
+                                     :component/middleware))))
 
 (defn get-init-state
   [{:component/keys [auto-persistent init key] :context/keys [entity-key] :as component}]
@@ -77,6 +81,8 @@
       (update :component/tickers system/process-refs :ticker)
       (update :component/handlers system/process-refs :handler)
       (update :component/reactors system/process-refs :reactor)
+      (update :component/middlewares system/process-refs :middleware)
       (update :component/tickers  #(sp/transform [MAP-VALS] ticker/init %))
       (update :component/handlers #(sp/transform [MAP-VALS] handler/init %))
-      (update :component/reactors #(sp/transform [MAP-VALS] reactor/init %))))
+      (update :component/reactors #(sp/transform [MAP-VALS] reactor/init %))
+      (update :component/middlewares #(sp/transform [MAP-VALS] middleware/init %))))

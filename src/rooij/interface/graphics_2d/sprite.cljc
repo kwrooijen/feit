@@ -1,8 +1,8 @@
 (ns rooij.interface.graphics-2d.sprite
   (:require
+   [rooij.dsl :as r]
    [integrant-tools.core :as it]
    [integrant.core :as ig]
-   [meta-merge.core :refer [meta-merge]]
    [rooij.config]
    [rooij.state :as state]
    [rooij.interface.graphics-2d.core :refer [make-sprite]]))
@@ -33,23 +33,20 @@
     [_context {:event/keys [x y]} state]
     (flip state x y)))
 
-(defmethod ig/prep-key :graphics-2d.component/sprite [_ opts]
-  (meta-merge
-   {:component/handlers [{:handler/ref (ig/ref :general-2d.handler.position/set)}
-                         {:handler/ref (ig/ref :graphics-2d.handler.sprite/play)}
-                         {:handler/ref (ig/ref :graphics-2d.handler.sprite/play-loop)}
-                         {:handler/ref (ig/ref :graphics-2d.handler.sprite/stop-loop)}
-                         {:handler/ref (ig/ref :graphics-2d.handler.sprite/flip)}]}
-   opts))
-
 (defmethod ig/init-key :graphics-2d.component/sprite [_ opts]
   (make-sprite state/graphics-2d opts))
 
 (it/derive-hierarchy
- {:graphics-2d.component/sprite    [:rooij/component :rooij/position]})
+ {:graphics-2d.component/sprite [:rooij/component :rooij/position]})
 
-(rooij.config/merge-interface!
- {[:rooij/handler :graphics-2d.handler.sprite/play] {}
-  [:rooij/handler :graphics-2d.handler.sprite/play-loop] {}
-  [:rooij/handler :graphics-2d.handler.sprite/stop-loop] {}
-  [:rooij/handler :graphics-2d.handler.sprite/flip] {}})
+(-> (r/handler :graphics-2d.handler.sprite/play)
+    (r/handler :graphics-2d.handler.sprite/play-loop)
+    (r/handler :graphics-2d.handler.sprite/stop-loop)
+    (r/handler :graphics-2d.handler.sprite/flip)
+    (r/component :graphics-2d.component/sprite)
+    (r/ref-handler :graphics-2d.handler.sprite/play)
+    (r/ref-handler :graphics-2d.handler.sprite/play-loop)
+    (r/ref-handler :graphics-2d.handler.sprite/stop-loop)
+    (r/ref-handler :graphics-2d.handler.sprite/flip)
+    (r/ref-handler :general-2d.handler.position/set)
+    (r/save-interface!))

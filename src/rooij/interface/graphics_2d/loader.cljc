@@ -2,7 +2,7 @@
   (:require
    [integrant-tools.core :as it]
    [integrant.core :as ig]
-   [meta-merge.core :refer [meta-merge]]
+   [rooij.dsl :as r]
    [rooij.config]
    [rooij.interface.graphics-2d.core :refer [make-loader]]
    [rooij.query :refer [emit! transition-scene]]
@@ -17,13 +17,6 @@
           :event/entity entity-key
           :event/handler :graphics-2d.handler.loader/load-complete
           :event/content {}}))
-
-(defmethod ig/prep-key :graphics-2d.component/loader [_ opts]
-  (meta-merge
-   {:component/handlers [{:handler/ref (ig/ref :graphics-2d.handler.loader/load-complete)}
-                         {:handler/ref (ig/ref :graphics-2d.handler.loader/load-texture)}
-                         {:handler/ref (ig/ref :graphics-2d.handler.loader/load-spritesheet)}]}
-   opts))
 
 (defmethod ig/init-key :graphics-2d.component/loader
   [_ {:context/keys [scene-key entity-key]
@@ -61,11 +54,11 @@
         (transition-scene scene-key next-scene)
         new-state))))
 
-(it/derive-hierarchy
- {:graphics-2d.entity/asset-loader [:rooij/entity]
-  :graphics-2d.entity/spritesheet-loader [:rooij/entity]})
-
-(rooij.config/merge-interface!
- {[:rooij/handler :graphics-2d.handler.loader/load-complete] {}
-  [:rooij/handler :graphics-2d.handler.loader/load-texture] {}
-  [:rooij/handler :graphics-2d.handler.loader/load-spritesheet] {}})
+(-> (r/handler :graphics-2d.handler.loader/load-complete)
+    (r/handler :graphics-2d.handler.loader/load-texture)
+    (r/handler :graphics-2d.handler.loader/load-spritesheet)
+    (r/component :graphics-2d.component/loader)
+    (r/ref-handler :graphics-2d.handler.loader/load-complete)
+    (r/ref-handler :graphics-2d.handler.loader/load-texture)
+    (r/ref-handler :graphics-2d.handler.loader/load-spritesheet)
+    (r/save-interface!))

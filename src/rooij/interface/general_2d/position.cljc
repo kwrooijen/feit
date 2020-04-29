@@ -1,7 +1,7 @@
 (ns rooij.interface.general-2d.position
   (:require
    [rooij.query :refer [emit!]]
-   [integrant-tools.core :as it]
+   [rooij.dsl :as r]
    [integrant.core :as ig]
    [rooij.config]))
 
@@ -41,10 +41,6 @@
                   (or y (:y state))
                   (or angle (:angle state)))))
 
-(it/derive-hierarchy
- {:general-2d.handler.position/set [:rooij/handler]
-  :general-2d.ticker.position/emitter [:rooij/ticker]})
-
-(rooij.config/merge-interface!
- {:general-2d.handler.position/set {}
-  :general-2d.ticker.position/emitter {}})
+(-> (r/handler :general-2d.handler.position/set)
+    (r/ticker :general-2d.ticker.position/emitter)
+    (r/save-interface!))

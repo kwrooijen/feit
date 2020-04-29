@@ -7,7 +7,6 @@
    [rooij.system.middleware :as middleware]
    [rooij.state :as state]
    [rooij.system.core :as system]
-   [rooij.util :refer [top-key]]
    [taoensso.timbre :as timbre]))
 
 (def init-dissocs
@@ -18,8 +17,7 @@
    :component/tickers
    :component/reactors
    :component/middleware
-   :component/state
-   :component/opts])
+   :component/state])
 
 (defn path
   ([entity]
@@ -30,31 +28,18 @@
     :entity/components component]))
 
 (defn save-persistent-component!
-  [{:component/keys [key opts state] :context/keys [entity-key] :as component}]
-  (when (or (:component/persistent opts)
-            (:component/auto-persistent opts))
+  [{:component/keys [key state persistent auto-persistent]
+    :context/keys [entity-key] :as component}]
+  (when (or persistent auto-persistent)
     (state/save-component! state entity-key key))
   component)
 
 (defmethod system/init-key :rooij/component [k opts]
   (timbre/debug ::init-key opts)
-  (-> opts
-      (select-keys [:component/tickers
-                    :component/handlers
-                    :component/reactors
-                    :component/middleware
-                    :component/persistent
-                    :component/original-key])
-      (assoc :component/key (top-key k)
-             :component/init (system/get-init-key k)
-             :component/state nil
-             :component/halt! (system/get-halt-key k opts)
-             :component/opts (dissoc opts
-                                     :component/handlers
-                                     :component/tickers
-                                     :component/original-key
-                                     :component/reactors
-                                     :component/middleware))))
+  (assoc opts
+         :component/init (system/get-init-key k)
+         :component/state nil
+         :component/halt! (system/get-halt-key k opts)))
 
 (defn get-init-state
   [{:component/keys [auto-persistent init key] :context/keys [entity-key] :as component}]
@@ -77,7 +62,7 @@
 
 (defn prep [component context]
   (-> component
-      (merge (:component/opts component) context)
+      (merge context)
       (update :component/tickers system/process-refs :ticker)
       (update :component/handlers system/process-refs :handler)
       (update :component/reactors system/process-refs :reactor)

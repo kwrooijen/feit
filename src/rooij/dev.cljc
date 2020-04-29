@@ -12,10 +12,13 @@
 (def config
   {[:rooij/entity :entity.rooij.dev/wireframe]
    {:entity/components
-    [(ig/ref :component.rooij.dev/wireframe)]}
+    {:component.rooij.dev/wireframe
+     {:component/ref (ig/ref :component.rooij.dev/wireframe)}}}
 
    [:rooij/component :component.rooij.dev/wireframe]
-   {:component/tickers [(ig/ref :ticker.rooij.dev/wireframe)]}
+   {:component/tickers
+    {:ticker.rooij.dev/wireframe
+     {:ticker/ref (ig/ref :ticker.rooij.dev/wireframe)}}}
 
    [:rooij/ticker :ticker.rooij.dev/wireframe] {}})
 

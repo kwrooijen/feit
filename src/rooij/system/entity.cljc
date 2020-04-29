@@ -32,14 +32,7 @@
   (timbre/debug ::init-key opts)
   (-> opts
       (update :entity/components system/process-refs :component)
-      (select-keys [:entity/components
-                    :entity/dynamic
-                    :entity/subs])
-      (update :entity/subs merge (-> opts :entity/opts :entity/subs))
       (assoc :entity/key (top-key k)
-             :entity/opts (dissoc opts
-                                  :entity/components
-                                  :entity/subs)
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))
 
@@ -48,16 +41,14 @@
 
 ;; TODO Create prep function (like component)
 (defn init [{entity-key :entity/key
-             entity-opts :entity/opts
              scene-key :context/scene-key
              :as entity}]
   (timbre/debug ::start entity)
-  (-> {:context/scene-key scene-key
-       :context/entity-key entity-key
-       :entity/opts entity-opts
-       :entity/state (entity-component-state entity)}
+  (-> entity
+      (assoc :context/scene-key scene-key
+             :context/entity-key entity-key
+             :entity/state (entity-component-state entity))
       (->> ((:entity/init entity) entity-key))
-      (merge entity)
       (add-routes)))
 
 (defn halt! [{:entity/keys [components] :as entity}]

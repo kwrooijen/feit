@@ -56,7 +56,7 @@
                       {:reason ::invalid-ref-system-keyword})))
     (if (:system/key parent-system-key)
       (-> config
-          (meta-merge {(:system/key parent-system-key) {parent-collection [system]}})
+          (meta-merge {(:system/key parent-system-key) {parent-collection {system-child-key system}}})
           (vary-meta assoc :last-ref-system {:ref/ref system-child-key
                                              :ref/parent-system-key system-key
                                              :ref/parent (:system/key parent-system-key)}))
@@ -93,7 +93,7 @@
    (ref-system config
                {:system/system-child-key entity-key
                 :system/system-key :rooij/entity
-                :system/system-config (assoc entity-config :entity/original-key entity-key)
+                :system/system-config entity-config
                 :system/system-ref :entity/ref
                 :system/parent :rooij/scene
                 :system/parent-collection :scene/entities})))
@@ -105,7 +105,7 @@
    (ref-system config
                {:system/system-child-key component-key
                 :system/system-key :rooij/component
-                :system/system-config (assoc component-config :component/original-key component-key)
+                :system/system-config component-config
                 :system/system-ref :component/ref
                 :system/parent :rooij/entity
                 :system/parent-collection :entity/components})))
@@ -117,7 +117,7 @@
    (ref-system config
                {:system/system-child-key handler-key
                 :system/system-key :rooij/handler
-                :system/system-config (assoc handler-config :handler/original-key handler-key)
+                :system/system-config handler-config
                 :system/system-ref :handler/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/handlers})))
@@ -129,7 +129,7 @@
    (ref-system config
                {:system/system-child-key ticker-key
                 :system/system-key :rooij/ticker
-                :system/system-config (assoc ticker-config :ticker/original-key ticker-key)
+                :system/system-config ticker-config
                 :system/system-ref :ticker/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/tickers})))
@@ -141,7 +141,7 @@
    (ref-system config
                {:system/system-child-key reactor-key
                 :system/system-key :rooij/reactor
-                :system/system-config (assoc reactor-config :reactor/original-key reactor-key)
+                :system/system-config reactor-config
                 :system/system-ref :reactor/ref
                 :system/parent :rooij/component
                 :system/parent-collection :component/reactors})))
@@ -154,7 +154,6 @@
                {:system/system-child-key middleware-key
                 :system/system-key :rooij/middleware
                 :system/system-config (assoc middleware-config
-                                             :middleware/original-key middleware-key
                                              :middleware/handlers handlers)
                 :system/system-ref :middleware/ref
                 :system/parent :rooij/component

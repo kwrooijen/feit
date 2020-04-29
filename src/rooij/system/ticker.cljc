@@ -1,7 +1,5 @@
 (ns rooij.system.ticker
   (:require
-   [integrant.core :as ig]
-   [meta-merge.core :refer [meta-merge]]
    [rooij.state :as state]
    [rooij.system.core :as system]
    [rooij.util :refer [top-key]]
@@ -35,15 +33,13 @@
            :remove/key ticker-key
            :event/type :remove/ticker})))
 
-(defn init [{:ticker/keys [key opts] :as ticker}]
+(defn init [{:ticker/keys [init] :as ticker}]
   (-> ticker
-      (assoc :ticker/fn (ig/init-key key opts))
-      (update :ticker/subs meta-merge (:ticker/subs opts))))
+      (assoc :ticker/fn (init ticker))))
 
 (defmethod system/init-key :rooij/ticker [k opts]
   (timbre/debug ::init-key opts)
   (assoc opts
-         :ticker/opts opts
          :ticker/key (top-key k)
          :ticker/init (system/get-init-key k)
          :ticker/fn nil))

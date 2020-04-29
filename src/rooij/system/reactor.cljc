@@ -2,8 +2,7 @@
   (:require
    [taoensso.timbre :as timbre]
    [rooij.util :refer [top-key]]
-   [rooij.system.core :as system]
-   [integrant.core :as ig]))
+   [rooij.system.core :as system]))
 
 (defmethod system/init-key :rooij/reactor [k opts]
   (timbre/debug ::init-key opts)
@@ -12,5 +11,5 @@
          :reactor/init (system/get-init-key k)
          :reactor/fn nil))
 
-(defn init [{:reactor/keys [key opts] :as reactor}]
-  (assoc reactor :reactor/fn (ig/init-key key opts)))
+(defn init [{:reactor/keys [key init] :as reactor}]
+  (assoc reactor :reactor/fn (init key reactor)))

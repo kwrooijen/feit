@@ -2,9 +2,7 @@
   (:require
    [taoensso.timbre :as timbre]
    [rooij.system.core :as system]
-   [rooij.util :refer [top-key]]
-   [rooij.state :as state]
-   [integrant.core :as ig]))
+   [rooij.state :as state]))
 
 (defn path
   ([entity-key component-key]
@@ -36,11 +34,7 @@
 
 (defmethod system/init-key :rooij/middleware [k opts]
   (timbre/debug ::init-key opts)
-  (-> opts
-      (assoc :middleware/key (top-key k)
-             :middleware/fn (ig/init-key k opts))))
+  (assoc opts :middleware/init (system/get-init-key k)))
 
-(defn init [{:middleware/keys [key opts] :as middleware}]
-  (-> middleware
-      (assoc :middleware/fn (ig/init-key key opts))
-      (update :middleware/handlers concat (:middleware/handlers opts))))
+(defn init [{:middleware/keys [key init] :as middleware}]
+  (assoc middleware :middleware/fn (init key middleware)))

@@ -1,6 +1,7 @@
 (ns rooij.system.core
   (:require
    [rooij.config]
+   [com.rpl.specter :as sp :refer [MAP-VALS]]
    [meta-merge.core :refer [meta-merge]]
    [taoensso.timbre :as timbre]
    [rooij.methods :refer [assert-schema-key]]
@@ -50,37 +51,21 @@
   (memoize
    (fn [ns]
      {:key (keyword ns "key")
-      :opts (keyword ns "opts")
       :ref (keyword ns "ref")
-      :dynamic (keyword ns "dynamic")
-      :original-key (keyword ns "original-key")})))
+      :dynamic (keyword ns "dynamic")})))
 
-(defn set-ref-dynamic-key [ref ks opts]
-  (if (or (get ref (:dynamic ks))
-          (get opts (:dynamic ks)))
-    (update ref (:key ks) make-child)
-    ref))
-
-(defn set-component-opts [ref ks opts]
-  (update ref (:opts ks) meta-merge (dissoc opts (:ref ks))))
-
-(defn merge-extra-opts [ks opts]
-  (if-let [ref (get opts (:ref ks))]
-    (-> ref
-        (set-ref-dynamic-key ks opts)
-        (set-component-opts ks opts))
-    opts))
-
-(defn update-key [ks m]
-  (if-let [original-key (get m (:original-key ks))]
-    (assoc m (:key ks) original-key)
-    m))
+(defn- merge-extra-opts [ks opts]
+  (-> opts
+      (meta-merge (get opts (:ref ks)))
+      (dissoc (:ref ks))))
 
 (defn process-refs [ref-opts ns]
-  (let [ks (process-refs-keys ns)]
-    (-> (mapv (partial merge-extra-opts ks) (remove nil? ref-opts))
-        (->> (mapv (partial update-key ks)))
-        (vec->map (:key ks)))))
+  (when ref-opts
+    (let [ks (process-refs-keys ns)]
+      (->> ref-opts
+           (sp/transform [MAP-VALS] (partial merge-extra-opts ks))
+           (map (fn [[k v]] [k (assoc v (:key ks) k)]))
+           (into {})))))
 
 (defn get-halt-key [derived-k entity-opts]
   (if-let [f (get-method ig/halt-key! (#'ig/normalize-key derived-k))]

@@ -87,9 +87,9 @@
 
 (defn ref-entity [scene entity-key opts]
   (it/derive-composite entity-key)
-  (update scene :scene/entities conj
-          (merge {:entity/ref (it/find-derived-value @state/system (bottom-key entity-key))}
-                 opts)))
+  (let [ref (it/find-derived-value @state/system (bottom-key entity-key))]
+    (assoc-in scene [:scene/entities (top-key entity-key)]
+              (merge {:entity/ref ref} opts))))
 
 (defn transition-scene
   "Transition from `scene-from` to `scene-to`. Halts `scene-from` before

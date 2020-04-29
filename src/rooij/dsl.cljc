@@ -2,6 +2,7 @@
   (:require
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
+   [integrant-tools.keyword :refer [make-child]]
    [rooij.util :refer [top-key]]
    [rooij.config]))
 
@@ -13,9 +14,9 @@
 ;;   (comp second
 ;;         current-key))
 
-(def ^:private last-added-system
-  (comp :last-added-system
-        meta))
+;; (def ^:private last-added-system
+;;   (comp :last-added-system
+;;         meta))
 
 (defn- ->composite-key [k ck]
   (if (vector? k)
@@ -43,12 +44,18 @@
       :else (throw (ex-info (str "You can only add " system-key " to " parent)
                             {:reason ::invalid-config})))))
 
+(defn get-system-child-identifier [{:system/keys [system-child-key system-config]}]
+  (if (:dynamic system-config)
+    (make-child system-child-key)
+    system-child-key))
+
 (defn- ref-system
   "Adds a reference to `system-child-key` to `parent-system-key`. Does not add
   the `system-child-key` to `config`. This is meant to reuse a premade system. If
   you want to create a new system, use `add-system` instead."
-  [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection]}]
+  [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection] :as system}]
   (let [parent-system-key (get-ref-target-key config parent system-key)
+        system-child-identifier (get-system-child-identifier system)
         system (merge system-config
                       {system-ref (ig/ref (top-key system-child-key))})]
     (when-not (keyword? system-key)
@@ -56,7 +63,7 @@
                       {:reason ::invalid-ref-system-keyword})))
     (if (:system/key parent-system-key)
       (-> config
-          (meta-merge {(:system/key parent-system-key) {parent-collection {system-child-key system}}})
+          (meta-merge {(:system/key parent-system-key) {parent-collection {system-child-identifier system}}})
           (vary-meta assoc :last-ref-system {:ref/ref system-child-key
                                              :ref/parent-system-key system-key
                                              :ref/parent (:system/key parent-system-key)}))

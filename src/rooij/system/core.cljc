@@ -54,8 +54,8 @@
       :dynamic (keyword ns "dynamic")})))
 
 (defn- merge-extra-opts [ks opts]
-  (-> opts
-      (meta-merge (get opts (:ref ks)))
+  (-> (get opts (:ref ks))
+      (meta-merge opts)
       (dissoc (:ref ks))))
 
 (defn process-refs [ref-opts ns]

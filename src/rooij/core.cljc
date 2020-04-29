@@ -4,6 +4,7 @@
    [integrant-tools.core :as it]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [integrant.core :as ig]
+   [integrant-tools.keyword :refer [make-child]]
    [rooij.config]
    [rooij.error]
    [rooij.interface.graphics-2d.core :as interface.graphics-2d]
@@ -86,9 +87,12 @@
       (->> (apply merge))))
 
 (defn ref-entity [scene entity-key opts]
-  (it/derive-composite entity-key)
-  (let [ref (it/find-derived-value @state/system (bottom-key entity-key))]
-    (assoc-in scene [:scene/entities (top-key entity-key)]
+  ;; (it/derive-composite entity-key)
+  (let [ref (it/find-derived-value @state/system (bottom-key entity-key))
+        identifier (if (:dynamic opts)
+                     (make-child (top-key entity-key))
+                     (top-key entity-key))]
+    (assoc-in scene [:scene/entities identifier]
               (merge {:entity/ref ref} opts))))
 
 (defn transition-scene

@@ -6,9 +6,8 @@
    [taoensso.timbre :as timbre]
    [rooij.methods :refer [assert-schema-key]]
    [rooij.state :as state]
-   [rooij.util :refer [derive-composite-all vec->map]]
+   [rooij.util :refer [derive-composite-all]]
    [integrant-tools.core :as it]
-   [integrant-tools.keyword :refer [make-child]]
    [integrant.core :as ig]))
 
 (it/derive-hierarchy

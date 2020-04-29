@@ -3,9 +3,6 @@
    [clojure.walk :refer [postwalk]]
    [integrant-tools.core :as it]))
 
-(defn vec->map [v k]
-  (reduce #(assoc %1 (get %2 k) %2) {} (flatten v)))
-
 (defn top-key [k]
   (if ^boolean (coll? k) (last k) k))
 

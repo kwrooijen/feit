@@ -118,26 +118,23 @@
   ([config scene]
    (assoc config :rooij/initial-scene scene)))
 
-;; (defn persistent
-;;   "Make a component persistent. When a persistent component is initialized they
-;;   will receive an extra key; `context/state`. This holds the persisted state of
-;;   the component. If no state has been persisted yet (first initialization) then
-;;   this key will be nil"
-;;   [config]
-;;   (when-not (#{:rooij/component} (first (current-key config)))
-;;     (throw (ex-info "You can only make components persistent"
-;;                     {:reason ::invalid-persistent-key})))
-;;   (update config (config-key config) assoc :component/persistent true))
+(defn persistent
+  "Make a component persistent. When a persistent component is initialized they
+  will receive an extra key; `context/state`. This holds the persisted state of
+  the component. If no state has been persisted yet (first initialization) then
+  this key will be nil"
+  [config]
+  (when-not (:component/last (meta config)) (throw "Can only make components persistent."))
+  (update-in config (:component/last (meta config)) assoc :component/persistent true))
 
-;; (defn auto-persistent
-;;   "Make a component auto-persistent. If an auto-persistent component has any
-;;   persisted state (if it has already been initiated before) then the component
-;;   will not be initiated, and instead return the persisted state immediately."
-;;   [config]
-;;   (when-not (#{:rooij/component} (first (current-key config)))
-;;     (throw (ex-info "You can only make components auto-persistent"
-;;                     {:reason ::invalid-auto-persistent-key})))
-;;   (update config (config-key config) assoc :component/auto-persistent true))
+(defn auto-persistent
+  "Make a component auto-persistent. If an auto-persistent component has any
+  persisted state (if it has already been initiated before) then the component
+  will not be initiated, and instead return the persisted state immediately."
+  [config]
+  (when-not (:component/last (meta config)) (throw "Can only make components persistent."))
+  (update-in config (:component/last (meta config)) assoc :component/auto-persistent true))
+
 
 ;; (defn position-emitter [config]
 ;;   (if-let [last-added-component (:rooij/component (last-added-system config))]

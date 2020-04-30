@@ -3,7 +3,8 @@
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
    [integrant-tools.keyword :refer [make-child]]
-   [rooij.util :refer [top-key]]
+   [integrant-tools.core :as it]
+   [rooij.util :refer [bottom-key top-key]]
    [rooij.config]))
 
 ;; (def ^:private current-key
@@ -33,7 +34,8 @@
    (-> config
        (meta-merge {(->composite-key k system-key) system-opts})
        (vary-meta assoc :last-added-system {:system/key (->composite-key k system-key)
-                                            :system/system-key system-key}))))
+                                            :system/system-key system-key})
+       (vary-meta assoc :last-system [(->composite-key k system-key)]))))
 
 (defn get-ref-target-key [config parent system-key]
   (let [system (get (meta config) :last-added-system)
@@ -49,122 +51,93 @@
     (make-child system-child-key)
     system-child-key))
 
-(defn- ref-system
-  "Adds a reference to `system-child-key` to `parent-system-key`. Does not add
-  the `system-child-key` to `config`. This is meant to reuse a premade system. If
-  you want to create a new system, use `add-system` instead."
-  [config {:system/keys [system-child-key system-key system-config system-ref parent parent-collection] :as system}]
-  (let [parent-system-key (get-ref-target-key config parent system-key)
-        system-child-identifier (get-system-child-identifier system)
-        system (merge system-config
-                      {system-ref (ig/ref (top-key system-child-key))})]
-    (when-not (keyword? system-key)
-      (throw (ex-info (str system-child-key "must be a keyword")
-                      {:reason ::invalid-ref-system-keyword})))
-    (if (:system/key parent-system-key)
-      (-> config
-          (meta-merge {(:system/key parent-system-key) {parent-collection {system-child-identifier system}}})
-          (vary-meta assoc :last-ref-system {:ref/ref system-child-key
-                                             :ref/parent-system-key system-key
-                                             :ref/parent (:system/key parent-system-key)}))
-      (do
-        (println "TODO")
-        config))))
+(defn ref-system [config system-key system-config last-parent parent-collection system-ref last-system]
+   (let [parent-path (conj (last-parent (meta config)) parent-collection)
+         component-id (top-key system-key)
+         full-path (conj parent-path component-id)
+         system-config (assoc system-config system-ref (ig/ref (bottom-key system-key)))]
+     (-> config
+         (update-in full-path meta-merge system-config)
+         (vary-meta assoc last-system full-path))))
 
 (defn scene [& args]
-  (apply system (concat args [:rooij/scene])))
+  (let [config (apply system (concat args [:rooij/scene]))]
+    (vary-meta config assoc :last-scene (-> config meta :last-system))))
 
 (defn entity [& args]
-  (apply system (concat args [:rooij/entity])))
+  (let [config (apply system (concat args [:rooij/entity]))]
+    (vary-meta config assoc :last-entity (-> config meta :last-system))))
 
 (defn component [& args]
-  (apply system (concat args [:rooij/component])))
+  (let [config (apply system (concat args [:rooij/component]))]
+    (vary-meta config assoc :last-component (-> config meta :last-system))))
 
 (defn handler [& args]
-  (apply system (concat args [:rooij/handler])))
+  (let [config (apply system (concat args [:rooij/handler]))]
+    (vary-meta config assoc :last-handler (-> config meta :last-system))))
 
 (defn reactor [& args]
-  (apply system (concat args [:rooij/reactor])))
+  (let [config (apply system (concat args [:rooij/reactor]))]
+    (vary-meta config assoc :last-reactor (-> config meta :last-system))))
 
 (defn ticker [& args]
-  (apply system (concat args [:rooij/ticker])))
+  (let [config (apply system (concat args [:rooij/ticker]))]
+    (vary-meta config assoc :last-ticker (-> config meta :last-system))))
 
 (defn middleware [& args]
-  (apply system (concat args [:rooij/middleware])))
-
+  (let [config (apply system (concat args [:rooij/middleware]))]
+    (vary-meta config assoc :last-middleware (-> config meta :last-system))))
 
 (defn ref-entity
   ([config entity-key]
    (ref-entity config entity-key {}))
   ([config entity-key entity-config]
-   (ref-system config
-               {:system/system-child-key entity-key
-                :system/system-key :rooij/entity
-                :system/system-config entity-config
-                :system/system-ref :entity/ref
-                :system/parent :rooij/scene
-                :system/parent-collection :scene/entities})))
+   (let [parent-path (conj (:last-scene (meta config)) :scene/entities)
+         entity-id (if (:dynamic entity-config)
+                     (make-child (top-key entity-key))
+                     (top-key entity-key))
+         full-path (conj parent-path entity-id)
+         entity-config (assoc entity-config :entity/ref (ig/ref (bottom-key entity-key)))]
+     (-> config
+         (update-in full-path meta-merge entity-config)
+         (vary-meta assoc :last-entity full-path)))))
 
 (defn ref-component
   ([config component-key]
    (ref-component config component-key {}))
   ([config component-key component-config]
-   (ref-system config
-               {:system/system-child-key component-key
-                :system/system-key :rooij/component
-                :system/system-config component-config
-                :system/system-ref :component/ref
-                :system/parent :rooij/entity
-                :system/parent-collection :entity/components})))
+   (when-not (:last-entity (meta config)) (throw "Can only add components to entities."))
+   (ref-system config component-key component-config :last-entity :entity/components :component/ref :last-component)))
 
 (defn ref-handler
   ([config handler-key]
    (ref-handler config handler-key {}))
   ([config handler-key handler-config]
-   (ref-system config
-               {:system/system-child-key handler-key
-                :system/system-key :rooij/handler
-                :system/system-config handler-config
-                :system/system-ref :handler/ref
-                :system/parent :rooij/component
-                :system/parent-collection :component/handlers})))
+   (when-not (:last-component (meta config)) (throw "Can only add handlers to components."))
+   (ref-system config handler-key handler-config :last-component :component/handlers :handler/ref :last-handler)))
 
 (defn ref-ticker
   ([config ticker-key]
    (ref-ticker config ticker-key {}))
   ([config ticker-key ticker-config]
-   (ref-system config
-               {:system/system-child-key ticker-key
-                :system/system-key :rooij/ticker
-                :system/system-config ticker-config
-                :system/system-ref :ticker/ref
-                :system/parent :rooij/component
-                :system/parent-collection :component/tickers})))
+   (when-not (:last-component (meta config)) (throw "Can only add tickers to components."))
+   (ref-system config ticker-key ticker-config :last-component :component/tickers :ticker/ref :last-ticker)))
 
 (defn ref-reactor
   ([config reactor-key]
    (ref-reactor config reactor-key {}))
   ([config reactor-key reactor-config]
-   (ref-system config
-               {:system/system-child-key reactor-key
-                :system/system-key :rooij/reactor
-                :system/system-config reactor-config
-                :system/system-ref :reactor/ref
-                :system/parent :rooij/component
-                :system/parent-collection :component/reactors})))
+   (when-not (:last-component (meta config)) (throw "Can only add reactors to components."))
+   (ref-system config reactor-key reactor-config :last-component :component/reactors :reactor/ref :last-reactor)))
 
 (defn ref-middleware
   ([config middleware-key handlers]
    (ref-middleware config middleware-key handlers {}))
   ([config middleware-key handlers middleware-config]
-   (ref-system config
-               {:system/system-child-key middleware-key
-                :system/system-key :rooij/middleware
-                :system/system-config (assoc middleware-config
-                                             :middleware/handlers handlers)
-                :system/system-ref :middleware/ref
-                :system/parent :rooij/component
-                :system/parent-collection :component/middlewares})))
+   (when-not (:last-component (meta config)) (throw "Can only add middlewares to components."))
+   (ref-system config middleware-key
+                 (assoc middleware-config :middleware/handlers handlers)
+                 :last-component :component/middlewares :middleware/ref :last-middleware)))
 
 (defn initial-scene
   ([config]

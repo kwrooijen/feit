@@ -3,21 +3,8 @@
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
    [integrant-tools.keyword :refer [make-child]]
-   [integrant-tools.core :as it]
    [rooij.util :refer [bottom-key top-key]]
    [rooij.config]))
-
-;; (def ^:private current-key
-;;   (comp :current-key
-;;         meta))
-
-;; (def ^:private config-key
-;;   (comp second
-;;         current-key))
-
-;; (def ^:private last-added-system
-;;   (comp :last-added-system
-;;         meta))
 
 (defn- ->composite-key [k ck]
   (if (vector? k)
@@ -31,27 +18,10 @@
      (system {} component-key--config component-key--component-opts system-key)
      (system component-key--config component-key--component-opts {} system-key)))
   ([config k system-opts system-key]
-   (-> config
-       (meta-merge {(->composite-key k system-key) system-opts})
-       (vary-meta assoc :last-added-system {:system/key (->composite-key k system-key)
-                                            :system/system-key system-key})
-       (vary-meta assoc :last-system [(->composite-key k system-key)]))))
+   (let [system-key (->composite-key k system-key)]
+     [system-key (meta-merge config {system-key system-opts})])))
 
-(defn get-ref-target-key [config parent system-key]
-  (let [system (get (meta config) :last-added-system)
-        ref (get (meta config) :last-ref-system)]
-    (cond
-      (#{parent} (:system/system-key system)) system
-      (#{parent} (:ref/parent-system-key ref)) ref
-      :else (throw (ex-info (str "You can only add " system-key " to " parent)
-                            {:reason ::invalid-config})))))
-
-(defn get-system-child-identifier [{:system/keys [system-child-key system-config]}]
-  (if (:dynamic system-config)
-    (make-child system-child-key)
-    system-child-key))
-
-(defn ref-system [config system-key system-config last-parent parent-collection system-ref last-system]
+(defn- ref-system [config system-key system-config last-parent parent-collection system-ref last-system]
    (let [parent-path (conj (last-parent (meta config)) parent-collection)
          component-id (top-key system-key)
          full-path (conj parent-path component-id)
@@ -61,32 +31,32 @@
          (vary-meta assoc last-system full-path))))
 
 (defn scene [& args]
-  (let [config (apply system (concat args [:rooij/scene]))]
-    (vary-meta config assoc :last-scene (-> config meta :last-system))))
+  (let [[k config] (apply system (concat args [:rooij/scene]))]
+    (vary-meta config assoc :last-scene [k])))
 
 (defn entity [& args]
-  (let [config (apply system (concat args [:rooij/entity]))]
-    (vary-meta config assoc :last-entity (-> config meta :last-system))))
+  (let [[k config] (apply system (concat args [:rooij/entity]))]
+    (vary-meta config assoc :last-entity [k])))
 
 (defn component [& args]
-  (let [config (apply system (concat args [:rooij/component]))]
-    (vary-meta config assoc :last-component (-> config meta :last-system))))
+  (let [[k config] (apply system (concat args [:rooij/component]))]
+    (vary-meta config assoc :last-component [k])))
 
 (defn handler [& args]
-  (let [config (apply system (concat args [:rooij/handler]))]
-    (vary-meta config assoc :last-handler (-> config meta :last-system))))
+  (let [[k config] (apply system (concat args [:rooij/handler]))]
+    (vary-meta config assoc :last-handler [k])))
 
 (defn reactor [& args]
-  (let [config (apply system (concat args [:rooij/reactor]))]
-    (vary-meta config assoc :last-reactor (-> config meta :last-system))))
+  (let [[k config] (apply system (concat args [:rooij/reactor]))]
+    (vary-meta config assoc :last-reactor [k])))
 
 (defn ticker [& args]
-  (let [config (apply system (concat args [:rooij/ticker]))]
-    (vary-meta config assoc :last-ticker (-> config meta :last-system))))
+  (let [[k config] (apply system (concat args [:rooij/ticker]))]
+    (vary-meta config assoc :last-ticker [k])))
 
 (defn middleware [& args]
-  (let [config (apply system (concat args [:rooij/middleware]))]
-    (vary-meta config assoc :last-middleware (-> config meta :last-system))))
+  (let [[k config] (apply system (concat args [:rooij/middleware]))]
+    (vary-meta config assoc :last-middleware [k])))
 
 (defn ref-entity
   ([config entity-key]
@@ -141,11 +111,10 @@
 
 (defn initial-scene
   ([config]
-   (let [{:system/keys [system-key key]} (get (meta config) :last-added-system)]
-     (if (#{:rooij/scene} system-key)
-         (initial-scene config (last key))
-         (throw (ex-info "You can only mark scenes as intial-scene"
-                         {:reason ::invalid-scene-key})))))
+   (if-let [[scene-key] (get (meta config) :last-scene)]
+     (initial-scene config (top-key scene-key))
+     (throw (ex-info "You can only mark scenes as intial-scene"
+                     {:reason ::invalid-scene-key}))))
   ([config scene]
    (assoc config :rooij/initial-scene scene)))
 

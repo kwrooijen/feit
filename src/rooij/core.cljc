@@ -70,6 +70,12 @@
           {:event/entity entity-key
            :event/handler handler-key
            :event/content content
+           :event/excludes []}))
+  ([scene-key entity-key handler-key content]
+   (swap! (state/get-scene-events scene-key) conj
+          {:event/entity entity-key
+           :event/handler handler-key
+           :event/content content
            :event/excludes []})))
 
 (defn entities

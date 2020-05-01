@@ -2,7 +2,6 @@
   (:require
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [integrant.core :as ig]
-   [rooij.system.scene :as scene]
    [rooij.state :as state]))
 
 (def ^:private event-keys
@@ -13,8 +12,16 @@
 
 (defn emit!
   "Emit a event with `content` to an `entity`'s `handler` in `scene`"
-  [{:event/keys [scene] :as event}]
-  (swap! (state/get-scene-events scene) conj (select-keys event event-keys)))
+  ([{:event/keys [scene] :as event}]
+   (swap! (state/get-scene-events scene) conj (select-keys event event-keys)))
+  ([context handler-key]
+   (emit! context handler-key {}))
+  ([{:context/keys [scene-key entity-key]} handler-key content]
+   (swap! (state/get-scene-events scene-key) conj
+          {:event/entity entity-key
+           :event/handler handler-key
+           :event/content content
+           :event/excludes []})))
 
 (defn scenes
   "Get all current running scenes as a set."

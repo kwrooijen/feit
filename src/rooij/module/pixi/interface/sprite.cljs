@@ -1,6 +1,7 @@
 (ns rooij.module.pixi.interface.sprite
   (:require
    ["pixi.js" :as PIXI]
+   [rooij.query :refer [emit!]]
    [rooij.interface.general-2d.position :refer [RooijGeneral2DPosition]]
    [rooij.interface.graphics-2d.sprite :refer [RooijGraphics2DSprite flip]]
    [rooij.module.pixi.state :as state]))
@@ -93,12 +94,27 @@
     (:spritesheet/texture opts)   (spritesheet-static-sprite opts)
     (:texture/name opts)          (texture-static-sprite opts)))
 
+(defn- add-on-click-events!
+  [sprite {:handler/keys [on-click] :as opts}]
+  (when on-click
+    (let [[handler extra-opts] on-click]
+      (set! (.-interactive sprite) true)
+      (.on sprite "mousedown"
+           (fn [event-data]
+             (->> [:context/scene-key
+                   :context/entity-key
+                   :context/component-key]
+                  (select-keys opts)
+                  (merge {:event/data event-data} extra-opts)
+                  (emit! opts handler)))))))
+
 (defn make [{:context/keys [scene-key]
              :position/keys [x y]
              flip-x :flip/x
              flip-y :flip/y
              :as opts}]
   (let [{:keys [sprite] :as state} (->sprite opts)]
+    (add-on-click-events! sprite opts)
     (set! (.-animationSpeed sprite) 0.167)
     (set! (.-x sprite) x)
     (set! (.-y sprite) y)

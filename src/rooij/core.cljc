@@ -105,3 +105,12 @@
   (swap! (state/get-scene-post-events scene-from) conj
          {:scene/key scene-from
           :event/type :scene/halt!}))
+
+(defn restart-scene
+  [scene-key]
+  (swap! (state/get-scene-post-events scene-key) conj
+         {:scene/key scene-key
+          :event/type :scene/halt!})
+  (swap! (state/get-scene-post-events scene-key) conj
+         {:scene/key scene-key
+          :event/type :scene/start!}))

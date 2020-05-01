@@ -3,17 +3,17 @@
    [rooij.system.component :as component]
    [integrant-tools.keyword :refer [ancestor?]]))
 
-(defn get-component-key [scene {:event/keys [entity handler]}]
+(defn- get-component-key [scene {:event/keys [entity handler]}]
   (get-in scene [:scene/entities entity :entity/routes handler]))
 
 (defn- get-components [scene {:event/keys [entity] :as event}]
   (->> (get-component-key scene event)
        (mapv #(get-in scene (component/path entity %)))))
 
-(defn excludable? [{:component/keys [key]} excludes]
+(defn ^boolean excludable? [{:component/keys [key]} excludes]
   (some (fn [exclude]
-          (or ^boolean (identical? key exclude)
-              ^boolean (ancestor? exclude key)))
+          (or (identical? key exclude)
+              (ancestor? exclude key)))
         excludes))
 
 (defn event->context [scene {:event/keys [entity handler content]} component]
@@ -34,7 +34,7 @@
 (defn event->contexts [scene {:event/keys [excludes] :as event}]
   (reduce
    (fn [acc component]
-     (if ^boolean (excludable? component excludes)
+     (if (excludable? component excludes)
        acc
        (conj acc (event->context scene event component))))
    []

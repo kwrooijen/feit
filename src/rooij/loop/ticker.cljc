@@ -1,13 +1,4 @@
-(ns rooij.loop.ticker
-  (:require
-   [integrant.core :as ig]))
-
-(defn- subs-states [{:scene/keys [entities]}  {:ticker/keys [subs]}]
-  (apply merge
-         {}
-         (for [[key components] subs
-               [entity-key entity-value] (ig/find-derived entities key)]
-           {entity-key (select-keys (:entity/state entity-value) components)})))
+(ns rooij.loop.ticker)
 
 (defn process [{:scene/keys [key entities] :as scene} delta time]
   (doseq [[entity-key {:entity/keys [components state] :as entity}] entities
@@ -18,6 +9,5 @@
                    :context/component-key component-key
                    :context/delta delta
                    :context/time time
-                   :context/subs (subs-states scene ticker-v)
                    :context/entity (:entity/state entity)}]
       ((:ticker/fn ticker-v) context (get state component-key)))))

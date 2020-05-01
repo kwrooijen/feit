@@ -175,7 +175,7 @@ will reduce the damage to 0.
 ``` clojure
 (defmethod ig/init-key :middleware.health/invincible [_ _opts]
   (fn middleware-health--invincible
-    [_subs event _state _entity-state]
+    [event _state _entity-state]
     (assoc event :event/damage 0)))
 
 ```

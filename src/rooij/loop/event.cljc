@@ -1,17 +1,7 @@
 (ns rooij.loop.event
   (:require
    [rooij.system.component :as component]
-   [integrant-tools.keyword :refer [ancestor?]]
-   [integrant.core :as ig]))
-
-(defn- subs-states [entities subs]
-  (apply merge
-         (for [[key components] subs
-               [derived-key opts] (ig/find-derived entities key)]
-           {derived-key (select-keys (:entity/state opts) components)})))
-
-(defn- get-subs [entity entities]
-  (subs-states entities (-> entities entity :entity/subs)))
+   [integrant-tools.keyword :refer [ancestor?]]))
 
 (defn get-component-key [scene {:event/keys [entity handler]}]
   (get-in scene [:scene/entities entity :entity/routes handler]))
@@ -39,7 +29,6 @@
      :context/old-state (get entity-state component-key)
      :context/handler (get-in component [:component/handlers handler])
      :context/handler-key handler
-     :context/subs (get-subs entity (:scene/entities scene))
      :context/event content}))
 
 (defn event->contexts [scene {:event/keys [excludes] :as event}]

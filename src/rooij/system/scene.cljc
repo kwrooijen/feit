@@ -6,7 +6,7 @@
    [taoensso.timbre :as timbre]
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [rooij.state :as state]
-   [rooij.util :refer [top-key]]
+   [rooij.util :refer [top-key resolve-all]]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [descendant?]]
    [rooij.system.keyboard :as keyboard]
@@ -49,8 +49,16 @@
                         (partial start-components scene-key))
                   opts)))
 
-(defn apply-init [scene-opts scene-key opts]
-  ((:scene/init scene-opts) scene-key (merge scene-opts opts)))
+(defn prepare-init-config [scene-key extra-opts opts]
+  (with-meta
+    {scene-key (merge extra-opts opts)}
+    {:scene/last [scene-key]}))
+
+(defn apply-init [scene-opts scene-key extra-opts]
+  (-> (prepare-init-config scene-key extra-opts scene-opts)
+      (->> ((:scene/init scene-opts) scene-key))
+      (get scene-key)
+      (resolve-all)))
 
 (defn start-keyboard [system]
   (update system :scene/keyboard #(sp/transform [MAP-VALS] keyboard/init %)))

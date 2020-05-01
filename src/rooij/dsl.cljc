@@ -101,13 +101,11 @@
    (ref-system config reactor-key reactor-config :component :reactors :reactor)))
 
 (defn ref-middleware
-  ([config middleware-key handlers]
-   (ref-middleware config middleware-key handlers {}))
-  ([config middleware-key handlers middleware-config]
+  ([config middleware-key]
+   (ref-middleware config middleware-key {}))
+  ([config middleware-key middleware-config]
    (when-not (:component/last (meta config)) (throw "Can only add middlewares to components."))
-   (ref-system config middleware-key
-                 (assoc middleware-config :middleware/handlers handlers)
-                 :component :middlewares :middleware)))
+   (ref-system config middleware-key middleware-config :component :middlewares :middleware)))
 
 (defn initial-scene
   ([config]

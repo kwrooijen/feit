@@ -1,6 +1,8 @@
 (ns rooij.util
   (:require
    [clojure.walk :refer [postwalk]]
+   [integrant.core :as ig]
+   [rooij.state :as state]
    [integrant-tools.core :as it]))
 
 (defn top-key [k]
@@ -22,3 +24,14 @@
     (doall
      (doall
       (postwalk (fn [x] (if ^boolean (map? x) (into {} (map f x)) x)) m)))))
+
+(defn resolve-ref [ref]
+  (->> ref
+       (:key)
+       (it/find-derived-value @state/system)))
+
+(defn resolve-all [m]
+  (postwalk #(if (ig/ref? %)
+               (resolve-ref %)
+               %)
+            m))

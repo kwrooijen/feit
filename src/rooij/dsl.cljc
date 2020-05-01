@@ -102,10 +102,15 @@
 
 (defn ref-middleware
   ([config middleware-key]
-   (ref-middleware config middleware-key {}))
+   (ref-middleware config middleware-key {} []))
   ([config middleware-key middleware-config]
+   (ref-middleware config middleware-key middleware-config []))
+  ([config middleware-key middleware-config handlers]
    (when-not (:component/last (meta config)) (throw "Can only add middlewares to components."))
-   (ref-system config middleware-key middleware-config :component :middlewares :middleware)))
+   (ref-system config
+               middleware-key
+               (assoc middleware-config :middleware/handlers handlers)
+               :component :middlewares :middleware)))
 
 (defn initial-scene
   ([config]
@@ -132,6 +137,16 @@
   [config]
   (when-not (:component/last (meta config)) (throw "Can only make components persistent."))
   (update-in config (:component/last (meta config)) assoc :component/auto-persistent true))
+
+(defn is-dynamic
+  [config]
+  (when-not (:entity/last (meta config)) (throw "Can only make entities dynamic."))
+  (update-in config (:component/last (meta config)) assoc :entity/dynamic true))
+
+(defn middleware-handlers
+  [config handlers]
+  (when-not (:middleware/last (meta config)) (throw "Can only add handlers to middleware."))
+  (update-in config (conj (:middleware/last (meta config)) :middleware/handlers) concat handlers))
 
 
 ;; (defn position-emitter [config]

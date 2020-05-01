@@ -80,6 +80,31 @@
        (into {})
        (sp/transform [MAP-VALS] :entity/state)))
 
+(defn- apply-query-filters [filters v]
+  (filter (fn [[_ v]]
+            (every?
+             (fn [[fk fp]]
+               (fp (get v fk)))
+             filters))
+          v))
+
+(defn query
+  "Get all component states of any enitities from `scene-key` which are derived
+  from `entity-key`"
+  ([scene-key entity-key]
+   (query scene-key entity-key []))
+  ([scene-key entity-key filters]
+   (->> (ig/find-derived (:scene/entities @(state/get-scene scene-key)) entity-key)
+        (map (fn [[k v]] [k (:entity/state v)]))
+        (apply-query-filters filters)
+        (into {}))))
+
+(defn query-keys
+  ([scene-key entity-key]
+   (query-keys scene-key entity-key []))
+  ([scene-key entity-key filters]
+   (keys (query scene-key entity-key filters))))
+
 (defn entity [scene-key entity-key]
   (-> (entities scene-key entity-key)
       (get entity-key)

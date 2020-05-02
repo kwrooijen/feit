@@ -18,7 +18,7 @@
     (state/save-component! state entity-key component-key)))
 
 (defn process [[scene {:context/keys [old-state] :as context}] ]
-  (when-not ^boolean (identical? old-state (get-in scene (path-entity-state context)))
+  (when-not (identical? old-state (get-in scene (path-entity-state context)))
     (apply-reactors! context)
     (save-component! context))
   scene)

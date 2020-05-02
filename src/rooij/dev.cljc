@@ -1,7 +1,7 @@
 (ns rooij.dev
   (:require
    [rooij.config]
-   [rooij.core :refer [scenes]]
+   [rooij.api :refer [scenes]]
    [rooij.interface.graphics-2d.core :refer [draw-wireframe]]
    [rooij.interface.physics-2d.core :refer [get-wireframe-vectors]]
    [rooij.state :as state]

@@ -1,7 +1,7 @@
 (ns rooij.module.pixi.interface.sprite
   (:require
    ["pixi.js" :as PIXI]
-   [rooij.query :refer [emit!]]
+   [rooij.api :refer [emit!]]
    [rooij.interface.general-2d.position :refer [RooijGeneral2DPosition]]
    [rooij.interface.graphics-2d.sprite :refer [RooijGraphics2DSprite flip]]
    [rooij.module.pixi.state :as state]))

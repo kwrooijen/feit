@@ -1,11 +1,10 @@
 (ns rooij.interface.graphics-2d.loader
   (:require
-   [integrant-tools.core :as it]
    [integrant.core :as ig]
    [rooij.dsl :as r]
    [rooij.config]
    [rooij.interface.graphics-2d.core :refer [make-loader]]
-   [rooij.query :refer [emit! transition-scene]]
+   [rooij.api :refer [emit! transition-scene]]
    [rooij.state :as state]))
 
 (defprotocol RooijGraphics2DLoader

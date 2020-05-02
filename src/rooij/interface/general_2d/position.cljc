@@ -1,6 +1,6 @@
 (ns rooij.interface.general-2d.position
   (:require
-   [rooij.query :refer [emit!]]
+   [rooij.api :refer [emit!]]
    [rooij.dsl :as r]
    [integrant.core :as ig]
    [rooij.config]))

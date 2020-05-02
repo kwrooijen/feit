@@ -1,4 +1,4 @@
-(ns rooij.query
+(ns rooij.api
   (:require
    [com.rpl.specter :as sp :refer [MAP-VALS]]
    [integrant.core :as ig]

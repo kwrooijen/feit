@@ -1,13 +1,14 @@
 (ns rooij.dev
   (:require
-   [rooij.config]
+   [integrant.core :as ig]
    [rooij.api :refer [scenes]]
+   [rooij.config]
+   [rooij.dsl :as r]
    [rooij.interface.graphics-2d.core :refer [draw-wireframe]]
    [rooij.interface.physics-2d.core :refer [get-wireframe-vectors]]
    [rooij.state :as state]
    [rooij.system.core :as system]
-   [rooij.system.scene :as scene]
-   [integrant.core :as ig]))
+   [rooij.system.scene :as scene]))
 
 (def config
   {[:rooij/entity :entity.rooij.dev/wireframe]
@@ -41,7 +42,10 @@
   (doseq [scene-key (scenes)]
     (scene/halt! scene-key)))
 
-(defn resume []
-  (system/start)
-  (doseq [scene-key @halted-scenes]
-    (scene/start! scene-key)))
+(defn resume
+  ([] (resume {}))
+  ([config]
+   (r/save! config)
+   (system/start)
+   (doseq [scene-key @halted-scenes]
+     (scene/start! scene-key))))

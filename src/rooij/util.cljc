@@ -11,7 +11,7 @@
 (defn bottom-key [k]
   (if ^boolean (coll? k) (first k) k))
 
-(defn derive-composite-all
+(defn derive-all-composites
   "Recursively apply `it/derive-composite` on all map keys."
   [m]
   (let [f (fn [[k v]]
@@ -21,9 +21,18 @@
                      ;; This means this key already derives from the parent
                      nil)))
             [k v])]
-    (doall
-     (doall
-      (postwalk (fn [x] (if ^boolean (map? x) (into {} (map f x)) x)) m)))))
+    (postwalk (fn [x] (if (map? x)
+                        (into {} (map f x))
+                        x))
+              m)))
+
+(defn derive-all-hierarchies [m]
+  (postwalk
+   (fn [x]
+     (when-let [hierarchy (:keyword/hierarchy x)]
+       (it/derive-hierarchy hierarchy))
+     x)
+   m))
 
 (defn resolve-ref [ref]
   (->> ref

@@ -11,6 +11,11 @@
     k
     [ck k]))
 
+(defn- add-hierarchy [config k]
+  (if (= (top-key k) (bottom-key k))
+    config
+    (update config :keyword/hierarchy meta-merge {(top-key k) [(bottom-key k)]})))
+
 (defn- system
   ([k system-key] (system {} k {} system-key))
   ([component-key--config component-key--component-opts system-key]
@@ -25,7 +30,9 @@
   (let [parent-path (conj ((keyword parent "last") (meta config)) (keyword parent collection))
         component-id (top-key system-key)
         full-path (conj parent-path component-id)
-        system-config (assoc system-config (keyword child "ref") (ig/ref (bottom-key system-key)))]
+        system-config (-> system-config
+                          (assoc (keyword child "ref") (ig/ref (bottom-key system-key)))
+                          (add-hierarchy system-key))]
     (-> config
         (update-in full-path meta-merge system-config)
         (vary-meta assoc (keyword child "last") full-path))))
@@ -67,7 +74,9 @@
                      (make-child (top-key entity-key))
                      (top-key entity-key))
          full-path (conj parent-path entity-id)
-         entity-config (assoc entity-config :entity/ref (ig/ref (bottom-key entity-key)))]
+         entity-config (-> entity-config
+                           (assoc :entity/ref (ig/ref (bottom-key entity-key)))
+                           (add-hierarchy entity-key))]
      (-> config
          (update-in full-path meta-merge entity-config)
          (vary-meta assoc :entity/last full-path)))))

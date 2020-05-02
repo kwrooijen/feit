@@ -6,7 +6,7 @@
    [taoensso.timbre :as timbre]
    [rooij.methods :refer [assert-schema-key]]
    [rooij.state :as state]
-   [rooij.util :refer [derive-composite-all]]
+   [rooij.util :refer [derive-all-composites derive-all-hierarchies]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 
@@ -38,7 +38,8 @@
   "Prepares the config system with a composite derive on all keys. This is used
   internally by rooij and should not be called directly."
   [config]
-  (derive-composite-all config)
+  (derive-all-composites config)
+  (derive-all-hierarchies config)
   (ig/prep config))
 
 (defn get-init-key [derived-k]

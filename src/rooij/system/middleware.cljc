@@ -34,7 +34,9 @@
 
 (defmethod system/init-key :rooij/middleware [k opts]
   (timbre/debug ::init-key opts)
-  (assoc opts :middleware/init (system/get-init-key k)))
+  (assoc opts
+         :middleware/init (system/get-init-key k)
+         :middleware/priority (:middleware/priority opts 0)))
 
 (defn init [{:middleware/keys [key init] :as middleware}]
   (assoc middleware :middleware/fn (init key middleware)))

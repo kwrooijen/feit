@@ -5,13 +5,13 @@
    #?(:clj [clojure.pprint :refer [pprint]]
       :cljs [cljs.pprint :refer [pprint]])))
 
-(defn format-pprint [v]
+(defn- format-pprint [v]
   (if (string? v) v (with-out-str (pprint v))))
 
-(defn pprint-middleware [data]
+(defn- pprint-middleware [data]
   (update data :vargs (partial mapv format-pprint)))
 
-(defn timbre-config [level]
+(defn- timbre-config [level]
   {:level level
    :ns-whitelist  []
    :ns-blacklist  []

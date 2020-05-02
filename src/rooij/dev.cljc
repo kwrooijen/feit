@@ -22,7 +22,6 @@
 
    [:rooij/ticker :ticker.rooij.dev/wireframe] {}})
 
-;; TODO Make this generic so we don't have to use pixi / matter
 (defmethod ig/init-key :entity.rooij.dev/wireframe [_ _opts] nil)
 
 (defmethod ig/init-key :component.rooij.dev/wireframe [_ _opts]
@@ -33,13 +32,6 @@
   (fn ticker-rooij-dev--wireframe [{:context/keys [scene-key]} _state]
     (draw-wireframe state/graphics-2d scene-key
                     (get-wireframe-vectors state/physics-2d scene-key))))
-
-(defn underive-all-from
-  "Underive all child keys starting from `k`"
-  [k]
-  (doseq [descendant (descendants k)
-          ancestor (ancestors descendant)]
-    (underive descendant ancestor)))
 
 (defonce halted-scenes (atom #{}))
 

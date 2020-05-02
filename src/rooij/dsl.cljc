@@ -112,6 +112,42 @@
                (assoc middleware-config :middleware/handlers handlers)
                :component :middlewares :middleware)))
 
+(defn del-entity [config entity-key]
+  (when-not (:scene/last (meta config)) (throw "Can only delete entities from scenes."))
+  (-> config
+      (update-in (conj (:scene/last (meta config)) :scene/ref :scene/entities) dissoc entity-key)
+      (update-in (conj (:scene/last (meta config)) :scene/entities) dissoc entity-key)))
+
+(defn del-component [config component-key]
+  (when-not (:entity/last (meta config)) (throw "Can only delete components from entities."))
+  (-> config
+      (update-in (conj (:entity/last (meta config)) :entity/ref :entity/components) dissoc component-key)
+      (update-in (conj (:entity/last (meta config)) :entity/components) dissoc component-key)))
+
+(defn del-handler [config handler-key]
+  (when-not (:component/last (meta config)) (throw "Can only delete handlers from components."))
+  (-> config
+      (update-in (conj (:component/last (meta config)) :component/ref :component/handlers) dissoc handler-key)
+      (update-in (conj (:component/last (meta config)) :component/handlers) dissoc handler-key)))
+
+(defn del-reactor [config reactor-key]
+  (when-not (:component/last (meta config)) (throw "Can only delete reactors from components."))
+  (-> config
+      (update-in (conj (:component/last (meta config)) :component/ref :component/reactors) dissoc reactor-key)
+      (update-in (conj (:component/last (meta config)) :component/reactors) dissoc reactor-key)))
+
+(defn del-ticker [config ticker-key]
+  (when-not (:component/last (meta config)) (throw "Can only delete tickers from components."))
+  (-> config
+      (update-in (conj (:component/last (meta config)) :component/ref :component/tickers) dissoc ticker-key)
+      (update-in (conj (:component/last (meta config)) :component/tickers) dissoc ticker-key)))
+
+(defn del-middleware [config middleware-key]
+  (when-not (:component/last (meta config)) (throw "Can only delete middlewares from components."))
+  (-> config
+      (update-in (conj (:component/last (meta config)) :component/ref :component/middlewares) dissoc middleware-key)
+      (update-in (conj (:component/last (meta config)) :component/middlewares) dissoc middleware-key)))
+
 (defn initial-scene
   ([config]
    (if-let [[scene-key] (get (meta config) :scene/last)]

@@ -64,8 +64,8 @@
   (condp = (:event/type event)
     :scene/start! (do (system.scene/start! (:scene/key event)) scene)
     :scene/halt! (do (system.scene/halt! (:scene/key event)) scene)
-    :remove/ticker (update-in scene (:remove/path event) dissoc (:remove/key event))
-    :remove/middleware (update-in scene (:remove/path event) dissoc (:remove/key event))))
+    :add/system (update-in scene (:add/path event) assoc (:add/key event) (:add/system event))
+    :remove/system (update-in scene (:remove/path event) dissoc (:remove/key event))))
 
 (defn post-events [{:scene/keys [key] :as scene}]
   (let [events (state/get-scene-post-events key)

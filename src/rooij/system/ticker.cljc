@@ -1,5 +1,6 @@
 (ns rooij.system.ticker
   (:require
+   [integrant-tools.core :as it]
    [rooij.state :as state]
    [rooij.system.core :as system]
    [rooij.util :refer [top-key]]
@@ -15,14 +16,20 @@
     :entity/components component-key
     :component/tickers ticker]))
 
+(defn init [{:ticker/keys [key init] :as ticker}]
+  (assoc ticker :ticker/fn (init key ticker)))
+
 (defn add!
   ([{:context/keys [scene-key entity-key component-key]} ticker]
-   (add! scene-key entity-key component-key ticker))
-  ([scene-key entity-key component-key ticker-key]
+   (add! scene-key entity-key component-key ticker {}))
+  ([{:context/keys [scene-key entity-key component-key]} ticker opts]
+   (add! scene-key entity-key component-key ticker opts))
+  ([scene-key entity-key component-key ticker-key opts]
    (swap! (state/get-scene-post-events scene-key) conj
           {:add/path (path entity-key component-key)
            :add/key ticker-key
-           :event/type :add/ticker})))
+           :add/system (init (merge (it/find-derived-value @state/system ticker-key) opts))
+           :event/type :add/system})))
 
 (defn remove!
   ([{:context/keys [scene-key entity-key component-key]} ticker]
@@ -31,11 +38,7 @@
    (swap! (state/get-scene-post-events scene-key) conj
           {:remove/path (path entity-key component-key)
            :remove/key ticker-key
-           :event/type :remove/ticker})))
-
-(defn init [{:ticker/keys [init] :as ticker}]
-  (-> ticker
-      (assoc :ticker/fn (init ticker))))
+           :event/type :remove/system})))
 
 (defmethod system/init-key :rooij/ticker [k opts]
   (timbre/debug ::init-key opts)

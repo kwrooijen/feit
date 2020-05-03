@@ -61,5 +61,5 @@
   (timbre/debug ::init-key opts)
   (assoc opts
          :ticker/key (top-key k)
-         :ticker/init (system/get-init-key k)
+         :ticker/init (system/get-init-key k {:required? true})
          :ticker/fn nil))

@@ -8,7 +8,7 @@
   (timbre/debug ::init-key opts)
   (assoc opts
          :reactor/key (top-key k)
-         :reactor/init (system/get-init-key k)
+         :reactor/init (system/get-init-key k {:required? true})
          :reactor/fn nil))
 
 (defn init [{:reactor/keys [key init] :as reactor}]

@@ -1,13 +1,10 @@
 (ns rooij.system.core
   (:require
-   [clojure.walk :refer [postwalk]]
    [rooij.config]
-   [com.rpl.specter :as sp :refer [ALL MAP-VALS MAP-KEYS]]
-   [meta-merge.core :refer [meta-merge]]
    [taoensso.timbre :as timbre]
    [rooij.methods :refer [assert-schema-key]]
    [rooij.state :as state]
-   [rooij.util :refer [derive-all-composites derive-all-hierarchies map-kv ->context]]
+   [rooij.util :refer [derive-all-composites derive-all-hierarchies]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 
@@ -43,10 +40,14 @@
   (derive-all-hierarchies config)
   (ig/prep config))
 
-(defn get-init-key [derived-k]
-  (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]
-    f
-    (fn [_ opts] opts)))
+(defn get-init-key
+  ([derived-k] (get-init-key derived-k {}))
+  ([derived-k opts]
+   (if-let [f (get-method ig/init-key (#'ig/normalize-key derived-k))]
+     f
+     (if (:required? opts)
+       (throw (ex-info (str "No ig/init-key found for key " derived-k) {:missing-key derived-k}))
+       (fn [_ opts] opts)))))
 
 (def process-refs-keys
   (memoize

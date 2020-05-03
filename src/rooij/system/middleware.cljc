@@ -9,7 +9,7 @@
 (defmethod system/init-key :rooij/middleware [k opts]
   (timbre/debug ::init-key opts)
   (assoc opts
-         :middleware/init (system/get-init-key k)
+         :middleware/init (system/get-init-key k {:required? true})
          :middleware/priority (:middleware/priority opts 0)))
 
 (def context-keys

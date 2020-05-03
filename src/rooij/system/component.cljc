@@ -51,6 +51,7 @@
           (init (reduce dissoc component init-dissocs))
           (dissoc :context/scene-key
                   :context/entity-key
+                  :context/component-key
                   :context/state)))))
 
 (defn preprocess-component [context component-key component-opts]

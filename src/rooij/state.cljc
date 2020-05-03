@@ -79,3 +79,6 @@
 
 (defn set-keyboard! [v]
   (set! keyboard v))
+
+(comment
+  (tap> @(rooij.state/get-scene :scene/battle)))

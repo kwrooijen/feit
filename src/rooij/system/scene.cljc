@@ -14,7 +14,7 @@
    [rooij.system.core :as system]
    [rooij.system.component :as component]))
 
-(defn change-keyboard-identifier
+(defn- change-keyboard-identifier
   "Regular systems identify by their integrant key. It's different for keyboard
   events because we look them up by their keycode. Use [:key/down keycode] or
   [:key/up keycode] as the identifier instead."
@@ -33,7 +33,7 @@
          :scene/init (system/get-init-key k)
          :scene/halt! (system/get-halt-key k opts)))
 
-(defn start-components [scene-key {entity-key :entity/key :as entity}]
+(defn- start-components [scene-key {entity-key :entity/key :as entity}]
   (let [context {:context/scene-key scene-key
                  :context/entity-key entity-key}]
     (sp/transform [:entity/components MAP-VALS]
@@ -41,7 +41,7 @@
                         #(component/prep % context))
                   entity)))
 
-(defn start-entities [opts scene-key]
+(defn- start-entities [opts scene-key]
   (let [context {:context/scene-key scene-key}]
     (sp/transform [:scene/entities MAP-VALS]
                   (comp entity/init
@@ -49,18 +49,18 @@
                         (partial start-components scene-key))
                   opts)))
 
-(defn prepare-init-config [scene-key extra-opts opts]
+(defn- prepare-init-config [scene-key extra-opts opts]
   (with-meta
     {scene-key (merge extra-opts opts)}
     {:scene/last [scene-key]}))
 
-(defn apply-init [scene-opts scene-key extra-opts]
+(defn- apply-init [scene-opts scene-key extra-opts]
   (-> (prepare-init-config scene-key extra-opts scene-opts)
       (->> ((:scene/init scene-opts) scene-key))
       (get scene-key)
       (resolve-all)))
 
-(defn start-keyboard [system]
+(defn- start-keyboard [system]
   (update system :scene/keyboard #(sp/transform [MAP-VALS] keyboard/init %)))
 
 (defn init [scene-key opts]
@@ -68,10 +68,8 @@
   (-> @state/system
       (it/find-derived-value scene-key)
       (apply-init scene-key opts)
-      (update :scene/entities system/process-refs :entity)
-      (update :scene/keyboard system/process-refs :keyboard)
+      (system/process-refs)
       (update :scene/keyboard change-keyboard-identifier)
-      (start-entities scene-key)
       (start-keyboard)
       (assoc :scene/key scene-key)
       (state/save-scene!)))

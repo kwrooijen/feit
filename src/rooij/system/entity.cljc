@@ -6,15 +6,15 @@
    [rooij.util :refer [top-key]]
    [integrant.core :as ig]))
 
-(defn has-handler? [handler-key component]
+(defn- has-handler? [handler-key component]
   ((set (sp/select [:component/handlers MAP-VALS :handler/key] component))
    handler-key))
 
-(defn filter-handler-components [handler-key components]
+(defn- filter-handler-components [handler-key components]
   (mapv :component/key
         (filter #(has-handler? handler-key %) components)))
 
-(defn components->nested-routes [handler-keys components]
+(defn- components->nested-routes [handler-keys components]
   (for [handler-key handler-keys]
     {handler-key (filter-handler-components handler-key components)}))
 
@@ -31,7 +31,6 @@
 (defmethod system/init-key :rooij/entity [k opts]
   (timbre/debug ::init-key opts)
   (-> opts
-      (update :entity/components system/process-refs :component)
       (assoc :entity/key (top-key k)
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))

@@ -16,6 +16,7 @@
    [rooij.system.reactor]
    [rooij.system.scene :as scene]
    [rooij.system.ticker]
+   [rooij.spec]
    [taoensso.timbre :as timbre]))
 
 (set! *print-meta* true)

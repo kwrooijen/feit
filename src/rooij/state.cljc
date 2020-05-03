@@ -17,6 +17,8 @@
 
 (defonce ^:dynamic keyboard nil)
 
+;; TODO Maybe make scenes volatile!, that might be a critital performance boost
+;; since we update the scene atom after every message.
 (defonce ^:private scenes (atom {}))
 
 (defonce ^:private events (atom {}))
@@ -81,4 +83,5 @@
   (set! keyboard v))
 
 (comment
-  (tap> @(rooij.state/get-scene :scene/battle)))
+  (tap> @(rooij.state/get-scene :scene/battle))
+  (tap> @(rooij.state/get-scene :scene/loading)))

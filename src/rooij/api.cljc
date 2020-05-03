@@ -49,10 +49,10 @@
        (sp/transform [MAP-VALS] :entity/state)))
 
 (defn- apply-query-filters [filters v]
-  (filter (fn [[_ v]]
+  (filter (fn [[_ state]]
             (every?
              (fn [[fk fp]]
-               (fp (get v fk)))
+               (fp (get state fk)))
              filters))
           v))
 

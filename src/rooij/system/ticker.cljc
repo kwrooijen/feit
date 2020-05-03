@@ -1,10 +1,15 @@
 (ns rooij.system.ticker
-  (:require
-   [integrant-tools.core :as it]
-   [rooij.state :as state]
-   [rooij.system.core :as system]
-   [rooij.util :refer [top-key]]
-   [taoensso.timbre :as timbre]))
+  (:require [integrant-tools.core :as it]
+            [meta-merge.core :refer [meta-merge]]
+            [rooij.state :as state]
+            [rooij.system.core :as system]
+            [rooij.util :refer [->context map-kv top-key]]
+            [taoensso.timbre :as timbre]))
+
+(def context-keys
+  [:context/scene-key
+   :context/entity-key
+   :context/component-key])
 
 (defn path
   ([entity-key component-key]
@@ -16,8 +21,16 @@
     :entity/components component-key
     :component/tickers ticker]))
 
-(defn init [{:ticker/keys [key init] :as ticker}]
-  (assoc ticker :ticker/fn (init key ticker)))
+(defn preprocess-ticker [context ticker-key ticker-opts]
+  (-> ticker-opts
+      (->> (meta-merge (:ticker/ref ticker-opts)))
+      (dissoc :ticker/ref)
+      (merge (select-keys context context-keys))
+      (assoc :ticker/key ticker-key)
+      (as-> $ (assoc $ :ticker/fn ((:ticker/init $) ticker-key $)))))
+
+(defn preprocess-tickers [scene-key entity-key component-key ticker]
+  (map-kv #(preprocess-ticker (->context scene-key entity-key component-key) %1 %2) ticker))
 
 (defn add!
   ([{:context/keys [scene-key entity-key component-key]} ticker]
@@ -28,7 +41,11 @@
    (swap! (state/get-scene-post-events scene-key) conj
           {:add/path (path entity-key component-key)
            :add/key ticker-key
-           :add/system (init (merge (it/find-derived-value @state/system ticker-key) opts))
+           :add/system (-> opts
+                           (assoc :ticker/ref (it/find-derived-value @state/system ticker-key))
+                           (->> (preprocess-ticker
+                                 (->context scene-key entity-key component-key)
+                                 ticker-key)))
            :event/type :add/system})))
 
 (defn remove!

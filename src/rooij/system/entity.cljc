@@ -1,10 +1,11 @@
 (ns rooij.system.entity
-  (:require
-   [taoensso.timbre :as timbre]
-   [com.rpl.specter :as sp :refer [MAP-VALS MAP-KEYS ALL]]
-   [rooij.system.core :as system]
-   [rooij.util :refer [top-key]]
-   [integrant.core :as ig]))
+  (:require [com.rpl.specter :as sp :refer [ALL MAP-KEYS MAP-VALS]]
+            [integrant.core :as ig]
+            [meta-merge.core :refer [meta-merge]]
+            [rooij.system.component :refer [preprocess-components]]
+            [rooij.system.core :as system]
+            [rooij.util :refer [->context map-kv top-key]]
+            [taoensso.timbre :as timbre]))
 
 (defn- has-handler? [handler-key component]
   ((set (sp/select [:component/handlers MAP-VALS :handler/key] component))
@@ -18,7 +19,7 @@
   (for [handler-key handler-keys]
     {handler-key (filter-handler-components handler-key components)}))
 
-(defn routes [entity]
+(defn- routes [entity]
   (let [components (sp/select [:entity/components MAP-VALS] entity)
         handler-keys (sp/select [ALL :component/handlers MAP-KEYS] components)]
     (->> components
@@ -28,27 +29,34 @@
 (defn add-routes [entity] []
   (assoc entity :entity/routes (routes entity)))
 
+(defn- entity-component-state [{:entity/keys [components]}]
+  (sp/transform [MAP-VALS] :component/state components))
+
+(defn preprocess-entity [context entity-key entity-opts]
+  (-> entity-opts
+      (->> (meta-merge (:entity/ref entity-opts)))
+      (dissoc :entity/ref)
+      (merge context)
+      (assoc :entity/key entity-key)))
+
+(defn preprocess-entities [scene-key entities]
+  (map-kv #(preprocess-entity (->context scene-key %1) %1 %2) entities))
+
+(defn postprocess-entity [entity]
+  (-> entity
+      add-routes
+      (assoc :entity/state (entity-component-state entity))
+      (->> ((:entity/init entity) (:entity/key entity)))))
+
+(defn process-refs-entity [{:context/keys [scene-key entity-key] :as opts}]
+  (update opts :entity/components (partial preprocess-components scene-key entity-key)))
+
 (defmethod system/init-key :rooij/entity [k opts]
   (timbre/debug ::init-key opts)
   (-> opts
       (assoc :entity/key (top-key k)
              :entity/init (system/get-init-key k)
              :entity/halt! (system/get-halt-key k opts))))
-
-(defn- entity-component-state [{:entity/keys [components]}]
-  (sp/transform [MAP-VALS] :component/state components))
-
-;; TODO Create prep function (like component)
-(defn init [{entity-key :entity/key
-             scene-key :context/scene-key
-             :as entity}]
-  (timbre/debug ::start entity)
-  (-> entity
-      (assoc :context/scene-key scene-key
-             :context/entity-key entity-key
-             :entity/state (entity-component-state entity))
-      (->> ((:entity/init entity) entity-key))
-      (add-routes)))
 
 (defn halt! [{:entity/keys [components] :as entity}]
   ;; TODO remove dynamic entity

@@ -1,13 +1,13 @@
 (ns rooij.system.component
-  (:require
-   [com.rpl.specter :as sp :refer [MAP-VALS]]
-   [rooij.system.ticker :as ticker]
-   [rooij.system.handler :as handler]
-   [rooij.system.reactor :as reactor]
-   [rooij.system.middleware :as middleware]
-   [rooij.state :as state]
-   [rooij.system.core :as system]
-   [taoensso.timbre :as timbre]))
+  (:require [meta-merge.core :refer [meta-merge]]
+            [rooij.state :as state]
+            [rooij.system.core :as system]
+            [rooij.system.handler :as handler :refer [preprocess-handlers]]
+            [rooij.system.middleware :as middleware :refer [preprocess-middlewares]]
+            [rooij.system.reactor :as reactor :refer [preprocess-reactors]]
+            [rooij.system.ticker :as ticker :refer [preprocess-tickers]]
+            [rooij.util :refer [->context map-kv]]
+            [taoensso.timbre :as timbre]))
 
 (def init-dissocs
   [:component/init
@@ -27,7 +27,7 @@
    [:scene/entities entity
     :entity/components component]))
 
-(defn save-persistent-component!
+(defn- save-persistent-component!
   [{:component/keys [key state persistent auto-persistent]
     :context/keys [entity-key] :as component}]
   (when (or persistent auto-persistent)
@@ -53,17 +53,22 @@
                   :context/entity-key
                   :context/state)))))
 
-(defn init
-  [{:component/keys [key] :as component}]
-  (timbre/debug [::start key] component)
-  (-> component
-      (assoc :component/state (get-init-state component))
+(defn preprocess-component [context component-key component-opts]
+  (-> component-opts
+      (->> (meta-merge (:component/ref component-opts)))
+      (dissoc :component/ref)
+      (merge context)
+      (assoc :component/key component-key)
+      (as-> $ (assoc $ :component/state (get-init-state $)))
       (save-persistent-component!)))
 
-(defn prep [component context]
-  (-> component
-      (merge context)
-      (update :component/tickers  #(sp/transform [MAP-VALS] ticker/init %))
-      (update :component/handlers #(sp/transform [MAP-VALS] handler/init %))
-      (update :component/reactors #(sp/transform [MAP-VALS] reactor/init %))
-      (update :component/middlewares #(sp/transform [MAP-VALS] middleware/init %))))
+
+(defn preprocess-components [scene-key entity-key components]
+  (map-kv #(preprocess-component (->context scene-key entity-key %1) %1 %2) components))
+
+(defn process-refs-component [{:context/keys [scene-key entity-key component-key] :as opts}]
+  (-> opts
+      (update :component/handlers (partial preprocess-handlers scene-key entity-key component-key))
+      (update :component/tickers (partial preprocess-tickers scene-key entity-key component-key))
+      (update :component/reactors (partial preprocess-reactors scene-key entity-key component-key))
+      (update :component/middlewares (partial preprocess-middlewares scene-key entity-key component-key))))

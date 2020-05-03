@@ -31,7 +31,7 @@
 (defn- threshold-reached [scene-key]
   ;; TODO add debugging info
   (timbre/error ::threshold-reached scene-key {})
-  ::threshold-reached)
+  (throw (ex-info (str "Event threshold reached" scene-key) {:error ::threshold-reached})))
 
 (defn- process-keyboard-events [{:keys [scene/key] :as scene}]
   (let [keyboard-events @(state/get-input-events key)
@@ -44,21 +44,20 @@
       (loop.keyboard/process context {:input-event/key keyboard-down-key
                                       :input-event/type :key/while-down}))))
 
-(defn run-scene [{:keys [scene/key] :as scene} delta time]
-  (let [events (state/get-scene-events key)]
+(defn run-scene [scene-atom delta time]
+  (let [{scene-key :scene/key :as scene} @scene-atom
+        events (state/get-scene-events scene-key)]
     (process-keyboard-events scene)
     (loop.ticker/process scene delta time)
-    (loop [scene scene
-           todo-events @events
+    (loop [todo-events @events
            threshold 30]
-      (if (zero? threshold)
-        (threshold-reached key)
-        (do
-          (reset! events [])
-          (let [new-scene (reduce apply-event scene todo-events)]
-            (if ^boolean (empty? @events)
-              new-scene
-              (recur new-scene @events (dec threshold)))))))))
+      (when (zero? threshold)
+        (threshold-reached scene-key))
+      (reset! events [])
+      (doseq [event todo-events]
+        (swap! scene-atom (fn [scene] (apply-event scene event))))
+      (when-not ^boolean (empty? @events)
+        (recur @events (dec threshold))))))
 
 (defn handle-post-event [scene event]
   (condp = (:event/type event)
@@ -81,7 +80,7 @@
 (defn run-scenes [delta time]
   (doseq [scene-key (keys (state/get-scenes))]
     (interface.physics-2d/step state/physics-2d scene-key delta)
-    (swap! (get-scene scene-key) run-scene delta time)
+    (run-scene (get-scene scene-key) delta time)
     (debug-draw-wireframe scene-key)
     (interface.graphics-2d/step state/graphics-2d scene-key)
     (swap! (get-scene scene-key) post-events)))

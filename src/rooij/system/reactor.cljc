@@ -14,7 +14,6 @@
 (defn init [{:reactor/keys [key init] :as reactor}]
   (assoc reactor :reactor/fn (init key reactor)))
 
-
 (defn preprocess-reactor [context reactor-key reactor-opts]
   (-> reactor-opts
       (->> (meta-merge (:reactor/ref reactor-opts)))

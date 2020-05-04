@@ -38,7 +38,6 @@
 (defn preprocess-middlewares [scene-key entity-key component-key middleware]
   (map-kv #(preprocess-middleware (->context scene-key entity-key component-key) %1 %2) middleware))
 
-
 (defn add!
   ([{:context/keys [scene-key entity-key component-key]} middleware]
    (add! scene-key entity-key component-key middleware {}))

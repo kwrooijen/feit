@@ -49,11 +49,6 @@
        (throw (ex-info (str "No ig/init-key found for key " derived-k) {:missing-key derived-k}))
        (fn [_ opts] opts)))))
 
-(def process-refs-keys
-  (memoize
-   (fn [ns]
-     {:key (keyword ns "key")})))
-
 (defn get-halt-key [derived-k entity-opts]
   (if-let [f (get-method ig/halt-key! (#'ig/normalize-key derived-k))]
     (or (f derived-k entity-opts)

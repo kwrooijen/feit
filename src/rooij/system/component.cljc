@@ -63,7 +63,6 @@
       (as-> $ (assoc $ :component/state (get-init-state $)))
       (save-persistent-component!)))
 
-
 (defn preprocess-components [scene-key entity-key components]
   (map-kv #(preprocess-component (->context scene-key entity-key %1) %1 %2) components))
 

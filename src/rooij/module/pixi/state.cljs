@@ -18,6 +18,8 @@
 
 (defonce loader (.-shared PIXI/Loader))
 
+(defonce scale (atom 1))
+
 (def ^:dynamic renderer #js {})
 
 (defn set-renderer! [opts]

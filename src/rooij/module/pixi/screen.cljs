@@ -6,10 +6,13 @@
   (min (/ (.-innerWidth js/window) scale-x)
        (/ (.-innerHeight js/window) scale-y)))
 
-(defn- get-x-y [{:graphics-2d.window/keys [scale-x scale-y] :as opts}]
+(defn- update-scale [opts]
+  (reset! state/scale (scale opts)))
+
+(defn- get-x-y [{:graphics-2d.window/keys [scale-x scale-y]}]
   (if (and scale-x scale-y)
-    [(* scale-x (scale opts))
-     (* scale-y (scale opts))]
+    [(* scale-x @state/scale)
+     (* scale-y @state/scale)]
     [(.-innerWidth js/window)
      (.-innerHeight js/window)]))
 
@@ -22,11 +25,17 @@
      (/ (.-width view) 2)))
 
 (defn- center-canvas-handler [view]
-  (if (> (.-width view) (.-height view))
+  (if (> (/ (.-innerWidth js/window) (.-width view))
+         (/ (.-innerHeight js/window) (.-height view)))
+    (do (set! (.. view -style -left) (str (get-width view) "px"))
+        (set! (.. view -style -top) "0px"))
     (do (set! (.. view -style -top) (str (get-height view) "px"))
-        (set! (.. view -style -left) "0px"))
-    (do (set! (.. view -style -left)(str (get-width view) "px"))
-        (set! (.. view -style -top) "0px"))))
+        (set! (.. view -style -left) "0px"))))
+
+(defn update-scene-scale []
+  (doseq [[_scene-key scene] @state/scenes]
+    (.. scene -scale (set @state/scale
+                          @state/scale))))
 
 (defn- resize-handler
   [{:graphics-2d.window/keys [view center-canvas?]
@@ -42,9 +51,13 @@
     :as opts
     :or {view "game" on-resize (fn [_])}}]
   (js/setTimeout
-   (comp #(on-resize (js/document.getElementById view))
-         #(resize-handler opts))
+   (comp #(on-resize (js/document.getElementById view) @state/scale)
+         #(resize-handler opts)
+         #(update-scene-scale)
+         #(update-scale opts))
    100)
   (.addEventListener js/window "resize"
-                     (comp #(on-resize (js/document.getElementById view))
-                           #(resize-handler opts))))
+                     (comp #(on-resize (js/document.getElementById view) @state/scale)
+                           #(resize-handler opts)
+                           #(update-scene-scale)
+                           #(update-scale opts))))

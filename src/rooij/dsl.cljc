@@ -6,25 +6,10 @@
    [rooij.util :refer [bottom-key top-key]]
    [rooij.config]))
 
-(defn- ->composite-key [k ck]
-  (if (vector? k)
-    k
-    [ck k]))
-
 (defn- add-hierarchy [config k]
   (if (= (top-key k) (bottom-key k))
     config
     (update config :keyword/hierarchy meta-merge {(top-key k) [(bottom-key k)]})))
-
-(defn- system
-  ([k system-key] (system {} k {} system-key))
-  ([component-key--config component-key--component-opts system-key]
-   (if (or (keyword? component-key--config) (vector? component-key--config))
-     (system {} component-key--config component-key--component-opts system-key)
-     (system component-key--config component-key--component-opts {} system-key)))
-  ([config k system-opts system-key]
-   (let [system-key (->composite-key k system-key)]
-     [system-key (meta-merge config {system-key system-opts})])))
 
 (defn- ref-system [config system-key system-config parent collection child]
   (let [parent-path (conj ((keyword parent "last") (meta config)) (keyword parent collection))
@@ -37,33 +22,82 @@
         (update-in full-path meta-merge system-config)
         (vary-meta assoc (keyword child "last") full-path))))
 
-(defn scene [& args]
-  (let [[k config] (apply system (concat args [:rooij/scene]))]
-    (vary-meta config assoc :scene/last [k])))
+(defn scene
+  ([scene-key]
+   (scene {} scene-key {}))
+  ([config scene-key]
+   (scene config scene-key {}))
+  ([config scene-key scene-opts]
+   {:pre [(qualified-keyword? scene-key)]}
+   (-> config
+       (meta-merge {[:rooij/scene scene-key] scene-opts})
+       (vary-meta assoc :scene/last [[:rooij/scene scene-key]]))))
 
-(defn entity [& args]
-  (let [[k config] (apply system (concat args [:rooij/entity]))]
-    (vary-meta config assoc :entity/last [k])))
+(defn entity
+  ([entity-key]
+   (entity {} entity-key {}))
+  ([config entity-key]
+   (entity config entity-key {}))
+  ([config entity-key entity-opts]
+   {:pre [(qualified-keyword? entity-key)]}
+   (-> config
+       (meta-merge {[:rooij/entity entity-key] entity-opts})
+       (vary-meta assoc :entity/last [[:rooij/entity entity-key]]))))
 
-(defn component [& args]
-  (let [[k config] (apply system (concat args [:rooij/component]))]
-    (vary-meta config assoc :component/last [k])))
+(defn component
+  ([component-key]
+   (component {} component-key {}))
+  ([config component-key]
+   (component config component-key {}))
+  ([config component-key component-opts]
+   {:pre [(qualified-keyword? component-key)]}
+   (-> config
+       (meta-merge {[:rooij/component component-key] component-opts})
+       (vary-meta assoc :component/last [[:rooij/component component-key]]))))
 
-(defn handler [& args]
-  (let [[k config] (apply system (concat args [:rooij/handler]))]
-    (vary-meta config assoc :handler/last [k])))
+(defn handler
+  ([handler-key]
+   (handler {} handler-key {}))
+  ([config handler-key]
+   (handler config handler-key {}))
+  ([config handler-key handler-opts]
+   {:pre [(qualified-keyword? handler-key)]}
+   (-> config
+       (meta-merge {[:rooij/handler handler-key] handler-opts})
+       (vary-meta assoc :handler/last [[:rooij/handler handler-key]]))))
 
-(defn reactor [& args]
-  (let [[k config] (apply system (concat args [:rooij/reactor]))]
-    (vary-meta config assoc :reactor/last [k])))
+(defn ticker
+  ([ticker-key]
+   (ticker {} ticker-key {}))
+  ([config ticker-key]
+   (ticker config ticker-key {}))
+  ([config ticker-key ticker-opts]
+   {:pre [(qualified-keyword? ticker-key)]}
+   (-> config
+       (meta-merge {[:rooij/ticker ticker-key] ticker-opts})
+       (vary-meta assoc :ticker/last [[:rooij/ticker ticker-key]]))))
 
-(defn ticker [& args]
-  (let [[k config] (apply system (concat args [:rooij/ticker]))]
-    (vary-meta config assoc :ticker/last [k])))
+(defn reactor
+  ([reactor-key]
+   (reactor {} reactor-key {}))
+  ([config reactor-key]
+   (reactor config reactor-key {}))
+  ([config reactor-key reactor-opts]
+   {:pre [(qualified-keyword? reactor-key)]}
+   (-> config
+       (meta-merge {[:rooij/reactor reactor-key] reactor-opts})
+       (vary-meta assoc :reactor/last [[:rooij/reactor reactor-key]]))))
 
-(defn middleware [& args]
-  (let [[k config] (apply system (concat args [:rooij/middleware]))]
-    (vary-meta config assoc :middleware/last [k])))
+(defn middleware
+  ([middleware-key]
+   (middleware {} middleware-key {}))
+  ([config middleware-key]
+   (middleware config middleware-key {}))
+  ([config middleware-key middleware-opts]
+   {:pre [(qualified-keyword? middleware-key)]}
+   (-> config
+       (meta-merge {[:rooij/middleware middleware-key] middleware-opts})
+       (vary-meta assoc :middleware/last [[:rooij/middleware middleware-key]]))))
 
 (defn ref-entity
   ([config entity-key]
@@ -120,6 +154,54 @@
                middleware-key
                (assoc middleware-config :middleware/handlers handlers)
                :component :middlewares :middleware)))
+
+(defn entity+ref
+  ([config entity-key]
+   (entity+ref config entity-key {}))
+  ([config entity-key entity-config]
+   (-> config
+       (entity entity-key entity-config)
+       (ref-entity entity-key))))
+
+(defn component+ref
+  ([config component-key]
+   (component+ref config component-key {}))
+  ([config component-key component-config]
+   (-> config
+       (component component-key component-config)
+       (ref-component component-key))))
+
+(defn handler+ref
+  ([config handler-key]
+   (handler+ref config handler-key {}))
+  ([config handler-key handler-config]
+   (-> config
+       (handler handler-key handler-config)
+       (ref-handler handler-key))))
+
+(defn ticker+ref
+  ([config ticker-key]
+   (ticker+ref config ticker-key {}))
+  ([config ticker-key ticker-config]
+   (-> config
+       (ticker ticker-key ticker-config)
+       (ref-ticker ticker-key))))
+
+(defn reactor+ref
+  ([config reactor-key]
+   (reactor+ref config reactor-key {}))
+  ([config reactor-key reactor-config]
+   (-> config
+       (reactor reactor-key reactor-config)
+       (ref-reactor reactor-key))))
+
+(defn middleware+ref
+  ([config middleware-key]
+   (middleware+ref config middleware-key {}))
+  ([config middleware-key middleware-config]
+   (-> config
+       (middleware middleware-key middleware-config)
+       (ref-middleware middleware-key))))
 
 (defn del-entity [config entity-key]
   (when-not (:scene/last (meta config)) (throw "Can only delete entities from scenes."))

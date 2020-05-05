@@ -25,8 +25,10 @@
 (defn scene
   ([scene-key]
    (scene {} scene-key {}))
-  ([config scene-key]
-   (scene config scene-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (scene key-or-config key-or-opts {})
+     (scene {} key-or-config key-or-opts)))
   ([config scene-key scene-opts]
    {:pre [(qualified-keyword? scene-key)]}
    (-> config
@@ -36,8 +38,10 @@
 (defn entity
   ([entity-key]
    (entity {} entity-key {}))
-  ([config entity-key]
-   (entity config entity-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (entity key-or-config key-or-opts {})
+     (entity {} key-or-config key-or-opts)))
   ([config entity-key entity-opts]
    {:pre [(qualified-keyword? entity-key)]}
    (-> config
@@ -47,8 +51,10 @@
 (defn component
   ([component-key]
    (component {} component-key {}))
-  ([config component-key]
-   (component config component-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (component key-or-config key-or-opts {})
+     (component {} key-or-config key-or-opts)))
   ([config component-key component-opts]
    {:pre [(qualified-keyword? component-key)]}
    (-> config
@@ -58,8 +64,10 @@
 (defn handler
   ([handler-key]
    (handler {} handler-key {}))
-  ([config handler-key]
-   (handler config handler-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (handler key-or-config key-or-opts {})
+     (handler {} key-or-config key-or-opts)))
   ([config handler-key handler-opts]
    {:pre [(qualified-keyword? handler-key)]}
    (-> config
@@ -69,8 +77,10 @@
 (defn ticker
   ([ticker-key]
    (ticker {} ticker-key {}))
-  ([config ticker-key]
-   (ticker config ticker-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (ticker key-or-config key-or-opts {})
+     (ticker {} key-or-config key-or-opts)))
   ([config ticker-key ticker-opts]
    {:pre [(qualified-keyword? ticker-key)]}
    (-> config
@@ -80,8 +90,10 @@
 (defn reactor
   ([reactor-key]
    (reactor {} reactor-key {}))
-  ([config reactor-key]
-   (reactor config reactor-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (reactor key-or-config key-or-opts {})
+     (reactor {} key-or-config key-or-opts)))
   ([config reactor-key reactor-opts]
    {:pre [(qualified-keyword? reactor-key)]}
    (-> config
@@ -91,8 +103,10 @@
 (defn middleware
   ([middleware-key]
    (middleware {} middleware-key {}))
-  ([config middleware-key]
-   (middleware config middleware-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (middleware key-or-config key-or-opts {})
+     (middleware {} key-or-config key-or-opts)))
   ([config middleware-key middleware-opts]
    {:pre [(qualified-keyword? middleware-key)]}
    (-> config
@@ -197,11 +211,13 @@
 
 (defn middleware+ref
   ([config middleware-key]
-   (middleware+ref config middleware-key {}))
+   (middleware+ref config middleware-key {} []))
   ([config middleware-key middleware-config]
+   (middleware+ref config middleware-key middleware-config []))
+  ([config middleware-key middleware-config handlers]
    (-> config
        (middleware middleware-key middleware-config)
-       (ref-middleware middleware-key))))
+       (ref-middleware middleware-key middleware-config handlers))))
 
 (defn del-entity [config entity-key]
   (when-not (:scene/last (meta config)) (throw "Can only delete entities from scenes."))

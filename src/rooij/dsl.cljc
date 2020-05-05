@@ -6,6 +6,27 @@
    [rooij.util :refer [bottom-key top-key]]
    [rooij.config]))
 
+(defn error-map [system-key config system-config]
+  {::system-key system-key
+   ::config config
+   ::system-config system-config})
+
+(defn valid-system-key? [system-key]
+  (or (qualified-keyword? system-key)
+      (vector? system-key)))
+
+(defn error-msg-system-key [system-key]
+  (str "Error trying to add reference.\n"
+       "Invalid system-key: " system-key "\n\n"
+       "Should be a qualified-keyword or a vector of qualified keywords"))
+
+(defn- ref-system-pre [config system-key system-config]
+  (let [context (error-map config system-key system-config)]
+    (cond
+      (not (valid-system-key? system-key))
+      (throw (ex-info (error-msg-system-key system-key) context))
+      :else true)))
+
 (defn- add-hierarchy [config k]
   (if (= (top-key k) (bottom-key k))
     config
@@ -117,6 +138,7 @@
   ([config entity-key]
    (ref-entity config entity-key {}))
   ([config entity-key entity-opts]
+   {:pre [(qualified-keyword? entity-key)]}
    (let [parent-path (conj (:scene/last (meta config)) :scene/entities)
          entity-id (if (:dynamic entity-opts)
                      (make-child (top-key entity-key))
@@ -133,6 +155,7 @@
   ([config component-key]
    (ref-component config component-key {}))
   ([config component-key component-opts]
+   {:pre [(ref-system-pre config component-key component-opts)]}
    (when-not (:entity/last (meta config)) (throw "Can only add components to entities."))
    (ref-system config component-key component-opts :entity :components :component)))
 
@@ -140,6 +163,7 @@
   ([config handler-key]
    (ref-handler config handler-key {}))
   ([config handler-key handler-opts]
+   {:pre [(ref-system-pre config handler-key handler-opts)]}
    (when-not (:component/last (meta config)) (throw "Can only add handlers to components."))
    (ref-system config handler-key handler-opts :component :handlers :handler)))
 
@@ -147,6 +171,7 @@
   ([config ticker-key]
    (ref-ticker config ticker-key {}))
   ([config ticker-key ticker-opts]
+   {:pre [(ref-system-pre config ticker-key ticker-opts)]}
    (when-not (:component/last (meta config)) (throw "Can only add tickers to components."))
    (ref-system config ticker-key ticker-opts :component :tickers :ticker)))
 
@@ -154,6 +179,7 @@
   ([config reactor-key]
    (ref-reactor config reactor-key {}))
   ([config reactor-key reactor-opts]
+   {:pre [(ref-system-pre config reactor-key reactor-opts)]}
    (when-not (:component/last (meta config)) (throw "Can only add reactors to components."))
    (ref-system config reactor-key reactor-opts :component :reactors :reactor)))
 
@@ -163,6 +189,7 @@
   ([config middleware-key middleware-opts]
    (ref-middleware config middleware-key middleware-opts []))
   ([config middleware-key middleware-opts handlers]
+   {:pre [(ref-system-pre config middleware-key middleware-opts)]}
    (when-not (:component/last (meta config)) (throw "Can only add middlewares to components."))
    (ref-system config
                middleware-key

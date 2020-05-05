@@ -116,108 +116,108 @@
 (defn ref-entity
   ([config entity-key]
    (ref-entity config entity-key {}))
-  ([config entity-key entity-config]
+  ([config entity-key entity-opts]
    (let [parent-path (conj (:scene/last (meta config)) :scene/entities)
-         entity-id (if (:dynamic entity-config)
+         entity-id (if (:dynamic entity-opts)
                      (make-child (top-key entity-key))
                      (top-key entity-key))
          full-path (conj parent-path entity-id)
-         entity-config (-> entity-config
+         entity-opts (-> entity-opts
                            (assoc :entity/ref (ig/ref (bottom-key entity-key)))
                            (add-hierarchy entity-key))]
      (-> config
-         (update-in full-path meta-merge entity-config)
+         (update-in full-path meta-merge entity-opts)
          (vary-meta assoc :entity/last full-path)))))
 
 (defn ref-component
   ([config component-key]
    (ref-component config component-key {}))
-  ([config component-key component-config]
+  ([config component-key component-opts]
    (when-not (:entity/last (meta config)) (throw "Can only add components to entities."))
-   (ref-system config component-key component-config :entity :components :component)))
+   (ref-system config component-key component-opts :entity :components :component)))
 
 (defn ref-handler
   ([config handler-key]
    (ref-handler config handler-key {}))
-  ([config handler-key handler-config]
+  ([config handler-key handler-opts]
    (when-not (:component/last (meta config)) (throw "Can only add handlers to components."))
-   (ref-system config handler-key handler-config :component :handlers :handler)))
+   (ref-system config handler-key handler-opts :component :handlers :handler)))
 
 (defn ref-ticker
   ([config ticker-key]
    (ref-ticker config ticker-key {}))
-  ([config ticker-key ticker-config]
+  ([config ticker-key ticker-opts]
    (when-not (:component/last (meta config)) (throw "Can only add tickers to components."))
-   (ref-system config ticker-key ticker-config :component :tickers :ticker)))
+   (ref-system config ticker-key ticker-opts :component :tickers :ticker)))
 
 (defn ref-reactor
   ([config reactor-key]
    (ref-reactor config reactor-key {}))
-  ([config reactor-key reactor-config]
+  ([config reactor-key reactor-opts]
    (when-not (:component/last (meta config)) (throw "Can only add reactors to components."))
-   (ref-system config reactor-key reactor-config :component :reactors :reactor)))
+   (ref-system config reactor-key reactor-opts :component :reactors :reactor)))
 
 (defn ref-middleware
   ([config middleware-key]
    (ref-middleware config middleware-key {} []))
-  ([config middleware-key middleware-config]
-   (ref-middleware config middleware-key middleware-config []))
-  ([config middleware-key middleware-config handlers]
+  ([config middleware-key middleware-opts]
+   (ref-middleware config middleware-key middleware-opts []))
+  ([config middleware-key middleware-opts handlers]
    (when-not (:component/last (meta config)) (throw "Can only add middlewares to components."))
    (ref-system config
                middleware-key
-               (assoc middleware-config :middleware/handlers handlers)
+               (assoc middleware-opts :middleware/handlers handlers)
                :component :middlewares :middleware)))
 
 (defn entity+ref
   ([config entity-key]
    (entity+ref config entity-key {}))
-  ([config entity-key entity-config]
+  ([config entity-key entity-opts]
    (-> config
-       (entity entity-key entity-config)
+       (entity entity-key entity-opts)
        (ref-entity entity-key))))
 
 (defn component+ref
   ([config component-key]
    (component+ref config component-key {}))
-  ([config component-key component-config]
+  ([config component-key component-opts]
    (-> config
-       (component component-key component-config)
+       (component component-key component-opts)
        (ref-component component-key))))
 
 (defn handler+ref
   ([config handler-key]
    (handler+ref config handler-key {}))
-  ([config handler-key handler-config]
+  ([config handler-key handler-opts]
    (-> config
-       (handler handler-key handler-config)
+       (handler handler-key handler-opts)
        (ref-handler handler-key))))
 
 (defn ticker+ref
   ([config ticker-key]
    (ticker+ref config ticker-key {}))
-  ([config ticker-key ticker-config]
+  ([config ticker-key ticker-opts]
    (-> config
-       (ticker ticker-key ticker-config)
+       (ticker ticker-key ticker-opts)
        (ref-ticker ticker-key))))
 
 (defn reactor+ref
   ([config reactor-key]
    (reactor+ref config reactor-key {}))
-  ([config reactor-key reactor-config]
+  ([config reactor-key reactor-opts]
    (-> config
-       (reactor reactor-key reactor-config)
+       (reactor reactor-key reactor-opts)
        (ref-reactor reactor-key))))
 
 (defn middleware+ref
   ([config middleware-key]
    (middleware+ref config middleware-key {} []))
-  ([config middleware-key middleware-config]
-   (middleware+ref config middleware-key middleware-config []))
-  ([config middleware-key middleware-config handlers]
+  ([config middleware-key middleware-opts]
+   (middleware+ref config middleware-key middleware-opts []))
+  ([config middleware-key middleware-opts handlers]
    (-> config
-       (middleware middleware-key middleware-config)
-       (ref-middleware middleware-key middleware-config handlers))))
+       (middleware middleware-key middleware-opts)
+       (ref-middleware middleware-key middleware-opts handlers))))
 
 (defn del-entity [config entity-key]
   (when-not (:scene/last (meta config)) (throw "Can only delete entities from scenes."))

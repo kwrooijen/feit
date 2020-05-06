@@ -14,8 +14,8 @@
   (state/set-renderer!
    {:view        (js/document.getElementById view)
     ;; TODO add scale boolean instead of scale-x scale-y
-    :width       scale-x
-    :height      scale-y
+    :width       width
+    :height      height
     ;; :transparent true
     :autoDencity auto-dencity}))
 

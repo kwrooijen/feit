@@ -7,11 +7,16 @@
               {:rooij.interface.graphics-2d/system
                {:graphics-2d.window/center-canvas? true}}))
 
-(defn set-scale [config x y]
+(defn set-dimensions [config width height]
   (meta-merge config
               {:rooij.interface.graphics-2d/system
-               {:graphics-2d.window/scale-x x
-                :graphics-2d.window/scale-y y}}))
+               {:graphics-2d.window/width width
+                :graphics-2d.window/height height}}))
+
+(defn auto-scale [config]
+  (meta-merge config
+              {:rooij.interface.graphics-2d/system
+               {:graphics-2d.window/auto-scale true}}))
 
 (defn on-resize [config k]
   (meta-merge config

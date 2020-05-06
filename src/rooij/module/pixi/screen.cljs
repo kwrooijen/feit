@@ -2,17 +2,17 @@
   (:require
    [rooij.module.pixi.state :as state]))
 
-(defn- scale [{:graphics-2d.window/keys [scale-x scale-y]}]
-  (min (/ (.-innerWidth js/window) scale-x)
-       (/ (.-innerHeight js/window) scale-y)))
+(defn- scale [{:graphics-2d.window/keys [width height]}]
+  (min (/ (.-innerWidth js/window) width)
+       (/ (.-innerHeight js/window) height)))
 
 (defn- update-scale [opts]
   (reset! state/scale (scale opts)))
 
-(defn- get-x-y [{:graphics-2d.window/keys [scale-x scale-y]}]
-  (if (and scale-x scale-y)
-    [(* scale-x @state/scale)
-     (* scale-y @state/scale)]
+(defn- get-x-y [{:graphics-2d.window/keys [width height]}]
+  (if (and width height)
+    [(* width @state/scale)
+     (* height @state/scale)]
     [(.-innerWidth js/window)
      (.-innerHeight js/window)]))
 
@@ -25,12 +25,12 @@
      (/ (.-width view) 2)))
 
 (defn- center-canvas-handler [view]
-  (if (> (/ (.-innerWidth js/window) (.-width view))
-         (/ (.-innerHeight js/window) (.-height view)))
-    (do (set! (.. view -style -left) (str (get-width view) "px"))
-        (set! (.. view -style -top) "0px"))
-    (do (set! (.. view -style -top) (str (get-height view) "px"))
-        (set! (.. view -style -left) "0px"))))
+  (if (> (.-innerWidth js/window) (.-width view))
+    (set! (.. view -style -left) (str (get-width view) "px"))
+    (set! (.. view -style -left) "0px"))
+  (if (> (.-innerHeight js/window) (.-height view))
+    (set! (.. view -style -top) (str (get-height view) "px"))
+    (set! (.. view -style -top) "0px")))
 
 (defn update-scene-scale []
   (doseq [[_scene-key scene] @state/scenes]
@@ -46,18 +46,15 @@
     (when center-canvas?
       (center-canvas-handler (js/document.getElementById view)))))
 
-(defn setup-event-listener-resize
-  [{:graphics-2d.window/keys [on-resize view]
-    :as opts
-    :or {view "game" on-resize (fn [_])}}]
-  (js/setTimeout
-   (comp #(on-resize (js/document.getElementById view) @state/scale)
-         #(resize-handler opts)
-         #(update-scene-scale)
-         #(update-scale opts))
-   100)
-  (.addEventListener js/window "resize"
-                     (comp #(on-resize (js/document.getElementById view) @state/scale)
-                           #(resize-handler opts)
-                           #(update-scene-scale)
-                           #(update-scale opts))))
+(defn- handler [{:graphics-2d.window/keys [on-resize view auto-scale]
+                 :as opts
+                 :or {view "game"}}]
+  (when auto-scale
+    (update-scale opts))
+  (update-scene-scale)
+  (resize-handler opts)
+  (on-resize (js/document.getElementById view) @state/scale))
+
+(defn setup-event-listener-resize [opts]
+  (js/setTimeout #(handler opts) 100)
+  (.addEventListener js/window "resize" #(handler opts)))

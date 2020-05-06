@@ -1,4 +1,4 @@
-(ns rooij.interface.graphics-2d.api
+(ns rooij.interface.graphics-2d.dsl
   (:require [integrant.core :as ig]
             [meta-merge.core :refer [meta-merge]]
             [rooij.dsl :as r]))

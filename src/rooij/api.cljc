@@ -10,30 +10,19 @@
       (keys)
       (set)))
 
-(def ^:private event-keys
-  [:event/entity
-   :event/handler
-   :event/content
-   :event/excludes])
-
 (defn emit!
   "Emit a event with `content` to an `entity`'s `handler` in `scene`"
-  ([{:event/keys [scene] :as event}]
-   (swap! (state/get-scene-events scene) conj (select-keys event event-keys)))
   ([context handler-key]
-   (emit! context handler-key {}))
-  ([{:context/keys [scene-key entity-key]} handler-key content]
+   (emit! context handler-key nil []))
+  ([context handler-key content]
+   (emit! context handler-key content []))
+  ([{:context/keys [scene-key entity-key] :as context} handler-key content excludes]
    (swap! (state/get-scene-events scene-key) conj
           {:event/entity entity-key
            :event/handler handler-key
            :event/content content
-           :event/excludes []}))
-  ([scene-key entity-key handler-key content]
-   (swap! (state/get-scene-events scene-key) conj
-          {:event/entity entity-key
-           :event/handler handler-key
-           :event/content content
-           :event/excludes []})))
+           :event/excludes excludes})
+   context))
 
 (defn- apply-query-filters [filters v]
   (filter (fn [[_ state]]

@@ -12,25 +12,24 @@
   (load-texture [this context file name]))
 
 (defn load-complete! [{:context/keys [scene-key entity-key]}]
-  (emit! {:event/scene scene-key
-          :event/entity entity-key
-          :event/handler :graphics-2d.handler.loader/load-complete
-          :event/content {}}))
+  (emit! {:context/scene-key scene-key
+          :context/entity-key entity-key}
+         :graphics-2d.handler.loader/load-complete))
 
 (defmethod ig/init-key :graphics-2d.component/loader
   [_ {:context/keys [scene-key entity-key]
       :loader/keys [spritesheets textures next-scene]
       :as opts}]
   (doseq [spritesheet spritesheets]
-    (emit! {:event/scene scene-key
-            :event/entity entity-key
-            :event/handler :graphics-2d.handler.loader/load-spritesheet
-            :event/content spritesheet}))
+    (emit! {:context/scene-key scene-key
+            :context/entity-key entity-key}
+           :graphics-2d.handler.loader/load-spritesheet
+           spritesheet))
   (doseq [texture textures]
-    (emit! {:event/scene scene-key
-            :event/entity entity-key
-            :event/handler :graphics-2d.handler.loader/load-texture
-            :event/content texture}))
+    (emit! {:context/scene-key scene-key
+            :context/entity-key entity-key}
+           :graphics-2d.handler.loader/load-texture
+           texture))
   {:loader/loaded 0
    :loader/to-load (count (apply merge spritesheets textures))
    :loader/loader (make-loader state/graphics-2d opts)

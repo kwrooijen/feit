@@ -28,11 +28,11 @@
         (when (position-changed? @old-position new-position)
           (update-old-position! old-position new-position)
           (emit!
-           {:event/scene scene-key
-            :event/entity entity-key
-            :event/excludes [component-key]
-            :event/handler :general-2d.handler.position/set
-            :event/content new-position}))))))
+           {:context/scene-key scene-key
+            :context/entity-key entity-key}
+           :general-2d.handler.position/set
+           new-position
+           [component-key]))))))
 
 (defmethod ig/init-key :general-2d.handler.position/set [_ opts]
   (fn [_context {:keys [x y angle]} state]

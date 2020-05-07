@@ -12,11 +12,13 @@
 
 (defonce sheets (atom nil))
 
+;; TODO Rename textures to spritesheet-textures
 (defonce textures (atom nil))
 
-(defonce animations (atom nil))
+;; TODO Rename textures-2 to textures
+(defonce textures-2 (atom {}))
 
-(defonce loader (.-shared PIXI/Loader))
+(defonce animations (atom nil))
 
 (defonce scale (atom 1))
 
@@ -46,6 +48,9 @@
   (swap! textures assoc name (js-keys->clj-keys (.-textures sheet)))
   (swap! animations assoc name (js-keys->clj-keys (.-animations (.-spritesheet sheet)))))
 
+(defn add-texture! [name texture]
+  (swap! textures-2 assoc name texture))
+
 (defn spritesheet-animation-texture [spritesheet animation]
   (or (get-in @animations [spritesheet animation])
       (timbre/error ::spritesheet-animation-texture-not-found
@@ -55,3 +60,6 @@
   (or (get-in @textures [spritesheet texture])
       (timbre/error ::spritesheet-static-texture-not-found
                     {:spritesheet spritesheet :texture texture})))
+
+(defn texture [name]
+  (get @textures-2 name))

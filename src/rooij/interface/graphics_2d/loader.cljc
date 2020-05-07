@@ -49,7 +49,8 @@
 (defmethod ig/init-key :graphics-2d.handler.loader/load-complete [_ _opts]
   (fn [{:context/keys [scene-key]} _event {:loader/keys [to-load next-scene] :as state}]
     (let [new-state (update state :loader/loaded inc)]
-      (if (>= (:loader/loaded new-state) to-load)
+      (if (and next-scene
+               (>= (:loader/loaded new-state) to-load))
         (transition-scene scene-key next-scene)
         new-state))))
 

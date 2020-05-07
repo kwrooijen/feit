@@ -12,17 +12,21 @@
       (->> (state/add-spritesheet! name)))
   (interface.loader/load-complete! context))
 
+(defn- texture-loaded [context file name loader]
+  (state/add-texture! name (-> loader .-resources (aget file) .-texture))
+  (interface.loader/load-complete! context))
+
 (defrecord PixiGraphics2DLoader [opts]
   RooijGraphics2DLoader
 
   (load-texture [this context file name]
     (-> (PIXI/Loader.)
-        (.add file name)
-        (.load #(interface.loader/load-complete! context))))
+        (.add file)
+        (.load (partial texture-loaded context file name))))
 
   (load-spritesheet [this context file name]
     (-> (PIXI/Loader.)
-        (.add file name)
+        (.add file)
         (.load (partial spritesheet-loaded context file name)))))
 
 (defn make [opts]

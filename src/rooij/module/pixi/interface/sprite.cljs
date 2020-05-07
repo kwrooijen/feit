@@ -82,7 +82,7 @@
       :flip {:x false :y false}})))
 
 (defn texture-static-sprite [{:texture/keys [name]}]
-  (let [texture (-> state/loader .-resources (aget name) .-texture)]
+  (let [texture (state/texture name)]
     (map->PixiGraphics2DSprite
      {:sprite (PIXI/AnimatedSprite. #js [texture])
       :initial-textures [texture]

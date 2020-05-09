@@ -3,10 +3,12 @@
    [rooij.config]
    [rooij.error]
    [rooij.interface.graphics-2d.core :as interface.graphics-2d]
-   [rooij.interface.physics-2d.core :as interface.physics-2d]
    [rooij.interface.keyboard.core :as interface.keyboard]
+   [rooij.interface.physics-2d.core :as interface.physics-2d]
    [rooij.logger]
    [rooij.loop.core]
+   [rooij.spec]
+   [rooij.state :as state]
    [rooij.system.component]
    [rooij.system.core :as system]
    [rooij.system.entity]
@@ -16,7 +18,6 @@
    [rooij.system.reactor]
    [rooij.system.scene :as scene]
    [rooij.system.ticker]
-   [rooij.spec]
    [taoensso.timbre :as timbre]))
 
 (set! *print-meta* true)
@@ -39,3 +40,6 @@
      (catch #?(:clj Throwable :cljs :default) e
        (rooij.error/handle-error e)
        (throw e)))))
+
+(defn wireframe-enabled! [boolean]
+  (reset! state/wireframe-enabled? boolean))

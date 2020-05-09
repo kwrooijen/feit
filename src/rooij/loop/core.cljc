@@ -81,7 +81,8 @@
   (doseq [scene-key (keys (state/get-scenes))]
     (interface.physics-2d/step state/physics-2d scene-key delta)
     (run-scene (get-scene scene-key) delta time)
-    (debug-draw-wireframe scene-key)
+    (when @state/wireframe-enabled?
+      (debug-draw-wireframe scene-key))
     (interface.graphics-2d/step state/graphics-2d scene-key)
     (swap! (get-scene scene-key) post-events)))
 

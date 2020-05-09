@@ -31,6 +31,8 @@
 
 (defonce ^:private persistent-components (atom {}))
 
+(defonce wireframe-enabled? (atom false))
+
 (defn reset-events! [scene-key]
   (swap! events assoc scene-key (atom []))
   (swap! post-events assoc scene-key (atom []))

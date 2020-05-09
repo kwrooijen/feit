@@ -60,3 +60,6 @@
    {:context/scene-key scene-key
     :context/entity-key entity-key
     :context/component-key component-key}))
+
+(defn ->vec [v]
+  (if (vector? v) v [v]))

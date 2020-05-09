@@ -64,14 +64,16 @@
               #js {:isStatic static? :isSensor sensor?}))
 
 (defn- new-rectangle [k {:context/keys [scene-key entity-key]
-                         :keys [x y w h]
+                         :keys [x y w h angle]
                          pivot-x :pivot/x
                          pivot-y :pivot/y
+                         :or {angle 0}
                          :as opts}]
   (let [rectangle (opts->rectangle opts)]
     (when (false? (:auto-rotate opts))
       (.setInertia Body rectangle js/Infinity))
     (.add World (state/get-world scene-key) rectangle)
+    (.setAngle Body rectangle angle)
     (set! (.-component-key rectangle) k)
     (set! (.-entity-key rectangle) entity-key)
     (set! (.-scene-key rectangle) scene-key)

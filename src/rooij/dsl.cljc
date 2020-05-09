@@ -3,7 +3,7 @@
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
    [integrant-tools.keyword :refer [make-child]]
-   [rooij.util :refer [bottom-key top-key]]
+   [rooij.util :refer [bottom-key top-key ->vec]]
    [rooij.config]))
 
 (defn error-map [system-key config system-config]
@@ -31,6 +31,23 @@
   (if (= (top-key k) (bottom-key k))
     config
     (update config :keyword/hierarchy meta-merge {(top-key k) [(bottom-key k)]})))
+
+
+(defn- get-entity-key
+  [config entity-key]
+  (-> config
+      (get-in (:scene/last (meta config)))
+      :scene/entities
+      (->> (filter (fn [[kk]] (some #{entity-key} (->vec kk)))))
+      ffirst))
+
+(defn- get-component-key
+  [config component-key]
+  (-> config
+      (get-in (:entity/last (meta config)))
+      :entity/components
+      (->> (filter (fn [[kk]] (some #{component-key} (->vec kk)))))
+      ffirst))
 
 (defn- ref-system [config system-key system-config parent collection child]
   (let [parent-path (conj ((keyword parent "last") (meta config)) (keyword parent collection))
@@ -332,3 +349,32 @@
 (defn save-interface! [config]
   (rooij.config/merge-interface! config)
   config)
+
+(defn select-entity
+  [config entity-key]
+  (if-let [entity-key (get-entity-key config entity-key)]
+    (vary-meta config
+               assoc :entity/last
+               (conj (:scene/last (meta config))
+                     :scene/entities
+                     entity-key))
+    config))
+
+(defn select-component
+  [config component-key]
+  (if-let [component-key (get-component-key config component-key)]
+    (vary-meta config
+               assoc :component/last
+               (conj (:entity/last (meta config))
+                     :entity/components
+                     component-key))
+    config))
+
+(defn select
+  [config entity-key component-key]
+  (let [new-config (-> config
+                       (select-entity entity-key)
+                       (select-component component-key))]
+    (if (-> new-config meta :component/last last)
+      new-config
+      config)))

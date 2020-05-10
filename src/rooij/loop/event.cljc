@@ -6,10 +6,6 @@
 (defn- get-component-key [scene {:event/keys [entity handler]}]
   (get-in scene [:scene/entities entity :entity/routes handler]))
 
-(defn- get-components [scene {:event/keys [entity] :as event}]
-  (->> (get-component-key scene event)
-       (mapv #(get-in scene (component/path entity %)))))
-
 (defn ^boolean excludable? [{:component/keys [key]} excludes]
   (some (fn [exclude]
           (or (identical? key exclude)
@@ -31,11 +27,10 @@
      :context/handler-key handler
      :context/event content}))
 
-(defn event->contexts [scene {:event/keys [excludes] :as event}]
-  (reduce
-   (fn [acc component]
-     (if (excludable? component excludes)
-       acc
-       (conj acc (event->context scene event component))))
-   []
-   (get-components scene event)))
+(defn event->contexts [scene {:event/keys [excludes entity] :as event}]
+  (let [contexts (volatile! [])]
+    (doseq [component-key (get-component-key scene event)]
+      (let [component (get-in scene (component/path entity component-key))]
+        (when-not (excludable? component excludes)
+          (vswap! contexts conj (event->context scene event component)))))
+    @contexts))

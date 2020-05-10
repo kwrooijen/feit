@@ -35,18 +35,18 @@
    :loader/loader (make-loader state/graphics-2d opts)
    :loader/next-scene next-scene})
 
-(defmethod ig/init-key :graphics-2d.handler.loader/load-spritesheet [_ _opts]
-  (fn [context {:spritesheet/keys [file name]} {:loader/keys [loader] :as state}]
-    (load-spritesheet loader context file name)
+(defmethod ig/init-key :graphics-2d.handler.loader/load-spritesheet [_ opts]
+  (fn [_context {:spritesheet/keys [file name]} {:loader/keys [loader] :as state}]
+    (load-spritesheet loader opts file name)
     state))
 
-(defmethod ig/init-key :graphics-2d.handler.loader/load-texture [_ _opts]
-  (fn [context {:texture/keys [file name]} {:loader/keys [loader] :as state}]
-    (load-texture loader context file name)
+(defmethod ig/init-key :graphics-2d.handler.loader/load-texture [_ opts]
+  (fn [_context {:texture/keys [file name]} {:loader/keys [loader] :as state}]
+    (load-texture loader opts file name)
     state))
 
-(defmethod ig/init-key :graphics-2d.handler.loader/load-complete [_ _opts]
-  (fn [{:context/keys [scene-key]} _event {:loader/keys [to-load next-scene] :as state}]
+(defmethod ig/init-key :graphics-2d.handler.loader/load-complete [_ {:context/keys [scene-key]}]
+  (fn [_context _event {:loader/keys [to-load next-scene] :as state}]
     (let [new-state (update state :loader/loaded inc)]
       (if (and next-scene
                (>= (:loader/loaded new-state) to-load))

@@ -51,7 +51,7 @@
   (get @post-events scene-key))
 
 (defn save-scene! [scene]
-  (swap! scenes assoc (:scene/key scene) (atom scene)))
+  (swap! scenes assoc (:scene/key scene) (volatile! scene)))
 
 (defn remove-scene! [scene-key]
   (swap! scenes dissoc scene-key))

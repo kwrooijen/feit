@@ -29,8 +29,8 @@
   {:wireframe/active? true})
 
 (defmethod ig/init-key :ticker.rooij.dev/wireframe
-  [_k _opts]
-  (fn ticker-rooij-dev--wireframe [{:context/keys [scene-key]} _state]
+  [_k {:context/keys [scene-key]}]
+  (fn ticker-rooij-dev--wireframe [_context _state]
     (draw-wireframe state/graphics-2d scene-key
                     (get-wireframe-vectors state/physics-2d scene-key))))
 

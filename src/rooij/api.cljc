@@ -55,6 +55,13 @@
   ([scene-key entity-key filters]
    (get (query scene-key entity-key filters) entity-key)))
 
+(defn select-value
+  ([scene-key entity-key]
+   (select-value scene-key entity-key []))
+  ([scene-key entity-key filters]
+   (-> (select scene-key entity-key filters)
+       (vals)
+       (first))))
 
 (defn transition-scene
   "Transition from `scene-from` to `scene-to`. Halts `scene-from` before

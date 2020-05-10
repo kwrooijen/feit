@@ -69,7 +69,7 @@
    (component-rectangle config k x y w h fill {}))
   ([config k x y w h fill opts]
    (r/ref-component config [:graphics-2d.component/rectangle k]
-                    (merge {:shape/x x :shape/y y :shape/w w :shape/h h :shape/fill fill}
+                    (merge {:position/x x :position/y y :shape/w w :shape/h h :shape/fill fill}
                            opts))))
 
 (defn loader-next-scene

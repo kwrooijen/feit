@@ -14,10 +14,12 @@
     (set! (.. body -position -x) x)
     (set! (.. body -position -y) y)
     (set! (.. body -rotation) angle)
-    (assoc this :x y :y y)))
+    (assoc this :x x :y y)))
 
 (defn make
-  [{:shape/keys [x y w h fill] :context/keys [scene-key]}]
+  [{:shape/keys [w h fill]
+    :position/keys [x y]
+    :context/keys [scene-key]}]
   (let [rectangle (.from PIXI/Sprite PIXI/Texture.WHITE)]
     (set! (.-x rectangle) x)
     (set! (.-y rectangle) y)

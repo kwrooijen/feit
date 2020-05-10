@@ -1,18 +1,19 @@
 (ns rooij.system.scene
-  (:require [com.rpl.specter :as sp :refer [MAP-VALS]]
-            [integrant-tools.core :as it]
-            [integrant-tools.keyword :refer [descendant?]]
-            rooij.config
-            [rooij.interface.graphics-2d.core :as interface.graphics-2d]
-            [rooij.interface.physics-2d.core :as interface.physics-2d]
-            [rooij.state :as state]
-            [rooij.system.component :refer [process-refs-component]]
-            [rooij.system.core :as system]
-            [rooij.system.entity :as entity
-             :refer [postprocess-entity preprocess-entities process-refs-entity]]
-            [rooij.system.keyboard :as keyboard]
-            [rooij.util :refer [resolve-all top-key]]
-            [taoensso.timbre :as timbre]))
+  (:require
+   [com.rpl.specter :as sp :refer [MAP-VALS]]
+   [integrant-tools.core :as it]
+   [integrant-tools.keyword :refer [descendant?]]
+   rooij.config
+   [rooij.interface.graphics-2d.core :as interface.graphics-2d]
+   [rooij.interface.physics-2d.core :as interface.physics-2d]
+   [rooij.state :as state]
+   [rooij.system.component :refer [process-refs-component]]
+   [rooij.system.core :as system]
+   [rooij.system.entity :as entity
+    :refer [postprocess-entity preprocess-entities process-refs-entity]]
+   [rooij.system.keyboard :as keyboard :refer [preprocess-keyboards]]
+   [rooij.util :refer [resolve-all top-key]]
+   [taoensso.timbre :as timbre]))
 
 (defmethod system/init-key :rooij/scene [k opts]
   (timbre/debug ::init-key opts)
@@ -45,10 +46,11 @@
       (resolve-all)))
 
 (defn- start-keyboard [system]
-  (update system :scene/keyboard #(sp/transform [MAP-VALS] keyboard/init %)))
+  (update system :scene/keyboards #(sp/transform [MAP-VALS] keyboard/init %)))
 
 (defn process-refs [{scene-key :scene/key :as opts}]
   (->> opts
+       (sp/transform [:scene/keyboards] (partial preprocess-keyboards scene-key))
        (sp/transform [:scene/entities] (partial preprocess-entities scene-key))
        (sp/transform [:scene/entities MAP-VALS] process-refs-entity)
        (sp/transform [:scene/entities MAP-VALS :entity/components MAP-VALS] process-refs-component)
@@ -60,7 +62,7 @@
       (it/find-derived-value scene-key)
       (apply-init scene-key opts)
       (process-refs)
-      (update :scene/keyboard change-keyboard-identifier)
+      (update :scene/keyboards change-keyboard-identifier)
       (start-keyboard)
       (assoc :scene/key scene-key)
       (state/save-scene!)))

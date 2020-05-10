@@ -151,6 +151,19 @@
        (meta-merge {[:rooij/middleware middleware-key] middleware-opts})
        (vary-meta assoc :middleware/last [[:rooij/middleware middleware-key]]))))
 
+(defn keyboard
+  ([keyboard-key]
+   (keyboard {} keyboard-key {}))
+  ([key-or-config key-or-opts]
+   (if (map? key-or-config)
+     (keyboard key-or-config key-or-opts {})
+     (keyboard {} key-or-config key-or-opts)))
+  ([config keyboard-key keyboard-opts]
+   {:pre [(qualified-keyword? keyboard-key)]}
+   (-> config
+       (meta-merge {[:rooij/keyboard keyboard-key] keyboard-opts})
+       (vary-meta assoc :keyboard/last [[:rooij/keyboard keyboard-key]]))))
+
 (defn ref-entity
   ([config entity-key]
    (ref-entity config entity-key {}))
@@ -162,8 +175,8 @@
                      (top-key entity-key))
          full-path (conj parent-path entity-id)
          entity-opts (-> entity-opts
-                           (assoc :entity/ref (ig/ref (bottom-key entity-key)))
-                           (add-hierarchy entity-key))]
+                         (assoc :entity/ref (ig/ref (bottom-key entity-key)))
+                         (add-hierarchy entity-key))]
      (-> config
          (update-in full-path meta-merge entity-opts)
          (vary-meta assoc :entity/last full-path)))))
@@ -212,6 +225,33 @@
                middleware-key
                (assoc middleware-opts :middleware/handlers handlers)
                :component :middlewares :middleware)))
+
+(defn ref-keyboard-down
+  ([config keyboard-key keyboard-down-key]
+   (ref-keyboard-down config keyboard-key keyboard-down-key {}))
+  ([config keyboard-key keyboard-down-key keyboard-opts]
+   (when-not (:scene/last (meta config)) (throw "Can only add keyboards to scenes."))
+   (ref-system config keyboard-key
+               (merge keyboard-opts {:keyboard-down/key keyboard-down-key})
+               :scene :keyboards :keyboard)))
+
+(defn ref-keyboard-up
+  ([config keyboard-key keyboard-up-key]
+   (ref-keyboard-up config keyboard-key keyboard-up-key {}))
+  ([config keyboard-key keyboard-up-key keyboard-opts]
+   (when-not (:scene/last (meta config)) (throw "Can only add keyboards to scenes."))
+   (ref-system config keyboard-key
+               (merge keyboard-opts {:keyboard-up/key keyboard-up-key})
+               :scene :keyboards :keyboard)))
+
+(defn ref-keyboard-while-down
+  ([config keyboard-key keyboard-while-down-key]
+   (ref-keyboard-while-down config keyboard-key keyboard-while-down-key {}))
+  ([config keyboard-key keyboard-while-down-key keyboard-opts]
+   (when-not (:scene/last (meta config)) (throw "Can only add keyboards to scenes."))
+   (ref-system config keyboard-key
+               (merge keyboard-opts {:keyboard-while-down/key keyboard-while-down-key})
+               :scene :keyboards :keyboard)))
 
 (defn entity+ref
   ([config entity-key]
@@ -262,6 +302,30 @@
    (-> config
        (middleware middleware-key middleware-opts)
        (ref-middleware middleware-key middleware-opts handlers))))
+
+(defn keyboard-down+ref
+  ([config keyboard-key keyboard-down-key]
+   (keyboard-down+ref config keyboard-key keyboard-down-key {}))
+  ([config keyboard-key keyboard-down-key keyboard-opts]
+   (-> config
+       (keyboard keyboard-key keyboard-opts)
+       (ref-keyboard-down keyboard-key keyboard-down-key))))
+
+(defn keyboard-up+ref
+  ([config keyboard-key keyboard-up-key]
+   (keyboard-up+ref config keyboard-key keyboard-up-key {}))
+  ([config keyboard-key keyboard-up-key keyboard-opts]
+   (-> config
+       (keyboard keyboard-key keyboard-opts)
+       (ref-keyboard-up keyboard-key keyboard-up-key))))
+
+(defn keyboard-while-down+ref
+  ([config keyboard-key keyboard-while-down-key]
+   (keyboard-while-down+ref config keyboard-key keyboard-while-down-key {}))
+  ([config keyboard-key keyboard-while-down-key keyboard-opts]
+   (-> config
+       (keyboard keyboard-key keyboard-opts)
+       (ref-keyboard-while-down keyboard-key keyboard-while-down-key))))
 
 (defn del-entity [config entity-key]
   (when-not (:scene/last (meta config)) (throw "Can only delete entities from scenes."))

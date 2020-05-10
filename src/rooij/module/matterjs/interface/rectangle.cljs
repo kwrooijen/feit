@@ -35,20 +35,24 @@
   (get-velocity [this]
     (-get-velocity this))
 
-  (set-velocity! [{:keys [body]} xy]
-    (.setVelocity Body body (matrix->matter-vector xy)))
+  (set-velocity [{:keys [body] :as this} xy]
+    (.setVelocity Body body (matrix->matter-vector xy))
+    this)
 
-  (set-velocity-x! [{:keys [body]} x]
-    (.setVelocity Body body #js {:x x :y (.. body -velocity -y)}))
+  (set-velocity-x [{:keys [body] :as this} x]
+    (.setVelocity Body body #js {:x x :y (.. body -velocity -y)})
+    this)
 
-  (set-velocity-y! [{:keys [body]} y]
-    (.setVelocity Body body #js {:x (.. body -velocity -x) :y y}))
+  (set-velocity-y [{:keys [body] :as this} y]
+    (.setVelocity Body body #js {:x (.. body -velocity -x) :y y})
+    this)
 
-  (add-velocity! [{:keys [body] :as this} xy]
+  (add-velocity [{:keys [body] :as this} xy]
     (.setVelocity Body body
                   (-> (-get-velocity this)
                       (m/add xy)
-                      (matrix->matter-vector)))))
+                      (matrix->matter-vector)))
+    this))
 
 (extend-protocol IPrintWithWriter
   ;; If a MatterJS body is printed using `println` a `too much recursion` error

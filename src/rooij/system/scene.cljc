@@ -45,9 +45,6 @@
       (get scene-key)
       (resolve-all)))
 
-(defn- start-keyboard [system]
-  (update system :scene/keyboards #(sp/transform [MAP-VALS] keyboard/init %)))
-
 (defn process-refs [{scene-key :scene/key :as opts}]
   (->> opts
        (sp/transform [:scene/keyboards] (partial preprocess-keyboards scene-key))
@@ -63,7 +60,6 @@
       (apply-init scene-key opts)
       (process-refs)
       (update :scene/keyboards change-keyboard-identifier)
-      (start-keyboard)
       (assoc :scene/key scene-key)
       (state/save-scene!)))
 

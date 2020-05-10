@@ -10,9 +10,6 @@
          :handler/init (system/get-init-key k {:required? true})
          :handler/fn nil))
 
-(defn init [{:handler/keys [key init] :as handler}]
-  (assoc handler :handler/fn (init key handler)))
-
 (defn preprocess-handler [context handler-key handler-opts]
   (-> handler-opts
       (->> (meta-merge (:handler/ref handler-opts)))

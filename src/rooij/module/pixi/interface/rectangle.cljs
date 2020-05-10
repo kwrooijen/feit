@@ -18,7 +18,7 @@
 
 (defn make
   [{:shape/keys [x y w h fill] :context/keys [scene-key]}]
-  (let [rectangle (.from PIXI/Sprite  PIXI/Texture.WHITE)]
+  (let [rectangle (.from PIXI/Sprite PIXI/Texture.WHITE)]
     (set! (.-x rectangle) x)
     (set! (.-y rectangle) y)
     (set! (.-width rectangle) w)

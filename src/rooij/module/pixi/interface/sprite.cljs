@@ -119,8 +119,9 @@
     (set! (.-x sprite) x)
     (set! (.-y sprite) y)
     (set! (.-y sprite) y)
-    (set! (.. sprite -scale -x) 3)
-    (set! (.. sprite -scale -y) 3)
+    ;; TODO Add scaling option
+    (set! (.. sprite -scale -x) 1)
+    (set! (.. sprite -scale -y) 1)
     (flip state flip-x flip-y)
     (.set (.-anchor sprite) 0.5)
     (.addChild (state/get-scene scene-key) sprite)

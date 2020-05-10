@@ -170,7 +170,7 @@
   ([config entity-key entity-opts]
    {:pre [(qualified-keyword? entity-key)]}
    (let [parent-path (conj (:scene/last (meta config)) :scene/entities)
-         entity-id (if (:dynamic entity-opts)
+         entity-id (if (:entity/dynamic entity-opts)
                      (make-child (top-key entity-key))
                      (top-key entity-key))
          full-path (conj parent-path entity-id)
@@ -389,10 +389,10 @@
   (when-not (:component/last (meta config)) (throw "Can only make components persistent."))
   (update-in config (:component/last (meta config)) assoc :component/auto-persistent true))
 
-(defn is-dynamic
+(defn dynamic
   [config]
   (when-not (:entity/last (meta config)) (throw "Can only make entities dynamic."))
-  (update-in config (:component/last (meta config)) assoc :entity/dynamic true))
+  (update-in config (:entity/last (meta config)) assoc :entity/dynamic true))
 
 (defn middleware-handlers
   [config handlers]
@@ -409,29 +409,22 @@
 
 (defn select-entity
   [config entity-key]
-  (if-let [entity-key (get-entity-key config entity-key)]
-    (vary-meta config
-               assoc :entity/last
-               (conj (:scene/last (meta config))
-                     :scene/entities
-                     entity-key))
-    config))
+  (vary-meta config
+             assoc :entity/last
+             (conj (:scene/last (meta config))
+                   :scene/entities
+                   entity-key)))
 
 (defn select-component
   [config component-key]
-  (if-let [component-key (get-component-key config component-key)]
-    (vary-meta config
-               assoc :component/last
-               (conj (:entity/last (meta config))
-                     :entity/components
-                     component-key))
-    config))
+  (vary-meta config
+             assoc :component/last
+             (conj (:entity/last (meta config))
+                   :entity/components
+                   component-key)))
 
 (defn select
   [config entity-key component-key]
-  (let [new-config (-> config
-                       (select-entity entity-key)
-                       (select-component component-key))]
-    (if (-> new-config meta :component/last last)
-      new-config
-      config)))
+  (-> config
+      (select-entity entity-key)
+      (select-component component-key)))

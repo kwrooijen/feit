@@ -399,13 +399,6 @@
   (when-not (:middleware/last (meta config)) (throw "Can only add handlers to middleware."))
   (update-in config (conj (:middleware/last (meta config)) :middleware/handlers) concat handlers))
 
-
-;; (defn position-emitter [config]
-;;   (if-let [last-added-component (:rooij/component (last-added-system config))]
-;;     (assoc-in config [last-added-component :component.position/emitter] true)
-;;     (throw (ex-info (str "You can only make components position-emitters: " (last-added-system config))
-;;                     {:reason ::invalid-position-emitter}))))
-
 (defn save! [config]
   (rooij.config/merge-user! config)
   config)

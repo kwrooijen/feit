@@ -27,3 +27,16 @@
   "TODO"
   [config x y]
   (merge-component config {:x x :y y}))
+
+(defn position-emitter
+  "TODO"
+  [config]
+  (when-not (:component/last (meta config))
+    (throw (ex-info (str "You can only make components position-emitters")
+                    {:reason ::invalid-position-emitter})))
+  (r/ref-ticker config :general-2d.ticker.position/emitter))
+
+(defn rotation?
+  "TODO"
+  [config boolean]
+  (merge-component config {:rotation? boolean}))

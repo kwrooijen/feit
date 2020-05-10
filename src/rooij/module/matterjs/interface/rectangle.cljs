@@ -74,7 +74,7 @@
                          :or {angle 0}
                          :as opts}]
   (let [rectangle (opts->rectangle opts)]
-    (when (false? (:auto-rotate opts))
+    (when (false? (:rotation? opts))
       (.setInertia Body rectangle js/Infinity))
     (.add World (state/get-world scene-key) rectangle)
     (.setAngle Body rectangle angle)

@@ -63,6 +63,15 @@
   ([config k opts]
    (r/ref-component config [:graphics-2d.component/loader k] opts)))
 
+(defn component-rectangle
+  "TODO"
+  ([config k x y w h fill]
+   (component-rectangle config k x y w h fill {}))
+  ([config k x y w h fill opts]
+   (r/ref-component config [:graphics-2d.component/rectangle k]
+                    (merge {:shape/x x :shape/y y :shape/w w :shape/h h :shape/fill fill}
+                           opts))))
+
 (defn loader-next-scene
   "TODO"
   [config next-scene]

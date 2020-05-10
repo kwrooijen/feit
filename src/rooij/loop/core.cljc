@@ -55,7 +55,7 @@
         (threshold-reached scene-key))
       (reset! events [])
       (doseq [event todo-events]
-        (swap! scene-atom (fn [scene] (apply-event scene event))))
+        (vswap! scene-atom (fn [scene] (apply-event scene event))))
       (when-not ^boolean (empty? @events)
         (recur @events (dec threshold))))))
 
@@ -84,7 +84,7 @@
     (when @state/wireframe-enabled?
       (debug-draw-wireframe scene-key))
     (interface.graphics-2d/step state/graphics-2d scene-key)
-    (swap! (get-scene scene-key) post-events)))
+    (vswap! (get-scene scene-key) post-events)))
 
 (declare game-loop)
 

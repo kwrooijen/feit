@@ -18,4 +18,4 @@
       (as-> $ (assoc $ :keyboard/fn ((:keyboard/init $) keyboard-key $)))))
 
 (defn preprocess-keyboards [scene-key keyboards]
-  (map-kv #(preprocess-keyboard (->context scene-key %1) %1 %2) keyboards))
+  (map-kv #(preprocess-keyboard (->context scene-key) %1 %2) keyboards))

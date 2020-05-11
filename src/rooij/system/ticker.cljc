@@ -25,7 +25,7 @@
   (-> ticker-opts
       (->> (meta-merge (:ticker/ref ticker-opts)))
       (dissoc :ticker/ref)
-      (merge (select-keys context context-keys))
+      (->> (merge (select-keys context context-keys)))
       (assoc :ticker/key ticker-key)
       (as-> $ (assoc $ :ticker/fn ((:ticker/init $) ticker-key $)))))
 

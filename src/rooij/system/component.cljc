@@ -54,21 +54,22 @@
                   :context/component-key
                   :context/state)))))
 
-(defn preprocess-component [context component-key component-opts]
-  (-> component-opts
-      (->> (meta-merge (:component/ref component-opts)))
-      (dissoc :component/ref)
-      (merge context)
-      (assoc :component/key component-key)
-      (as-> $ (assoc $ :component/state (get-init-state $)))
-      (save-persistent-component!)))
-
-(defn preprocess-components [scene-key entity-key components]
-  (map-kv #(preprocess-component (->context scene-key entity-key %1) %1 %2) components))
-
 (defn process-refs-component [{:context/keys [scene-key entity-key component-key] :as opts}]
   (-> opts
       (update :component/handlers (partial preprocess-handlers scene-key entity-key component-key))
       (update :component/tickers (partial preprocess-tickers scene-key entity-key component-key))
       (update :component/reactors (partial preprocess-reactors scene-key entity-key component-key))
       (update :component/middlewares (partial preprocess-middlewares scene-key entity-key component-key))))
+
+(defn preprocess-component [context component-key component-opts]
+  (-> component-opts
+      (->> (meta-merge (:component/ref component-opts)))
+      (dissoc :component/ref)
+      (->> (merge context))
+      (assoc :component/key component-key)
+      (as-> $ (assoc $ :component/state (get-init-state $)))
+      (process-refs-component)
+      (save-persistent-component!)))
+
+(defn preprocess-components [scene-key entity-key components]
+  (map-kv #(preprocess-component (->context scene-key entity-key %1) %1 %2) components))

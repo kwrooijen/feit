@@ -18,7 +18,7 @@
   (-> reactor-opts
       (->> (meta-merge (:reactor/ref reactor-opts)))
       (dissoc :reactor/ref)
-      (merge context)
+      (->> (merge context))
       (assoc :reactor/key reactor-key)
       (as-> $ (assoc $ :reactor/fn ((:reactor/init $) reactor-key $)))))
 

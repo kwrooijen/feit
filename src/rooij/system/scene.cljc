@@ -49,8 +49,6 @@
   (->> opts
        (sp/transform [:scene/keyboards] (partial preprocess-keyboards scene-key))
        (sp/transform [:scene/entities] (partial preprocess-entities scene-key))
-       (sp/transform [:scene/entities MAP-VALS] process-refs-entity)
-       (sp/transform [:scene/entities MAP-VALS :entity/components MAP-VALS] process-refs-component)
        (sp/transform [:scene/entities MAP-VALS] postprocess-entity)))
 
 (defn init [scene-key opts]

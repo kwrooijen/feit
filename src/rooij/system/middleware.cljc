@@ -31,7 +31,7 @@
   (-> middleware-opts
       (->> (meta-merge (:middleware/ref middleware-opts)))
       (dissoc :middleware/ref)
-      (merge (select-keys context context-keys))
+      (->> (merge (select-keys context context-keys)))
       (assoc :middleware/key middleware-key)
       (as-> $ (assoc $ :middleware/fn ((:middleware/init $) middleware-key $)))))
 

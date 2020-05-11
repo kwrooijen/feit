@@ -37,7 +37,8 @@
         component-id (top-key system-key)
         full-path (conj parent-path component-id)
         system-config (-> system-config
-                          (assoc (keyword child "ref") (ig/ref (bottom-key system-key)))
+                          (assoc (keyword child "ref") (ig/ref (bottom-key system-key))
+                                 (keyword child "key") (top-key system-key))
                           (add-hierarchy system-key))]
     (-> config
         (update-in full-path meta-merge system-config)
@@ -158,7 +159,8 @@
                      (top-key entity-key))
          full-path (conj parent-path entity-id)
          entity-opts (-> entity-opts
-                         (assoc :entity/ref (ig/ref (bottom-key entity-key)))
+                         (assoc :entity/ref (ig/ref (bottom-key entity-key))
+                                :entity/key entity-id)
                          (add-hierarchy entity-key))]
      (-> config
          (update-in full-path meta-merge entity-opts)
@@ -451,7 +453,7 @@
      entity-key (select-entity entity-key)
      component-key (select-component component-key))))
 
-(defn select
+(defn- select*
   ([config scene-key]
    (select-scene config scene-key))
   ([config scene-key entity-key]
@@ -463,3 +465,17 @@
        (select-scene scene-key)
        (select-entity entity-key)
        (select-component component-key))))
+
+(defn select
+  ([scene-key]
+   (select* {} scene-key))
+  ([config scene-key]
+   (if (map? config)
+     (select* config scene-key)
+     (select* {} config scene-key)))
+  ([config scene-key entity-key]
+   (if (map? config)
+     (select* config scene-key entity-key)
+     (select* {} config scene-key entity-key)))
+  ([config scene-key entity-key component-key]
+   (select* config scene-key entity-key component-key)))

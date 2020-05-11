@@ -1,5 +1,6 @@
 (ns rooij.api
   (:require
+   [clojure.walk :refer [postwalk]]
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [make-child]]
    [integrant.core :as ig]
@@ -92,10 +93,27 @@
          {:scene/key scene-key
           :event/type :scene/start!}))
 
+(defn- resolve-refs
+  [config]
+  (let [system @state/system]
+    (postwalk
+     (fn [m]
+       (cond
+         (:entity/ref m) (assoc m :entity/ref (it/find-derived-value system (:entity/key m)))
+         (:component/ref m) (assoc m :component/ref (it/find-derived-value system (:component/key m)))
+         (:handler/ref m) (assoc m :handler/ref (it/find-derived-value system (:handler/key m)))
+         (:ticker/ref m) (assoc m :ticker/ref (it/find-derived-value system (:ticker/key m)))
+         (:reactor/ref m) (assoc m :reactor/ref (it/find-derived-value system (:reactor/key m)))
+         (:middleware/ref m) (assoc m :middleware/ref (it/find-derived-value system (:middleware/key m)))
+         :else m))
+     config)))
+
 (defn add-entity!
   [config]
-  (let [entity-key (-> config meta :entity/last last)
-        scene-key (-> config meta :scene/last last top-key)
+  (let [config-meta (meta config)
+        config (resolve-refs config)
+        entity-key (-> config-meta :entity/last last)
+        scene-key (-> config-meta :scene/last last top-key)
         entity-ref (it/find-derived-value @state/system entity-key)
         entity-key (if (:entity/dynamic entity-ref)
                      (make-child (top-key entity-key))
@@ -114,13 +132,14 @@
 (defn add-component!
   [config]
   (let [config-meta (meta config)
+        config (resolve-refs config)
         component-key (-> config-meta :component/last last top-key)
         scene-key (-> config-meta :scene/last last top-key)
         entity-key (-> config-meta :entity/last last top-key)
         component-ref (it/find-derived-value @state/system component-key)
         component (-> (get-in config (:component/last config-meta))
-                   (assoc :component/ref component-ref)
-                   (->> (component/preprocess-component (->context scene-key entity-key component-key) component-key)))
+                      (assoc :component/ref component-ref)
+                      (->> (component/preprocess-component (->context scene-key entity-key component-key) component-key)))
         path [:scene/entities entity-key
               :entity/components]]
     (swap! (state/get-scene-post-events scene-key) conj
@@ -133,6 +152,7 @@
 (defn add-handler!
   [config]
   (let [config-meta (meta config)
+        config (resolve-refs config)
         handler-key (-> config-meta :handler/last last)
         scene-key (-> config-meta :scene/last last top-key)
         entity-key (-> config-meta :entity/last last top-key)
@@ -154,6 +174,7 @@
 (defn add-ticker!
   [config]
   (let [config-meta (meta config)
+        config (resolve-refs config)
         ticker-key (-> config-meta :ticker/last last)
         scene-key (-> config-meta :scene/last last top-key)
         entity-key (-> config-meta :entity/last last top-key)
@@ -175,6 +196,7 @@
 (defn add-reactor!
   [config]
   (let [config-meta (meta config)
+        config (resolve-refs config)
         reactor-key (-> config-meta :reactor/last last)
         scene-key (-> config-meta :scene/last last top-key)
         entity-key (-> config-meta :entity/last last top-key)
@@ -196,6 +218,7 @@
 (defn add-middleware!
   [config]
   (let [config-meta (meta config)
+        config (resolve-refs config)
         middleware-key (-> config-meta :middleware/last last)
         scene-key (-> config-meta :scene/last last top-key)
         entity-key (-> config-meta :entity/last last top-key)

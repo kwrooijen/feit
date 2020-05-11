@@ -3,9 +3,13 @@
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [make-child]]
    [integrant.core :as ig]
-   [meta-merge.core :refer [meta-merge]]
    [rooij.state :as state]
+   [rooij.system.component :as component]
    [rooij.system.entity :as entity]
+   [rooij.system.handler :as handler]
+   [rooij.system.middleware :as middleware]
+   [rooij.system.reactor :as reactor]
+   [rooij.system.ticker :as ticker]
    [rooij.util :refer [->context top-key]]))
 
 (defn scenes
@@ -96,8 +100,8 @@
         entity-key (if (:entity/dynamic entity-ref)
                      (make-child (top-key entity-key))
                      (top-key entity-key))
-        entity (-> {:entity/ref entity-ref}
-                   (meta-merge (get-in config (:entity/last (meta config))))
+        entity (-> (get-in config (:entity/last (meta config)))
+                   (assoc :entity/ref entity-ref)
                    (->> (entity/preprocess-entity (->context scene-key entity-key) entity-key)
                         (entity/postprocess-entity)))]
     (swap! (state/get-scene-post-events scene-key) conj
@@ -105,5 +109,107 @@
             :add/key entity-key
             :add/system entity
             :event/type :add/system})
-    {:context/scene-key scene-key
-     :context/entity-key entity-key}))
+    config))
+
+(defn add-component!
+  [config]
+  (let [config-meta (meta config)
+        component-key (-> config-meta :component/last last top-key)
+        scene-key (-> config-meta :scene/last last top-key)
+        entity-key (-> config-meta :entity/last last top-key)
+        component-ref (it/find-derived-value @state/system component-key)
+        component (-> (get-in config (:component/last config-meta))
+                   (assoc :component/ref component-ref)
+                   (->> (component/preprocess-component (->context scene-key entity-key component-key) component-key)))
+        path [:scene/entities entity-key
+              :entity/components]]
+    (swap! (state/get-scene-post-events scene-key) conj
+           {:add/path path
+            :add/key component-key
+            :add/system component
+            :event/type :add/system})
+    config))
+
+(defn add-handler!
+  [config]
+  (let [config-meta (meta config)
+        handler-key (-> config-meta :handler/last last)
+        scene-key (-> config-meta :scene/last last top-key)
+        entity-key (-> config-meta :entity/last last top-key)
+        component-key (-> config-meta :component/last last top-key)
+        handler-ref (it/find-derived-value @state/system handler-key)
+        handler (-> (get-in config (:handler/last config-meta))
+                    (assoc :handler/ref handler-ref)
+                    (->> (handler/preprocess-handler (->context scene-key entity-key component-key) handler-key)))
+        path [:scene/entities entity-key
+              :entity/components component-key
+              :component/handlers]]
+    (swap! (state/get-scene-post-events scene-key) conj
+           {:add/path path
+            :add/key handler-key
+            :add/system handler
+            :event/type :add/system})
+    config))
+
+(defn add-ticker!
+  [config]
+  (let [config-meta (meta config)
+        ticker-key (-> config-meta :ticker/last last)
+        scene-key (-> config-meta :scene/last last top-key)
+        entity-key (-> config-meta :entity/last last top-key)
+        component-key (-> config-meta :component/last last top-key)
+        ticker-ref (it/find-derived-value @state/system ticker-key)
+        ticker (-> (get-in config (:ticker/last config-meta))
+                   (assoc :ticker/ref ticker-ref)
+                   (->> (ticker/preprocess-ticker (->context scene-key entity-key component-key) ticker-key)))
+        path [:scene/entities entity-key
+              :entity/components component-key
+              :component/tickers]]
+    (swap! (state/get-scene-post-events scene-key) conj
+           {:add/path path
+            :add/key ticker-key
+            :add/system ticker
+            :event/type :add/system})
+    config))
+
+(defn add-reactor!
+  [config]
+  (let [config-meta (meta config)
+        reactor-key (-> config-meta :reactor/last last)
+        scene-key (-> config-meta :scene/last last top-key)
+        entity-key (-> config-meta :entity/last last top-key)
+        component-key (-> config-meta :component/last last top-key)
+        reactor-ref (it/find-derived-value @state/system reactor-key)
+        reactor (-> (get-in config (:reactor/last config-meta))
+                   (assoc :reactor/ref reactor-ref)
+                   (->> (reactor/preprocess-reactor (->context scene-key entity-key component-key) reactor-key)))
+        path [:scene/entities entity-key
+              :entity/components component-key
+              :component/reactors]]
+    (swap! (state/get-scene-post-events scene-key) conj
+           {:add/path path
+            :add/key reactor-key
+            :add/system reactor
+            :event/type :add/system})
+    config))
+
+(defn add-middleware!
+  [config]
+  (let [config-meta (meta config)
+        middleware-key (-> config-meta :middleware/last last)
+        scene-key (-> config-meta :scene/last last top-key)
+        entity-key (-> config-meta :entity/last last top-key)
+        component-key (-> config-meta :component/last last top-key)
+        middleware-ref (it/find-derived-value @state/system middleware-key)
+        middleware (-> (get-in config (:middleware/last config-meta))
+                       (assoc :middleware/ref middleware-ref)
+                       (->> (middleware/preprocess-middleware (->context scene-key entity-key component-key) middleware-key)))
+        path [:scene/entities entity-key
+              :entity/components component-key
+              :component/middlewares]]
+    (swap! (state/get-scene-post-events scene-key) conj
+           {:add/path path
+            :add/key middleware-key
+            :add/system middleware
+            :event/type :add/system})
+    config))

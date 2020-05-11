@@ -443,11 +443,13 @@
                    middleware-key)))
 
 (defn select-from-context
-  [config {:context/keys [scene-key entity-key component-key]}]
-  (cond-> config
-    scene-key (select-scene scene-key)
-    entity-key (select-entity entity-key)
-    component-key (select-component component-key)))
+  ([context]
+   (select-from-context {} context))
+  ([config {:context/keys [scene-key entity-key component-key]}]
+   (cond-> config
+     scene-key (select-scene scene-key)
+     entity-key (select-entity entity-key)
+     component-key (select-component component-key))))
 
 (defn select
   ([config scene-key]

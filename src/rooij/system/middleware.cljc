@@ -38,22 +38,6 @@
 (defn preprocess-middlewares [scene-key entity-key component-key middleware]
   (map-kv #(preprocess-middleware (->context scene-key entity-key component-key) %1 %2) middleware))
 
-(defn add!
-  ([{:context/keys [scene-key entity-key component-key]} middleware]
-   (add! scene-key entity-key component-key middleware {}))
-  ([{:context/keys [scene-key entity-key component-key]} middleware opts]
-   (add! scene-key entity-key component-key middleware opts))
-  ([scene-key entity-key component-key middleware-key opts]
-   (swap! (state/get-scene-post-events scene-key) conj
-          {:add/path (path entity-key component-key)
-           :add/key middleware-key
-           :add/system (-> opts
-                           (assoc :middleware/ref (it/find-derived-value @state/system middleware-key))
-                           (->> (preprocess-middleware
-                                 (->context scene-key entity-key component-key)
-                                 middleware-key)))
-           :event/type :add/system})))
-
 (defn remove!
   ([{:context/keys [scene-key entity-key component-key]} middleware]
    (remove! scene-key entity-key component-key middleware))

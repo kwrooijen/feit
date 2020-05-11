@@ -32,22 +32,6 @@
 (defn preprocess-tickers [scene-key entity-key component-key ticker]
   (map-kv #(preprocess-ticker (->context scene-key entity-key component-key) %1 %2) ticker))
 
-(defn add!
-  ([{:context/keys [scene-key entity-key component-key]} ticker]
-   (add! scene-key entity-key component-key ticker {}))
-  ([{:context/keys [scene-key entity-key component-key]} ticker opts]
-   (add! scene-key entity-key component-key ticker opts))
-  ([scene-key entity-key component-key ticker-key opts]
-   (swap! (state/get-scene-post-events scene-key) conj
-          {:add/path (path entity-key component-key)
-           :add/key ticker-key
-           :add/system (-> opts
-                           (assoc :ticker/ref (it/find-derived-value @state/system ticker-key))
-                           (->> (preprocess-ticker
-                                 (->context scene-key entity-key component-key)
-                                 ticker-key)))
-           :event/type :add/system})))
-
 (defn remove!
   ([{:context/keys [scene-key entity-key component-key]} ticker]
    (remove! scene-key entity-key component-key ticker))

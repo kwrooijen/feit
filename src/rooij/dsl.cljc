@@ -32,23 +32,6 @@
     config
     (update config :keyword/hierarchy meta-merge {(top-key k) [(bottom-key k)]})))
 
-
-(defn- get-entity-key
-  [config entity-key]
-  (-> config
-      (get-in (:scene/last (meta config)))
-      :scene/entities
-      (->> (filter (fn [[kk]] (some #{entity-key} (->vec kk)))))
-      ffirst))
-
-(defn- get-component-key
-  [config component-key]
-  (-> config
-      (get-in (:entity/last (meta config)))
-      :entity/components
-      (->> (filter (fn [[kk]] (some #{component-key} (->vec kk)))))
-      ffirst))
-
 (defn- ref-system [config system-key system-config parent collection child]
   (let [parent-path (conj ((keyword parent "last") (meta config)) (keyword parent collection))
         component-id (top-key system-key)
@@ -407,6 +390,10 @@
   (rooij.config/merge-interface! config)
   config)
 
+(defn select-scene
+  [config scene-key]
+  (vary-meta config assoc :scene/last [scene-key]))
+
 (defn select-entity
   [config entity-key]
   (vary-meta config
@@ -423,8 +410,54 @@
                    :entity/components
                    component-key)))
 
+(defn select-handler
+  [config handler-key]
+  (vary-meta config
+             assoc :handler/last
+             (conj (:component/last (meta config))
+                   :component/handlers
+                   handler-key)))
+
+(defn select-reactor
+  [config reactor-key]
+  (vary-meta config
+             assoc :reactor/last
+             (conj (:component/last (meta config))
+                   :component/reactors
+                   reactor-key)))
+
+(defn select-ticker
+  [config ticker-key]
+  (vary-meta config
+             assoc :ticker/last
+             (conj (:component/last (meta config))
+                   :component/tickers
+                   ticker-key)))
+
+(defn select-middleware
+  [config middleware-key]
+  (vary-meta config
+             assoc :middleware/last
+             (conj (:component/last (meta config))
+                   :component/middlewares
+                   middleware-key)))
+
+(defn select-from-context
+  [config {:context/keys [scene-key entity-key component-key]}]
+  (cond-> config
+    scene-key (select-scene scene-key)
+    entity-key (select-entity entity-key)
+    component-key (select-component component-key)))
+
 (defn select
-  [config entity-key component-key]
-  (-> config
-      (select-entity entity-key)
-      (select-component component-key)))
+  ([config scene-key]
+   (select-scene config scene-key))
+  ([config scene-key entity-key]
+   (-> config
+       (select-scene scene-key)
+       (select-entity entity-key)))
+  ([config scene-key entity-key component-key]
+   (-> config
+       (select-scene scene-key)
+       (select-entity entity-key)
+       (select-component component-key))))

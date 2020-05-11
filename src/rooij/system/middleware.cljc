@@ -21,11 +21,11 @@
   ([entity-key component-key]
    [:scene/entities entity-key
     :entity/components component-key
-    :component/middleware])
+    :component/middlewares])
   ([entity-key component-key ticker]
    [:scene/entities entity-key
     :entity/components component-key
-    :component/middleware ticker]))
+    :component/middlewares ticker]))
 
 (defn preprocess-middleware [context middleware-key middleware-opts]
   (-> middleware-opts

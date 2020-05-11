@@ -16,7 +16,7 @@
    :component/handlers
    :component/tickers
    :component/reactors
-   :component/middleware
+   :component/middlewares
    :component/state])
 
 (defn path

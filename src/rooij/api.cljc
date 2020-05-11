@@ -236,3 +236,67 @@
             :add/system middleware
             :event/type :add/system})
     config))
+
+(defn remove-entity!
+  ([{:context/keys [scene-key entity-key]}]
+   (remove-entity! scene-key entity-key))
+  ([scene-key entity-key]
+   (swap! (state/get-scene-post-events scene-key) conj
+          {:remove/path [:scene/entities]
+           :remove/key entity-key
+           :event/type :remove/system})))
+
+
+(defn remove-component!
+  ([{:context/keys [scene-key entity-key component-key]}]
+   (remove-component! scene-key entity-key component-key))
+  ([scene-key entity-key component-key]
+   (swap! (state/get-scene-post-events scene-key) conj
+          {:remove/path [:scene/entities entity-key
+                         :entity/components]
+           :remove/key component-key
+           :event/type :remove/system})))
+
+(defn remove-handler!
+  ([{:context/keys [scene-key entity-key component-key]} handler]
+   (remove-handler! scene-key entity-key component-key handler))
+  ([scene-key entity-key component-key handler-key]
+   (swap! (state/get-scene-post-events scene-key) conj
+          {:remove/path [:scene/entities entity-key
+                         :entity/components component-key
+                         :component/handlers]
+           :remove/key handler-key
+           :event/type :remove/system})))
+
+(defn remove-ticker!
+  ([{:context/keys [scene-key entity-key component-key]} ticker]
+   (remove-ticker! scene-key entity-key component-key ticker))
+  ([scene-key entity-key component-key ticker-key]
+   (swap! (state/get-scene-post-events scene-key) conj
+          {:remove/path [:scene/entities entity-key
+                         :entity/components component-key
+                         :component/tickers]
+           :remove/key ticker-key
+           :event/type :remove/system})))
+
+(defn remove-reactor!
+  ([{:context/keys [scene-key entity-key component-key]} reactor]
+   (remove-reactor! scene-key entity-key component-key reactor))
+  ([scene-key entity-key component-key reactor-key]
+   (swap! (state/get-scene-post-events scene-key) conj
+          {:remove/path [:scene/entities entity-key
+                         :entity/components component-key
+                         :component/reactors]
+           :remove/key reactor-key
+           :event/type :remove/system})))
+
+(defn remove-middleware!
+  ([{:context/keys [scene-key entity-key component-key]} middleware]
+   (remove-middleware! scene-key entity-key component-key middleware))
+  ([scene-key entity-key component-key middleware-key]
+   (swap! (state/get-scene-post-events scene-key) conj
+          {:remove/path [:scene/entities entity-key
+                         :entity/components component-key
+                         :component/middlewares]
+           :remove/key middleware-key
+           :event/type :remove/system})))

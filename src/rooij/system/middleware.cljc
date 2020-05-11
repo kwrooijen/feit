@@ -1,10 +1,9 @@
 (ns rooij.system.middleware
-  (:require [integrant-tools.core :as it]
-            [meta-merge.core :refer [meta-merge]]
-            [rooij.state :as state]
-            [rooij.system.core :as system]
-            [rooij.util :refer [->context map-kv]]
-            [taoensso.timbre :as timbre]))
+  (:require
+   [meta-merge.core :refer [meta-merge]]
+   [rooij.system.core :as system]
+   [rooij.util :refer [->context map-kv]]
+   [taoensso.timbre :as timbre]))
 
 (defmethod system/init-key :rooij/middleware [k opts]
   (timbre/debug ::init-key opts)
@@ -17,16 +16,6 @@
    :context/entity-key
    :context/component-key])
 
-(defn path
-  ([entity-key component-key]
-   [:scene/entities entity-key
-    :entity/components component-key
-    :component/middlewares])
-  ([entity-key component-key ticker]
-   [:scene/entities entity-key
-    :entity/components component-key
-    :component/middlewares ticker]))
-
 (defn preprocess-middleware [context middleware-key middleware-opts]
   (-> middleware-opts
       (->> (meta-merge (:middleware/ref middleware-opts)))
@@ -37,12 +26,3 @@
 
 (defn preprocess-middlewares [scene-key entity-key component-key middleware]
   (map-kv #(preprocess-middleware (->context scene-key entity-key component-key) %1 %2) middleware))
-
-(defn remove!
-  ([{:context/keys [scene-key entity-key component-key]} middleware]
-   (remove! scene-key entity-key component-key middleware))
-  ([scene-key entity-key component-key middleware-key]
-   (swap! (state/get-scene-post-events scene-key) conj
-          {:remove/path (path entity-key component-key)
-           :remove/key middleware-key
-           :event/type :remove/system})))

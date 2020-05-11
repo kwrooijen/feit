@@ -1,25 +1,14 @@
 (ns rooij.system.ticker
-  (:require [integrant-tools.core :as it]
-            [meta-merge.core :refer [meta-merge]]
-            [rooij.state :as state]
-            [rooij.system.core :as system]
-            [rooij.util :refer [->context map-kv top-key]]
-            [taoensso.timbre :as timbre]))
+  (:require
+   [meta-merge.core :refer [meta-merge]]
+   [rooij.system.core :as system]
+   [rooij.util :refer [->context map-kv top-key]]
+   [taoensso.timbre :as timbre]))
 
 (def context-keys
   [:context/scene-key
    :context/entity-key
    :context/component-key])
-
-(defn path
-  ([entity-key component-key]
-   [:scene/entities entity-key
-    :entity/components component-key
-    :component/tickers])
-  ([entity-key component-key ticker]
-   [:scene/entities entity-key
-    :entity/components component-key
-    :component/tickers ticker]))
 
 (defn preprocess-ticker [context ticker-key ticker-opts]
   (-> ticker-opts
@@ -31,15 +20,6 @@
 
 (defn preprocess-tickers [scene-key entity-key component-key ticker]
   (map-kv #(preprocess-ticker (->context scene-key entity-key component-key) %1 %2) ticker))
-
-(defn remove!
-  ([{:context/keys [scene-key entity-key component-key]} ticker]
-   (remove! scene-key entity-key component-key ticker))
-  ([scene-key entity-key component-key ticker-key]
-   (swap! (state/get-scene-post-events scene-key) conj
-          {:remove/path (path entity-key component-key)
-           :remove/key ticker-key
-           :event/type :remove/system})))
 
 (defmethod system/init-key :rooij/ticker [k opts]
   (timbre/debug ::init-key opts)

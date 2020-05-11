@@ -59,12 +59,23 @@
       (when-not ^boolean (empty? @events)
         (recur @events (dec threshold))))))
 
+(defn- remove-system
+  ""
+  [scene event]
+  (when (#{:system/entity} (:remove/system-type event))
+    (doseq [[_component-key component] (get-in scene (conj (event :remove/path) (:remove/key event) :entity/components))]
+      ((:component/halt! component) (:component/state component))))
+  (when (#{:system/component} (:remove/system-type event))
+    (let [component (get-in scene (conj (event :remove/path) (:remove/key event)))]
+      ((:component/halt! component) (:component/state component))))
+  (update-in scene (:remove/path event) dissoc (:remove/key event)))
+
 (defn handle-post-event [scene event]
   (condp = (:event/type event)
     :scene/start! (do (system.scene/start! (:scene/key event)) scene)
     :scene/halt! (do (system.scene/halt! (:scene/key event)) scene)
     :add/system (update-in scene (:add/path event) assoc (:add/key event) (:add/system event))
-    :remove/system (update-in scene (:remove/path event) dissoc (:remove/key event))))
+    :remove/system (remove-system scene event)))
 
 (defn post-events [{:scene/keys [key] :as scene}]
   (let [events (state/get-scene-post-events key)

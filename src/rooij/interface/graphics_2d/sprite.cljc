@@ -11,7 +11,8 @@
   (play [this spritesheet animation])
   (play-loop [this spritesheet animation opts])
   (stop-loop [this animation])
-  (flip [this x y]))
+  (flip [this x y])
+  (halt! [this]))
 
 (defmethod ig/init-key :graphics-2d.handler.sprite/play [_ _opts]
   (fn handler-sprite--play
@@ -35,6 +36,10 @@
 
 (defmethod ig/init-key :graphics-2d.component/sprite [_ opts]
   (make-sprite state/graphics-2d opts))
+
+(defmethod ig/halt-key! :graphics-2d.component/sprite [_ _opts]
+  (fn [state]
+    (halt! state)))
 
 (it/derive-hierarchy
  {:graphics-2d.component/sprite [:rooij/component :rooij/position]})

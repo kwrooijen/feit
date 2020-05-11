@@ -6,7 +6,9 @@
    [rooij.module.pixi.state :as state]))
 
 (defrecord PixiGraphics2DRectangle [body x y w h]
-  RooijGraphics2DRectangle)
+  RooijGraphics2DRectangle
+  (halt! [this]
+    (.destroy (:body this))))
 
 (extend-protocol RooijGeneral2DPosition
   PixiGraphics2DRectangle

@@ -55,7 +55,10 @@
       (set! (.. sprite -scale -y) (* -1 (.. sprite -scale -y))))
     (-> this
         (assoc-in [:flip :x] x)
-        (assoc-in [:flip :y] y))))
+        (assoc-in [:flip :y] y)))
+
+  (halt! [this]
+    (.destroy (:body this))))
 
 (extend-protocol RooijGeneral2DPosition
   PixiGraphics2DSprite

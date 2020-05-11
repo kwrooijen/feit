@@ -244,6 +244,7 @@
    (swap! (state/get-scene-post-events scene-key) conj
           {:remove/path [:scene/entities]
            :remove/key entity-key
+           :remove/system-type :system/entity
            :event/type :remove/system})))
 
 
@@ -255,6 +256,7 @@
           {:remove/path [:scene/entities entity-key
                          :entity/components]
            :remove/key component-key
+           :remove/system-type :system/component
            :event/type :remove/system})))
 
 (defn remove-handler!
@@ -266,6 +268,7 @@
                          :entity/components component-key
                          :component/handlers]
            :remove/key handler-key
+           :remove/system-type :system/handler
            :event/type :remove/system})))
 
 (defn remove-ticker!
@@ -277,6 +280,7 @@
                          :entity/components component-key
                          :component/tickers]
            :remove/key ticker-key
+           :remove/system-type :system/ticker
            :event/type :remove/system})))
 
 (defn remove-reactor!
@@ -288,6 +292,7 @@
                          :entity/components component-key
                          :component/reactors]
            :remove/key reactor-key
+           :remove/system-type :system/reactor
            :event/type :remove/system})))
 
 (defn remove-middleware!
@@ -299,4 +304,5 @@
                          :entity/components component-key
                          :component/middlewares]
            :remove/key middleware-key
+           :remove/system-type :system/middleware
            :event/type :remove/system})))

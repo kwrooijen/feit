@@ -7,10 +7,15 @@
    [rooij.interface.graphics-2d.core :refer [make-rectangle]]
    [rooij.state :as state]))
 
-(defprotocol RooijGraphics2DRectangle)
+(defprotocol RooijGraphics2DRectangle
+  (halt! [this]))
 
-(defmethod ig/init-key :graphics-2d.component/rectangle [k opts]
+(defmethod ig/init-key :graphics-2d.component/rectangle [_k opts]
   (make-rectangle state/graphics-2d opts))
+
+(defmethod ig/halt-key! :graphics-2d.component/rectangle [_ _opts]
+  (fn [state]
+    (halt! state)))
 
 (it/derive-hierarchy
  {:graphics-2d.component/rectangle [:rooij/component :rooij/position]})

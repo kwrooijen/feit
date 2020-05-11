@@ -1,7 +1,12 @@
 (ns rooij.api
   (:require
+   [integrant-tools.core :as it]
+   [integrant-tools.keyword :refer [make-child]]
+   [integrant.core :as ig]
+   [meta-merge.core :refer [meta-merge]]
    [rooij.state :as state]
-   [integrant.core :as ig]))
+   [rooij.system.entity :as entity]
+   [rooij.util :refer [->context top-key]]))
 
 (defn scenes
   "Get all current running scenes as a set."
@@ -82,3 +87,23 @@
   (swap! (state/get-scene-post-events scene-key) conj
          {:scene/key scene-key
           :event/type :scene/start!}))
+
+(defn add-entity!
+  [config]
+  (let [entity-key (-> config meta :entity/last last)
+        scene-key (-> config meta :scene/last last top-key)
+        entity-ref (it/find-derived-value @state/system entity-key)
+        entity-key (if (:entity/dynamic entity-ref)
+                     (make-child (top-key entity-key))
+                     (top-key entity-key))
+        entity (-> {:entity/ref entity-ref}
+                   (meta-merge (get-in config (:entity/last (meta config))))
+                   (->> (entity/preprocess-entity (->context scene-key entity-key) entity-key)
+                        (entity/postprocess-entity)))]
+    (swap! (state/get-scene-post-events scene-key) conj
+           {:add/path [:scene/entities]
+            :add/key entity-key
+            :add/system entity
+            :event/type :add/system})
+    {:context/scene-key scene-key
+     :context/entity-key entity-key}))

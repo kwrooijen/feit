@@ -67,7 +67,8 @@
   ;; TODO remove dynamic entity
   ;; OR Create local hierarchy for scenes
   (doseq [[_ component] components]
-    ((:component/halt! component) component))
+    ((:component/halt! component) (:component/state component)))
+
   ((:entity/halt! entity) entity))
 
 (defn suspend! [entity]

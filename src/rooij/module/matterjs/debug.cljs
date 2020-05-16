@@ -6,12 +6,25 @@
   [(.-x vertex)
    (.-y vertex)])
 
+(defn part->points
+  [part]
+  {:points (.map (.-vertices part) vertex->point)})
+
 (defn body->points [body]
-  (.map (.-vertices body) vertex->point))
+  {:body
+   (-> (.-parts body)
+       (.map part->points))})
 
 (defn engine->points [engine]
-  (.map (.-bodies (.-world engine)) body->points))
+  (-> engine
+      (.-world)
+      (.-bodies)
+      (.map body->points)
+      (.flat)))
 
 (defn wireframe-vectors [scene-key]
   (when-let [engine (state/get-engine scene-key)]
-    (js->clj (engine->points engine))))
+    (->> (engine->points engine)
+         (js->clj)
+         (mapcat (comp rest :body))
+         (mapv :points))))

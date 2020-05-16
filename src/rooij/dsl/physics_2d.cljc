@@ -1,12 +1,5 @@
 (ns rooij.dsl.physics-2d
-  (:require [meta-merge.core :refer [meta-merge]]
-            [rooij.dsl :as r]))
-
-(defn- merge-component [config m]
-  (update-in config (:component/last (meta config)) merge m))
-
-(defn- meta-merge-component [config m]
-  (update-in config (:component/last (meta config)) meta-merge m))
+  (:require [rooij.dsl :as r]))
 
 (defn component-rectangle
   "TODO"
@@ -16,17 +9,17 @@
 (defn static?
   "TODO"
   [config boolean]
-  (merge-component config {:static? boolean}))
+  (r/component-merge config {:static? boolean}))
 
 (defn angle
   "TODO"
   [config angle]
-  (merge-component config {:angle angle}))
+  (r/component-merge config {:angle angle}))
 
 (defn set-position
   "TODO"
   [config x y]
-  (merge-component config {:x x :y y}))
+  (r/component-merge config {:x x :y y}))
 
 (defn position-emitter
   "TODO"
@@ -39,4 +32,14 @@
 (defn rotation?
   "TODO"
   [config boolean]
-  (merge-component config {:rotation? boolean}))
+  (r/component-merge config {:rotation? boolean}))
+
+(defn add-sensor
+  ""
+  [config sensor-key x y w h opts]
+  (r/component-meta-merge config {:sensors [{:sensor/key sensor-key
+                                             :sensor/x x
+                                             :sensor/y y
+                                             :sensor/w w
+                                             :sensor/h h
+                                             :sensor/opts opts}]}))

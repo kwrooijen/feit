@@ -51,6 +51,7 @@
   [scene-key]
   (.on Events (get-engine scene-key) "collisionStart"
        (fn [event]
+         ;; FIXME we probably need to loop over these pairs?
          (let [pairs (-> (.-pairs event) (aget 0))
                body-a (.-bodyA pairs)
                body-b (.-bodyB pairs)]

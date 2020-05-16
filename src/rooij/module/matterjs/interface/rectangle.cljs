@@ -66,6 +66,9 @@
   (set! (.-component-key o) component-key)
   (set! (.-entity-key o) entity-key)
   (set! (.-scene-key o) scene-key)
+  (set! (.-context o) {:context/component-key component-key
+                       :context/entity-key entity-key
+                       :context/scene-key scene-key})
   o)
 
 (defn- opts->rectangle
@@ -85,6 +88,14 @@
     (.setInertia Body o js/Infinity))
   o)
 
+(defn add-sensor-keys
+  ""
+  [sensor {:sensor/keys [key opts]}]
+  (set! (.-collision-target sensor) (:sensor.collision/target opts))
+  (set! (.-collision-handler sensor) (:sensor.collision/handler opts))
+  (set! (.-sensor-key sensor) key)
+  sensor)
+
 (defn- add-sensor-to-parts
   ""
   [{:keys [x y]
@@ -92,12 +103,13 @@
    {sensor-x :sensor/x
     sensor-y :sensor/y
     sensor-w :sensor/w
-    sensor-h :sensor/h}]
-  ;; TODO Add callback here, or handler thing
+    sensor-h :sensor/h
+    :as sensor-opts}]
   (let [sensor-x (+ x sensor-x)
         sensor-y (+ y sensor-y)
-        sensor-opts #js {:isSensor true}]
-    (-> (.rectangle Bodies sensor-x sensor-y sensor-w sensor-h sensor-opts)
+        sensor-rectangle-opts #js {:isSensor true}]
+    (-> (.rectangle Bodies sensor-x sensor-y sensor-w sensor-h sensor-rectangle-opts)
+        (add-sensor-keys sensor-opts)
         (add-context-keys opts))))
 
 (defn- opts->rectangle-map

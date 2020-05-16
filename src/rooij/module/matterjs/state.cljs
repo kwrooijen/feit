@@ -1,6 +1,7 @@
 (ns rooij.module.matterjs.state
   (:require
-   ["matter-js" :as Matter :refer [Engine World Mouse MouseConstraint]]))
+   ["matter-js" :as Matter :refer [Engine Events Mouse MouseConstraint World]]
+   [rooij.api :as api]))
 
 (defonce ^:private engines (atom nil))
 
@@ -39,10 +40,30 @@
         mouseConstraint (.create MouseConstraint engine #js {:mouse mouse})]
     (.add World (.-world engine) mouseConstraint)))
 
+(defn ^boolean component-collision? [body-a body-b]
+  (some?
+   (when-let [target (.-collision-target body-a)]
+     (or (#{target} (.-collision-key body-b))
+         ((ancestors (.-collision-key body-b)) target)))))
+
+(defn add-collision!
+  ""
+  [scene-key]
+  (.on Events (get-engine scene-key) "collisionStart"
+       (fn [event]
+         (let [pairs (-> (.-pairs event) (aget 0))
+               body-a (.-bodyA pairs)
+               body-b (.-bodyB pairs)]
+           (when (component-collision? body-a body-b)
+             (api/emit! (.-context body-a) (.-collision-handler body-a)))
+           (when (component-collision? body-b body-a)
+             (api/emit! (.-context body-b) (.-collision-handler body-b)))))))
+
 (defn init-engine! [scene-key]
   (swap! engines assoc scene-key (.create Engine (clj->js default-world)))
   (swap! running-engines conj scene-key)
-  (add-mouse-constraint! scene-key))
+  (add-mouse-constraint! scene-key)
+  (add-collision! scene-key))
 
 (defn halt-engine! [scene-key]
   (.clear Engine (get-engine scene-key))

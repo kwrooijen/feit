@@ -479,3 +479,15 @@
      (select* {} config scene-key entity-key)))
   ([config scene-key entity-key component-key]
    (select* config scene-key entity-key component-key)))
+
+(defn component-derives
+  ""
+  [config k]
+  (let [component-key  (-> config meta :last/component last top-key)]
+    (update-in config [:keyword/hierarchy component-key] conj k)))
+
+(defn component-merge [config m]
+  (update-in config (:component/last (meta config)) merge m))
+
+(defn component-meta-merge [config m]
+  (update-in config (:component/last (meta config)) meta-merge m))

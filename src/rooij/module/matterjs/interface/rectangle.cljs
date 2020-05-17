@@ -20,15 +20,16 @@
 
 (extend-protocol RooijGeneral2DPosition
   MatterPhysics2DRectangle
-  (set-position [{:keys [rectangle pivot-x pivot-y] :as this} x y angle]
-    (.setPosition Body rectangle #js {:x (+ x pivot-x)
+  (set-position [{:keys [main pivot-x pivot-y] :as this} x y angle]
+    (.setPosition Body main #js {:x (+ x pivot-x)
                                  :y (+ y pivot-y)})
-    (.setAngle Body rectangle angle)
+    (.setAngle Body main angle)
     (assoc this :x x :y y))
-  (get-position [{:keys [rectangle w h] :as this}]
-    {:x (int (.. rectangle -position -x))
-     :y (int (.. rectangle -position -y))
-     :angle (.. rectangle -angle)}))
+  (get-position [{:keys [main w h] :as this}]
+    (js/console.log main)
+    {:x (int (.. main -position -x))
+     :y (int (.. main -position -y))
+     :angle (.. main -angle)}))
 
 (extend-protocol RooijPhysics2DShape
   MatterPhysics2DRectangle
@@ -128,18 +129,19 @@
         parts (map (partial add-sensor-to-parts opts) (:sensors opts))]
     (set-inertia rectangle opts)
     (.setAngle Body rectangle angle)
-    (-> (.create Body (clj->js {:parts (cons rectangle parts)
-                                :isStatic static?}))
-        (add-context-keys opts))))
+    [rectangle
+     (-> (.create Body (clj->js {:parts (cons rectangle parts)
+                                 :isStatic static?}))
+         (add-context-keys opts))]))
 
 (defn- new-rectangle
   [_ {:context/keys [scene-key]
       :as opts}]
-  (let [body (opts->rectangle-body opts)]
+  (let [[main body] (opts->rectangle-body opts)]
     (.add World (state/get-world scene-key) body)
     (map->MatterPhysics2DRectangle
      (-> (opts->rectangle-map opts)
-         (assoc :body body :rectangle (-> body (.-parts ) (aget 0)))))))
+         (assoc :body body :main main)))))
 
 (defn- existing-rectangle [{:context/keys [scene-key state]}]
   (.add World (state/get-world scene-key) (:body state))

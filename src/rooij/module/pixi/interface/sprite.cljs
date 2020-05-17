@@ -113,18 +113,19 @@
 
 (defn make [{:context/keys [scene-key]
              :position/keys [x y]
+             :sprite/keys [scale fps]
              flip-x :flip/x
              flip-y :flip/y
              :as opts}]
   (let [{:keys [sprite] :as state} (->sprite opts)]
     (add-on-click-events! sprite opts)
-    (set! (.-animationSpeed sprite) 0.167)
+    (set! (.-animationSpeed sprite) (/ (or fps 15) 60))
     (set! (.-x sprite) x)
     (set! (.-y sprite) y)
     (set! (.-y sprite) y)
     ;; TODO Add scaling option
-    (set! (.. sprite -scale -x) 1)
-    (set! (.. sprite -scale -y) 1)
+    (set! (.. sprite -scale -x) (or scale 1))
+    (set! (.. sprite -scale -y) (or scale 1))
     (flip state flip-x flip-y)
     (.set (.-anchor sprite) 0.5)
     (.addChild (state/get-scene scene-key) sprite)

@@ -131,3 +131,8 @@
   "TODO"
   [config scale]
   (meta-merge-component config {:sprite/scale scale}))
+
+(defn sprite-fps
+  "TODO"
+  [config fps]
+  (meta-merge-component config {:sprite/fps fps}))

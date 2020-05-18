@@ -22,11 +22,13 @@
 (def system
   :rooij.interface.physics-2d/system)
 
+(defmethod ig/init-key :rooij.interface.physics-2d/system [_ _]
+  (DefaultPhysics2D.))
+
 (defn init []
   (-> @rooij.config/config
       (meta-merge {system {}})
       (ig/prep [system])
       (ig/init [system])
       (it/find-derived-value system)
-      (or (DefaultPhysics2D.))
       (state/set-physics-2d!)))

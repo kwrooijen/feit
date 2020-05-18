@@ -25,11 +25,13 @@
 (def system
   :rooij.interface.graphics-2d/system)
 
+(defmethod ig/init-key :rooij.interface.graphics-2d/system [_ _]
+  (DefaultGraphics2D.))
+
 (defn init []
   (-> @rooij.config/config
       (meta-merge {system {}})
       (ig/prep [system])
       (ig/init [system])
       (it/find-derived-value system)
-      (or (DefaultGraphics2D.))
       (state/set-graphics-2d!)))

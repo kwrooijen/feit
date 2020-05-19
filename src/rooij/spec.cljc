@@ -7,6 +7,6 @@
 (s/def :context/component-key qualified-keyword?)
 
 (s/def :rooij/context
-  (s/keys :opt [:context/scene-key
-                :context/entity-key
+  (s/keys :req [:context/scene-key]
+          :opt [:context/entity-key
                 :context/component-key]))

@@ -1,9 +1,6 @@
 (ns feit.system.entity
   (:require
-   [integrant-tools.core :as it]
-   [integrant-tools.keyword :refer [make-child]]
    [com.rpl.specter :as sp :refer [ALL MAP-KEYS MAP-VALS]]
-   [feit.core.state :as state]
    [integrant.core :as ig]
    [meta-merge.core :refer [meta-merge]]
    [feit.system.component :refer [preprocess-components]]
@@ -61,7 +58,7 @@
   (-> opts
       (assoc :entity/key (top-key k)
              :entity/init (system/get-init-key k)
-             :entity/halt! (system/get-halt-key k opts))))
+             :entity/halt! (system/get-entity-halt-key k))))
 
 (defn halt! [{:entity/keys [components] :as entity}]
   ;; TODO remove dynamic entity
@@ -69,7 +66,7 @@
   (doseq [[_ component] components]
     ((:component/halt! component) (:component/state component)))
 
-  ((:entity/halt! entity) entity))
+  ((:entity/halt! entity) (:entity/key entity) entity))
 
 (defn suspend! [entity]
   (doseq [[component-key component] (:entity/components entity)]

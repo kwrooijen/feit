@@ -49,11 +49,22 @@
        (throw (ex-info (str "No ig/init-key found for key " derived-k) {:missing-key derived-k}))
        (fn [_ opts] opts)))))
 
+;; TODO This is currently used for components.
+;; Components needs to add a nested function. `opts` doesn't hold context.
+;; This should be changed that opts is a merged map of state + context keys
+;; (defmethod ig/halt-key! :graphics-2d.component/sprite [_ _opts]
+;;   (fn [state]
+;;     (halt! state)))
 (defn get-halt-key [derived-k entity-opts]
   (if-let [f (get-method ig/halt-key! (#'ig/normalize-key derived-k))]
     (or (f derived-k entity-opts)
         (fn [_] nil))
     (fn [_] nil)))
+
+(defn get-entity-halt-key [derived-k]
+  (if-let [f (get-method ig/halt-key! (#'ig/normalize-key derived-k))]
+    f
+    (fn [_key _opts] nil)))
 
 (defn start []
   (timbre/info ::start)

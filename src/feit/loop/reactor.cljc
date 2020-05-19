@@ -1,6 +1,6 @@
 (ns feit.loop.reactor
   (:require
-   [feit.state :as state]))
+   [feit.core.state :as state]))
 
 (defn- path-entity-state [{:context/keys [entity-key component-key]}]
   [:context/scene

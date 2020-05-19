@@ -1,8 +1,8 @@
-(ns feit.util
+(ns feit.core.util
   (:require
    [clojure.walk :refer [postwalk]]
    [integrant.core :as ig]
-   [feit.state :as state]
+   [feit.core.state :as state]
    [integrant-tools.core :as it]))
 
 (defn top-key [k]

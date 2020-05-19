@@ -2,7 +2,7 @@
   (:require
    [meta-merge.core :refer [meta-merge]]
    [feit.system.core :as system]
-   [feit.util :refer [->context map-kv top-key]]
+   [feit.core.util :refer [->context map-kv top-key]]
    [taoensso.timbre :as timbre]))
 
 (def context-keys

@@ -1,4 +1,4 @@
-(ns feit.error
+(ns feit.core.error
   (:require
    #?(:clj [clojure.pprint :refer [pprint]]
       :cljs [cljs.pprint :refer [pprint]])

@@ -1,6 +1,6 @@
 (ns feit.system.keyboard
   (:require
-   [feit.util :refer [->context map-kv]]
+   [feit.core.util :refer [->context map-kv]]
    [meta-merge.core :refer [meta-merge]]
    [feit.system.core :as system]
    [taoensso.timbre :as timbre]))

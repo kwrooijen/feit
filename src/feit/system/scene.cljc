@@ -6,13 +6,13 @@
    feit.config
    [feit.interface.graphics-2d.core :as interface.graphics-2d]
    [feit.interface.physics-2d.core :as interface.physics-2d]
-   [feit.state :as state]
+   [feit.core.state :as state]
    [feit.system.component :refer [process-refs-component]]
    [feit.system.core :as system]
    [feit.system.entity :as entity
     :refer [postprocess-entity preprocess-entities process-refs-entity]]
    [feit.system.keyboard :as keyboard :refer [preprocess-keyboards]]
-   [feit.util :refer [resolve-all top-key]]
+   [feit.core.util :refer [resolve-all top-key]]
    [taoensso.timbre :as timbre]))
 
 (defmethod system/init-key :feit/scene [k opts]

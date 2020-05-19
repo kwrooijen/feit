@@ -4,7 +4,7 @@
    [integrant.core :as ig]
    [feit.dsl :as r]
    [feit.interface.physics-2d.core :refer [make-rectangle]]
-   [feit.state :as state]))
+   [feit.core.state :as state]))
 
 (defprotocol FeitPhysics2DRectangle)
 

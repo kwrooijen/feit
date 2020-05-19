@@ -6,7 +6,7 @@
    [feit.dsl :as r]
    [feit.interface.graphics-2d.core :refer [draw-wireframe]]
    [feit.interface.physics-2d.core :refer [get-wireframe-vectors]]
-   [feit.state :as state]
+   [feit.core.state :as state]
    [feit.system.core :as system]
    [feit.system.scene :as scene]))
 

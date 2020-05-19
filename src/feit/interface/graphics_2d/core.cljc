@@ -4,7 +4,7 @@
    [integrant.core :as ig]
    [meta-merge.core :refer [meta-merge]]
    [feit.config]
-   [feit.state :as state]))
+   [feit.core.state :as state]))
 
 (defprotocol FeitGraphics2D
   (scene-init [this scene-key])

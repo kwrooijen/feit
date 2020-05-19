@@ -1,12 +1,12 @@
 (ns feit.system.component
   (:require [meta-merge.core :refer [meta-merge]]
-            [feit.state :as state]
+            [feit.core.state :as state]
             [feit.system.core :as system]
             [feit.system.handler :as handler :refer [preprocess-handlers]]
             [feit.system.middleware :as middleware :refer [preprocess-middlewares]]
             [feit.system.reactor :as reactor :refer [preprocess-reactors]]
             [feit.system.ticker :as ticker :refer [preprocess-tickers]]
-            [feit.util :refer [->context map-kv]]
+            [feit.core.util :refer [->context map-kv]]
             [taoensso.timbre :as timbre]))
 
 (def init-dissocs

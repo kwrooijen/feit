@@ -1,4 +1,4 @@
-(ns feit.state
+(ns feit.core.state
   #?(:cljs
      (:refer-clojure :exclude [atom]))
   #?(:cljs

@@ -4,7 +4,7 @@
    [integrant-tools.core :as it]
    [integrant.core :as ig]
    [feit.config]
-   [feit.state :as state]
+   [feit.core.state :as state]
    [feit.interface.graphics-2d.core :refer [make-sprite]]))
 
 (defprotocol FeitGraphics2DSprite

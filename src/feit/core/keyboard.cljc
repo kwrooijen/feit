@@ -1,7 +1,7 @@
-(ns feit.keyboard
+(ns feit.core.keyboard
   (:refer-clojure :exclude [keys])
   (:require
-   [feit.state :as state]))
+   [feit.core.state :as state]))
 
 ;; TODO Maybe we can optimize the creation of the input-event map with memoize
 (defn emit-keydown! [key]

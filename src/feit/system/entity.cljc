@@ -3,12 +3,12 @@
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [make-child]]
    [com.rpl.specter :as sp :refer [ALL MAP-KEYS MAP-VALS]]
-   [feit.state :as state]
+   [feit.core.state :as state]
    [integrant.core :as ig]
    [meta-merge.core :refer [meta-merge]]
    [feit.system.component :refer [preprocess-components]]
    [feit.system.core :as system]
-   [feit.util :refer [->context map-kv top-key]]
+   [feit.core.util :refer [->context map-kv top-key]]
    [taoensso.timbre :as timbre]))
 
 (defn- has-handler? [handler-key component]

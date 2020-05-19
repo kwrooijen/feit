@@ -8,7 +8,7 @@
    [feit.loop.reactor :as loop.reactor]
    [feit.loop.ticker :as loop.ticker]
    [feit.system.scene :as system.scene]
-   [feit.state :as state :refer [get-scene]]
+   [feit.core.state :as state :refer [get-scene]]
    [feit.interface.graphics-2d.core :as interface.graphics-2d :refer [draw-wireframe]]
    [feit.interface.physics-2d.core :as interface.physics-2d :refer [get-wireframe-vectors]]
    [taoensso.timbre :as timbre]))

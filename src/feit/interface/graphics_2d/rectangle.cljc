@@ -5,7 +5,7 @@
    [feit.config]
    [feit.dsl :as r]
    [feit.interface.graphics-2d.core :refer [make-rectangle]]
-   [feit.state :as state]))
+   [feit.core.state :as state]))
 
 (defprotocol FeitGraphics2DRectangle
   (halt! [this]))

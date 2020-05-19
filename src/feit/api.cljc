@@ -4,14 +4,14 @@
    [integrant-tools.core :as it]
    [integrant-tools.keyword :refer [make-child]]
    [integrant.core :as ig]
-   [feit.state :as state]
+   [feit.core.state :as state]
    [feit.system.component :as component]
    [feit.system.entity :as entity]
    [feit.system.handler :as handler]
    [feit.system.middleware :as middleware]
    [feit.system.reactor :as reactor]
    [feit.system.ticker :as ticker]
-   [feit.util :refer [->context top-key]]))
+   [feit.core.util :refer [->context top-key]]))
 
 (defn scenes
   "Get all current running scenes as a set."

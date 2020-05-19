@@ -3,7 +3,7 @@
    [meta-merge.core :refer [meta-merge]]
    [integrant.core :as ig]
    [integrant-tools.keyword :refer [make-child]]
-   [feit.util :refer [bottom-key top-key ->vec]]
+   [feit.core.util :refer [bottom-key top-key ->vec]]
    [feit.config]))
 
 (defn valid-key?

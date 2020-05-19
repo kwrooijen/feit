@@ -1,14 +1,14 @@
 (ns feit.core
   (:require
    [feit.config]
-   [feit.error]
+   [feit.core.error]
    [feit.interface.graphics-2d.core :as interface.graphics-2d]
    [feit.interface.keyboard.core :as interface.keyboard]
    [feit.interface.physics-2d.core :as interface.physics-2d]
    [feit.logger]
    [feit.loop.core]
    [feit.spec]
-   [feit.state :as state]
+   [feit.core.state :as state]
    [feit.system.component]
    [feit.system.core :as system]
    [feit.system.entity]
@@ -38,7 +38,7 @@
      (timbre/debug ::setup @feit.config/config)
      (start)
      (catch #?(:clj Throwable :cljs :default) e
-       (feit.error/handle-error e)
+       (feit.core.error/handle-error e)
        (throw e)))))
 
 (defn wireframe-enabled! [boolean]

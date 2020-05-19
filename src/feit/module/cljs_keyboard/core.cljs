@@ -1,7 +1,7 @@
 (ns feit.module.cljs-keyboard.core
   (:require
    [integrant.core :as ig]
-   [feit.keyboard]
+   [feit.core.keyboard]
    [feit.module.cljs-keyboard.interface :refer [->CljsKeyboard]]))
 
 (defn- body-active?
@@ -19,7 +19,7 @@
        (not (.-repeat event))))
 
 (defn- get-key [event]
-  (get feit.keyboard/keys (.-keyCode event)))
+  (get feit.core.keyboard/keys (.-keyCode event)))
 
 (defn- add-event-listener
   "Add an event listener to the body. Listen to `trigger` and execute `callback`.
@@ -31,8 +31,8 @@
   Example:
 
   ```clojure
-  (feit.keyboard/add-event-listener \"keydown\" es/emit-keydown!)
-  (feit.keyboard/add-event-listener \"keyup\" es/emit-keyup!)
+  (feit.module.cljs-keboard/add-event-listener \"keydown\" es/emit-keydown!)
+  (feit.module.cljs-keboard/add-event-listener \"keyup\" es/emit-keyup!)
   ```
 
   TODO: when keydown is triggered, and body loses focus, keyup is never emitted.
@@ -44,8 +44,8 @@
                         (callback %))))
 
 (defn add-event-listeners! []
-  (add-event-listener "keydown" (comp feit.keyboard/emit-keydown! get-key))
-  (add-event-listener "keyup"   (comp feit.keyboard/emit-keyup!   get-key)))
+  (add-event-listener "keydown" (comp feit.core.keyboard/emit-keydown! get-key))
+  (add-event-listener "keyup"   (comp feit.core.keyboard/emit-keyup!   get-key)))
 
 (defn disable-tabbing!
   "This disables the tabbing of HTML elements. This ensures that the user can't

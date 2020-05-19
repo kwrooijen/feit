@@ -5,7 +5,7 @@
    [feit.config]
    [feit.interface.graphics-2d.core :refer [make-loader]]
    [feit.api :refer [emit! transition-scene]]
-   [feit.state :as state]))
+   [feit.core.state :as state]))
 
 (defprotocol FeitGraphics2DLoader
   (load-spritesheet [this context file name])

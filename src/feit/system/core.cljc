@@ -2,8 +2,8 @@
   (:require
    [feit.config]
    [taoensso.timbre :as timbre]
-   [feit.state :as state]
-   [feit.util :refer [derive-all-composites derive-all-hierarchies]]
+   [feit.core.state :as state]
+   [feit.core.util :refer [derive-all-composites derive-all-hierarchies]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 

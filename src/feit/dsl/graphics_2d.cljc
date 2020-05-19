@@ -92,6 +92,8 @@
 
 (defn component-rectangle
   "TODO"
+  ([k x y w h fill]
+   (component-rectangle {} k x y w h fill {}))
   ([config k x y w h fill]
    (component-rectangle config k x y w h fill {}))
   ([config k x y w h fill opts]
@@ -106,7 +108,7 @@
   ([config k x y w h fill opts]
    (-> config
        (component-rectangle k x y w h fill opts)
-       (r/ref-component k))))
+       (r/ref-component k opts))))
 
 (defn loader-next-scene
   "TODO"
@@ -146,11 +148,18 @@
   [config texture-name]
   (merge-component config {:texture/name texture-name}))
 
-(defn sprite-position
-  "TODO"
+(defn set-position
+  "Sets the position of the last component to `position-x` / `position-y`
+  This works for `sprite`, and `rectangle` components."
   [config position-x position-y]
   (merge-component config {:position/x position-x
                            :position/y position-y}))
+
+(defn set-fill
+  "Sets the position of the last component to `position-x` / `position-y`
+  This works for `rectangle` components."
+  [config color]
+  (merge-component config {:shape/fill color}))
 
 (defn sprite-flip
   "TODO"

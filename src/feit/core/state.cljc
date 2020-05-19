@@ -42,7 +42,10 @@
   @scenes)
 
 (defn get-scene [scene-key]
-  (get @scenes scene-key))
+  (if-let [scene (get @scenes scene-key)]
+    scene
+    (throw (ex-info (str "Scene " scene-key " does not exist, or is not yet initiated")
+                    {::scene-key scene-key}))))
 
 (defn get-scene-events [scene-key]
   (get @events scene-key))

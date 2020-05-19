@@ -6,6 +6,13 @@
    [rooij.util :refer [bottom-key top-key ->vec]]
    [rooij.config]))
 
+(defn valid-key?
+  ""
+  [k]
+  (or (qualified-keyword? k)
+      (and (vector? k)
+           (every? qualified-keyword? k))))
+
 (defn error-map [system-key config system-config]
   {::system-key system-key
    ::config config
@@ -65,10 +72,11 @@
      (entity key-or-config key-or-opts {})
      (entity {} key-or-config key-or-opts)))
   ([config entity-key entity-opts]
-   {:pre [(qualified-keyword? entity-key)]}
+   {:pre [(valid-key? entity-key)]}
    (-> config
-       (meta-merge {[:rooij/entity entity-key] entity-opts})
-       (vary-meta assoc :entity/last [[:rooij/entity entity-key]]))))
+       (add-hierarchy entity-key)
+       (meta-merge {[:rooij/entity (top-key entity-key)] entity-opts})
+       (vary-meta assoc :entity/last [[:rooij/entity (top-key entity-key)]]))))
 
 (defn component
   ([component-key]
@@ -78,10 +86,11 @@
      (component key-or-config key-or-opts {})
      (component {} key-or-config key-or-opts)))
   ([config component-key component-opts]
-   {:pre [(qualified-keyword? component-key)]}
+   {:pre [(valid-key? component-key)]}
    (-> config
-       (meta-merge {[:rooij/component component-key] component-opts})
-       (vary-meta assoc :component/last [[:rooij/component component-key]]))))
+       (add-hierarchy component-key)
+       (meta-merge {[:rooij/component (top-key component-key)] component-opts})
+       (vary-meta assoc :component/last [[:rooij/component (top-key component-key)]]))))
 
 (defn handler
   ([handler-key]
@@ -91,10 +100,11 @@
      (handler key-or-config key-or-opts {})
      (handler {} key-or-config key-or-opts)))
   ([config handler-key handler-opts]
-   {:pre [(qualified-keyword? handler-key)]}
+   {:pre [(valid-key? handler-key)]}
    (-> config
-       (meta-merge {[:rooij/handler handler-key] handler-opts})
-       (vary-meta assoc :handler/last [[:rooij/handler handler-key]]))))
+       (add-hierarchy handler-key)
+       (meta-merge {[:rooij/handler (top-key handler-key)] handler-opts})
+       (vary-meta assoc :handler/last [[:rooij/handler (top-key handler-key)]]))))
 
 (defn ticker
   ([ticker-key]
@@ -104,10 +114,11 @@
      (ticker key-or-config key-or-opts {})
      (ticker {} key-or-config key-or-opts)))
   ([config ticker-key ticker-opts]
-   {:pre [(qualified-keyword? ticker-key)]}
+   {:pre [(valid-key? ticker-key)]}
    (-> config
-       (meta-merge {[:rooij/ticker ticker-key] ticker-opts})
-       (vary-meta assoc :ticker/last [[:rooij/ticker ticker-key]]))))
+       (add-hierarchy ticker-key)
+       (meta-merge {[:rooij/ticker (top-key ticker-key)] ticker-opts})
+       (vary-meta assoc :ticker/last [[:rooij/ticker (top-key ticker-key)]]))))
 
 (defn reactor
   ([reactor-key]
@@ -117,10 +128,11 @@
      (reactor key-or-config key-or-opts {})
      (reactor {} key-or-config key-or-opts)))
   ([config reactor-key reactor-opts]
-   {:pre [(qualified-keyword? reactor-key)]}
+   {:pre [(valid-key? reactor-key)]}
    (-> config
-       (meta-merge {[:rooij/reactor reactor-key] reactor-opts})
-       (vary-meta assoc :reactor/last [[:rooij/reactor reactor-key]]))))
+       (add-hierarchy reactor-key)
+       (meta-merge {[:rooij/reactor (top-key reactor-key)] reactor-opts})
+       (vary-meta assoc :reactor/last [[:rooij/reactor (top-key reactor-key)]]))))
 
 (defn middleware
   ([middleware-key]
@@ -130,10 +142,11 @@
      (middleware key-or-config key-or-opts {})
      (middleware {} key-or-config key-or-opts)))
   ([config middleware-key middleware-opts]
-   {:pre [(qualified-keyword? middleware-key)]}
+   {:pre [(valid-key? middleware-key)]}
    (-> config
-       (meta-merge {[:rooij/middleware middleware-key] middleware-opts})
-       (vary-meta assoc :middleware/last [[:rooij/middleware middleware-key]]))))
+       (add-hierarchy middleware-key)
+       (meta-merge {[:rooij/middleware (top-key middleware-key)] middleware-opts})
+       (vary-meta assoc :middleware/last [[:rooij/middleware (top-key middleware-key)]]))))
 
 (defn keyboard
   ([keyboard-key]

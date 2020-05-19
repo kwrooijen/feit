@@ -35,7 +35,7 @@
       :else true)))
 
 (defn- add-hierarchy [config k]
-  (if (= (top-key k) (bottom-key k))
+  (if (#{(top-key k)} (bottom-key k))
     config
     (update config :keyword/hierarchy meta-merge {(top-key k) [(bottom-key k)]})))
 

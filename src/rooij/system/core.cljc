@@ -36,8 +36,8 @@
   "Prepares the config system with a composite derive on all keys. This is used
   internally by rooij and should not be called directly."
   [config]
-  (derive-all-composites config)
   (derive-all-hierarchies config)
+  (derive-all-composites config)
   (ig/prep config))
 
 (defn get-init-key

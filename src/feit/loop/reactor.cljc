@@ -3,8 +3,7 @@
    [feit.core.state :as state]))
 
 (defn- path-entity-state [{:context/keys [entity-key component-key]}]
-  [:context/scene
-   :scene/entities entity-key
+  [:scene/entities entity-key
    :entity/state component-key])
 
 (defn- apply-reactors!

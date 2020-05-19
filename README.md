@@ -1,4 +1,4 @@
-# Rooij - Modular, Data driven Game Engine
+# Feit - Modular, Data driven Game Engine
 
 Heavily WIP, design phase. Not for use yet, no documentation at the moment
 
@@ -77,7 +77,7 @@ This project is structured in 3 (or 4) parts.
 
 ### System
 
-Under the `rooij.system` namespace, all system parts are defined. Scene, Entity,
+Under the `feit.system` namespace, all system parts are defined. Scene, Entity,
 Component, Handler, Middleware, Reactor, Ticker. System is responsible for
 setting up your game, it's the first thing that happens. Once this is setup, it
 won't be referred again, it's purely to bootstrap your system. This is mainly
@@ -104,7 +104,7 @@ platform agnostic.
 ### (extra) Module
 
 The module namespace contains 3rd party modules that implement these schemas.
-These shouldn't be in the Rooij project, but this is for development purposes.
+These shouldn't be in the Feit project, but this is for development purposes.
 
 ---
 
@@ -118,19 +118,19 @@ zero, a ticker to apply poison damage over time, and a middleware to reduce
 damage to 0 (invincibility).
 
 ``` clojure
-{[:rooij/component :component/health]
+{[:feit/component :component/health]
  {:component/handlers [#ig/ref :handler.health/damage]
   :component/reactors [#ig/ref :reactor.health/dead?]
   :component/ticker   [#ig/ref :ticker.health/poisoned]}
 
- [:rooij/handler :handler.health/damage]
+ [:feit/handler :handler.health/damage]
  {:handler/middleware [#ig/ref :middleware.health/invinciblity]}
 
- [:rooij/middleware :middleware.health/invincible] {}
+ [:feit/middleware :middleware.health/invincible] {}
 
- [:rooij/ticker :ticker.health/poisoned] {}
+ [:feit/ticker :ticker.health/poisoned] {}
 
- [:rooij/reactor :reactor.health/dead?] {}}
+ [:feit/reactor :reactor.health/dead?] {}}
 ```
 
 ### Code implementation
@@ -164,7 +164,7 @@ an animation.
   (fn reactor-health--dead?
     [{:context/keys [scene-key entity-key component-key]} _old-state new-state]
     (when (zero? (:component/health new-state))
-      (rooij/emit! {:event/scene scene-key
+      (feit/emit! {:event/scene scene-key
                     :event/entity entity-key
                     :event/handler :animation/dead}))))
 ```
@@ -199,7 +199,7 @@ every second.
         (> (- time @last-time) 1000)
         (do (reset! last-time time)
             (swap! remaining dec)
-            (rooij/emit!
+            (feit/emit!
              {:event/scene scene-key
               :event/entity entity-key
               :event/handler :handler.health/damage

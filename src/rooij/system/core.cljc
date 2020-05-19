@@ -2,7 +2,6 @@
   (:require
    [rooij.config]
    [taoensso.timbre :as timbre]
-   [rooij.methods :refer [assert-schema-key]]
    [rooij.state :as state]
    [rooij.util :refer [derive-all-composites derive-all-hierarchies]]
    [integrant-tools.core :as it]
@@ -30,7 +29,8 @@
   "Starts an rooij system (scene or entity). This is used internally by rooij
   and should not be called directly."
   [config key]
-  (ig/build config [key] init-key assert-schema-key ig/resolve-key))
+  ;; TODO Add assertions
+  (ig/build config [key] init-key (fn [_ _ _]) ig/resolve-key))
 
 (defn prep
   "Prepares the config system with a composite derive on all keys. This is used

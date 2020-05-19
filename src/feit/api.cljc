@@ -42,34 +42,44 @@
              filters))
           v))
 
-(defn query
+(defn entities
   "Get all component states of any enitities from `scene-key` which are derived
   from `entity-key`"
   ([scene-key entity-key]
-   (query scene-key entity-key []))
+   (entities scene-key entity-key []))
   ([scene-key entity-key filters]
    (->> (ig/find-derived (:scene/entities @(state/get-scene scene-key)) entity-key)
         (map (fn [[k v]] [k (:entity/state v)]))
         (apply-query-filters filters)
         (into {}))))
 
-(defn query-keys
-  ([scene-key entity-key]
-   (query-keys scene-key entity-key []))
-  ([scene-key entity-key filters]
-   (keys (query scene-key entity-key filters))))
+(defn entities-keys
+  "Get all entity keys that derive from `entity-key` in the scene
+  `scene-key`. Optionally you can apply `filters` in the form:
 
-(defn select
-  ([scene-key entity-key]
-   (select scene-key entity-key []))
-  ([scene-key entity-key filters]
-   (get (query scene-key entity-key filters) entity-key)))
+  ```clojure
+  [[:some/component #(> (:component/points %) 50]]
+  ```
 
-(defn select-value
+  Which will return any entity keys that have the component
+  `:some/component`, where its state must contain a key
+  `:component/points`, which is greater than 50."
   ([scene-key entity-key]
-   (select-value scene-key entity-key []))
+   (entities-keys scene-key entity-key []))
   ([scene-key entity-key filters]
-   (-> (select scene-key entity-key filters)
+   (keys (entities scene-key entity-key filters))))
+
+(defn entity
+  ([scene-key entity-key]
+   (entity scene-key entity-key []))
+  ([scene-key entity-key filters]
+   (get (entities scene-key entity-key filters) entity-key)))
+
+(defn entity-value
+  ([scene-key entity-key]
+   (entity-value scene-key entity-key []))
+  ([scene-key entity-key filters]
+   (-> (entity scene-key entity-key filters)
        (vals)
        (first))))
 

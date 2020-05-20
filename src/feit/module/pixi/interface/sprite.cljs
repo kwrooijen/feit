@@ -64,8 +64,8 @@
 (extend-protocol FeitGeneral2DPosition
   PixiGraphics2DSprite
   (set-position [{:keys [sprite] :as this} x y angle opts]
-    (set! (.. sprite -position -x) (util.position/x-with-anchor body x opts))
-    (set! (.. sprite -position -y) (util.position/y-with-anchor body y opts))
+    (set! (.. sprite -position -x) (util.position/x-with-anchor sprite x opts))
+    (set! (.. sprite -position -y) (util.position/y-with-anchor sprite y opts))
     (set! (.. sprite -rotation) angle)
     (assoc this :x x :y y)))
 

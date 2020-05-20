@@ -93,7 +93,6 @@
   ([config k opts]
    (-> config
        (r/component [:graphics-2d.component/loader k] opts)
-       (r/component :graphics-2d.component/loader)
        (r/ref-handler :graphics-2d.handler.loader/load-complete)
        (r/ref-handler :graphics-2d.handler.loader/load-texture)
        (r/ref-handler :graphics-2d.handler.loader/load-spritesheet))))

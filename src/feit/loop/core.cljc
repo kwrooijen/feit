@@ -37,15 +37,13 @@
   (throw (ex-info (str "Event threshold reached" scene-key) {:error ::threshold-reached})))
 
 (defn- process-keyboard-events [{:keys [scene/key] :as scene}]
-  (let [keyboard-events @(state/get-input-events key)
-        context {:context/scene-key key
-                 :context/scene scene}]
+  (let [keyboard-events @(state/get-input-events key)]
     (reset! (state/get-input-events key) [])
     (doseq [keyboard-event keyboard-events]
-      (loop.keyboard/process context keyboard-event))
+      (loop.keyboard/process scene keyboard-event))
     (doseq [keyboard-down-key (state/get-down-keys)]
-      (loop.keyboard/process context {:input-event/key keyboard-down-key
-                                      :input-event/type :key/while-down}))))
+      (loop.keyboard/process scene {:input-event/key keyboard-down-key
+                                    :input-event/type :key/while-down}))))
 
 (defn run-scene [scene-atom delta time]
   (let [{scene-key :scene/key :as scene} @scene-atom

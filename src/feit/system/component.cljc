@@ -6,6 +6,7 @@
             [feit.system.middleware :as middleware :refer [preprocess-middlewares]]
             [feit.system.reactor :as reactor :refer [preprocess-reactors]]
             [feit.system.ticker :as ticker :refer [preprocess-tickers]]
+            [feit.system.keyboard :as keyboard :refer [preprocess-keyboards]]
             [feit.core.util :refer [->context map-kv]]
             [taoensso.timbre :as timbre]))
 
@@ -67,7 +68,8 @@
       (update :component/handlers (partial preprocess-handlers scene-key entity-key component-key))
       (update :component/tickers (partial preprocess-tickers scene-key entity-key component-key))
       (update :component/reactors (partial preprocess-reactors scene-key entity-key component-key))
-      (update :component/middlewares (partial preprocess-middlewares scene-key entity-key component-key))))
+      (update :component/middlewares (partial preprocess-middlewares scene-key entity-key component-key))
+      (update :component/keyboards (partial preprocess-keyboards scene-key entity-key component-key))))
 
 (defn preprocess-component [context component-key component-opts]
   (-> component-opts

@@ -7,11 +7,9 @@
    [feit.interface.graphics-2d.core :as interface.graphics-2d]
    [feit.interface.physics-2d.core :as interface.physics-2d]
    [feit.core.state :as state]
-   [feit.system.component :refer [process-refs-component]]
    [feit.system.core :as system]
    [feit.system.entity :as entity
-    :refer [postprocess-entity preprocess-entities process-refs-entity]]
-   [feit.system.keyboard :as keyboard :refer [preprocess-keyboards]]
+    :refer [postprocess-entity preprocess-entities]]
    [feit.core.util :refer [resolve-all top-key]]
    [taoensso.timbre :as timbre]))
 
@@ -21,18 +19,6 @@
          :scene/key (top-key k)
          :scene/init (system/get-init-key k)
          :scene/halt! (system/get-halt-key k opts)))
-
-(defn- change-keyboard-identifier
-  "Regular systems identify by their integrant key. It's different for keyboard
-  events because we look them up by their keycode. Use [:key/down keycode] or
-  [:key/up keycode] as the identifier instead."
-  [keyboard]
-  (into {}
-        (for [[_ v] keyboard]
-          (cond
-            (:keyboard-down/key v)       [[:key/down       (:keyboard-down/key v)] v]
-            (:keyboard-up/key v)         [[:key/up         (:keyboard-up/key v)] v]
-            (:keyboard-while-down/key v) [[:key/while-down (:keyboard-while-down/key v)] v]))))
 
 (defn- prepare-init-config [scene-key extra-opts opts]
   (with-meta
@@ -47,7 +33,6 @@
 
 (defn process-refs [{scene-key :scene/key :as opts}]
   (->> opts
-       (sp/transform [:scene/keyboards] (partial preprocess-keyboards scene-key))
        (sp/transform [:scene/entities] (partial preprocess-entities scene-key))
        (sp/transform [:scene/entities MAP-VALS] postprocess-entity)))
 
@@ -57,7 +42,6 @@
       (it/find-derived-value scene-key)
       (apply-init scene-key opts)
       (process-refs)
-      (update :scene/keyboards change-keyboard-identifier)
       (assoc :scene/key scene-key)
       (state/save-scene!)))
 

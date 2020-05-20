@@ -50,12 +50,12 @@
 
 (defn- ref-system [config system-key system-config parent collection child]
   (let [parent-path (conj ((keyword parent "last") (meta config)) (keyword parent collection))
-        component-id (top-key system-key)
-        full-path (conj parent-path component-id)
         system-config (-> system-config
-                          (assoc (keyword child "ref") (ig/ref (bottom-key system-key))
-                                 (keyword child "key") (top-key system-key))
-                          (add-hierarchy system-key))]
+                          (->> (merge {(keyword child "ref") (ig/ref (bottom-key system-key))
+                                       (keyword child "key") (top-key system-key)}))
+                          (add-hierarchy system-key))
+        component-id (get system-config (keyword child "key"))
+        full-path (conj parent-path component-id)]
     (-> config
         (update-in full-path meta-merge system-config)
         (vary-meta assoc (keyword child "last") full-path))))
@@ -166,10 +166,11 @@
      (keyboard key-or-config key-or-opts {})
      (keyboard {} key-or-config key-or-opts)))
   ([config keyboard-key keyboard-opts]
-   {:pre [(qualified-keyword? keyboard-key)]}
+   {:pre [(valid-key? keyboard-key)]}
    (-> config
-       (meta-merge {[:feit/keyboard keyboard-key] keyboard-opts})
-       (vary-meta assoc :keyboard/last [[:feit/keyboard keyboard-key]]))))
+       (add-hierarchy keyboard-key :feit/keyboard)
+       (meta-merge {(top-key keyboard-key) keyboard-opts})
+       (vary-meta assoc :keyboard/last [(top-key keyboard-key)]))))
 
 (defn ref-entity
   ([config entity-key]
@@ -238,28 +239,34 @@
   ([config keyboard-key keyboard-down-key]
    (ref-keyboard-down config keyboard-key keyboard-down-key {}))
   ([config keyboard-key keyboard-down-key keyboard-opts]
-   (when-not (:scene/last (meta config)) (throw "Can only add keyboards to scenes."))
-   (ref-system config keyboard-key
-               (merge keyboard-opts {:keyboard-down/key keyboard-down-key})
-               :scene :keyboards :keyboard)))
+   (when-not (:component/last (meta config)) (throw "Can only add keyboards to components."))
+   (ref-system config
+               [:key/down keyboard-down-key]
+               (merge keyboard-opts {:keyboard/ref (ig/ref keyboard-key)
+                                     :keyboard/key [:key/down keyboard-down-key]})
+               :component :keyboards :keyboard)))
 
 (defn ref-keyboard-up
   ([config keyboard-key keyboard-up-key]
    (ref-keyboard-up config keyboard-key keyboard-up-key {}))
   ([config keyboard-key keyboard-up-key keyboard-opts]
-   (when-not (:scene/last (meta config)) (throw "Can only add keyboards to scenes."))
-   (ref-system config keyboard-key
-               (merge keyboard-opts {:keyboard-up/key keyboard-up-key})
-               :scene :keyboards :keyboard)))
+   (when-not (:component/last (meta config)) (throw "Can only add keyboards to components."))
+   (ref-system config
+               [:key/up {:keyboard-up/key keyboard-up-key}]
+               (merge keyboard-opts {:keyboard/ref (ig/ref keyboard-key)
+                                     :keyboard/key [:key/up keyboard-up-key]})
+               :component :keyboards :keyboard)))
 
 (defn ref-keyboard-while-down
   ([config keyboard-key keyboard-while-down-key]
    (ref-keyboard-while-down config keyboard-key keyboard-while-down-key {}))
   ([config keyboard-key keyboard-while-down-key keyboard-opts]
-   (when-not (:scene/last (meta config)) (throw "Can only add keyboards to scenes."))
-   (ref-system config keyboard-key
-               (merge keyboard-opts {:keyboard-while-down/key keyboard-while-down-key})
-               :scene :keyboards :keyboard)))
+   (when-not (:component/last (meta config)) (throw "Can only add keyboards to components."))
+   (ref-system config
+               [:key/while-down {:keyboard-down/key keyboard-while-down-key}]
+               (merge keyboard-opts {:keyboard/ref (ig/ref keyboard-key)
+                                     :keyboard/key [:key/while-down keyboard-while-down-key]})
+               :component :keyboards :keyboard)))
 
 (defn entity+ref
   ([config entity-key]

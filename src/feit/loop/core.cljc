@@ -16,14 +16,17 @@
 (defn- apply-event [scene event]
   (timbre/debug ::event scene event)
   (try
-    (reduce
-     (fn [acc context]
-       (-> [acc context]
-           (loop.middleware/process)
-           (loop.handler/process)
-           (loop.reactor/process)))
-     scene
-     (loop.event/event->contexts scene event))
+    (let [events (loop.event/event->contexts scene event)]
+      (when (empty? events)
+        (timbre/error ::unhandled-event (str "Unhandled event: " event)))
+      (reduce
+       (fn [acc context]
+         (-> [acc context]
+             (loop.middleware/process)
+             (loop.handler/process)
+             (loop.reactor/process)))
+       scene
+       events))
     (catch #?(:clj Throwable :cljs :default) e
       (timbre/error ::event-failed (str "Failed to process event " event) e)
       scene)))

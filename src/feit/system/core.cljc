@@ -3,7 +3,6 @@
    [feit.config]
    [taoensso.timbre :as timbre]
    [feit.core.state :as state]
-   [feit.core.util :refer [derive-all-composites derive-all-hierarchies]]
    [integrant-tools.core :as it]
    [integrant.core :as ig]))
 
@@ -36,8 +35,7 @@
   "Prepares the config system with a composite derive on all keys. This is used
   internally by feit and should not be called directly."
   [config]
-  (derive-all-hierarchies config)
-  (derive-all-composites config)
+  (it/derive-hierarchy (:keyword/hierarchy config))
   (ig/prep config))
 
 (defn get-init-key

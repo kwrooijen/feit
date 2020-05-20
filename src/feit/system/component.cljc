@@ -41,8 +41,16 @@
          :component/state nil
          :component/halt! (system/get-halt-key k opts)))
 
+(defn check-entity-hierarchy [entity-key]
+  (when-not (isa? entity-key :feit/entity)
+    (throw (ex-info (str entity-key " is not related to :feit/entity.\n\n"
+                         "This usually means that " entity-key " is derived from "
+                         "another key, which should be an entity.\n\n"
+                         "Ancestors: " (ancestors entity-key)) ::invalid-entity))))
+
 (defn get-init-state
   [{:component/keys [auto-persistent init key] :context/keys [entity-key] :as component}]
+  (check-entity-hierarchy entity-key)
   (let [persistent-state (state/get-component entity-key key)
         component (assoc component :context/state persistent-state)]
     (if (and auto-persistent persistent-state)

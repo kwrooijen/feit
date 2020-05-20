@@ -44,11 +44,14 @@
 (defn get-scene [scene-key]
   (if-let [scene (get @scenes scene-key)]
     scene
-    (throw (ex-info (str "Scene " scene-key " does not exist, or is not yet initiated")
+    (throw (ex-info (str "Scene " (pr-str scene-key) " does not exist, or is not yet initiated")
                     {::scene-key scene-key}))))
 
 (defn get-scene-events [scene-key]
-  (get @events scene-key))
+  (if-let [scene-events (get @events scene-key)]
+    scene-events
+    (throw (ex-info (str "Scene " (pr-str scene-key) " does not exist, or is not yet initiated")
+                    {::scene-key scene-key}))))
 
 (defn get-scene-post-events [scene-key]
   (get @post-events scene-key))
@@ -89,4 +92,5 @@
 
 (comment
   (tap> @(feit.state/get-scene :scene/battle))
+  (tap> @(feit.state/get-scene :scene/organize))
   (tap> @(feit.state/get-scene :scene/loading)))

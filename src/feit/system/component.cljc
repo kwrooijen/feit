@@ -75,7 +75,7 @@
   (-> component-opts
       (->> (meta-merge (:component/ref component-opts)))
       (dissoc :component/ref)
-      (->> (merge context))
+      (system/merge-context context)
       (assoc :component/key component-key)
       (as-> $ (assoc $ :component/state (get-init-state $)))
       (process-refs-component)

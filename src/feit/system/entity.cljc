@@ -40,7 +40,7 @@
   (-> entity-opts
       (->> (meta-merge (:entity/ref entity-opts)))
       (dissoc :entity/ref)
-      (->> (merge context))
+      (system/merge-context context)
       (assoc :entity/key entity-key)
       (process-refs-entity)))
 

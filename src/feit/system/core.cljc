@@ -15,6 +15,17 @@
   :feit/reactor [:feit/system]
   :feit/ticker [:feit/system]})
 
+(def context-keys
+  [:context/scene-key
+   :context/entity-key
+   :context/component-key])
+
+(defn merge-context
+  "Merges contexts keys from `context` into `opts`. If `opts` already
+  has context keys defined, they will have priority."
+  [opts context]
+  (merge (select-keys context context-keys) opts))
+
 (defmulti init-key
   "The init-key for feit system components. This is used internally by feit
   and should not be called directly."

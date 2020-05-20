@@ -13,7 +13,7 @@
   (-> keyboard-opts
       (->> (meta-merge (:keyboard/ref keyboard-opts)))
       (dissoc :keyboard/ref)
-      (merge context)
+      (system/merge-context context)
       (as-> $ (assoc $ :keyboard/fn ((:keyboard/init $) keyboard-key $)))))
 
 (defn preprocess-keyboards [scene-key entity-key component-key keyboard]

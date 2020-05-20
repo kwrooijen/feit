@@ -5,16 +5,11 @@
    [feit.core.util :refer [->context map-kv top-key]]
    [taoensso.timbre :as timbre]))
 
-(def context-keys
-  [:context/scene-key
-   :context/entity-key
-   :context/component-key])
-
 (defn preprocess-ticker [context ticker-key ticker-opts]
   (-> ticker-opts
       (->> (meta-merge (:ticker/ref ticker-opts)))
       (dissoc :ticker/ref)
-      (->> (merge (select-keys context context-keys)))
+      (system/merge-context context)
       (assoc :ticker/key ticker-key)
       (as-> $ (assoc $ :ticker/fn ((:ticker/init $) ticker-key $)))))
 

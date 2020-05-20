@@ -13,7 +13,7 @@
    [feit.interface.physics-2d.core :as interface.physics-2d :refer [get-wireframe-vectors]]
    [taoensso.timbre :as timbre]))
 
-(defn- apply-event [scene event]
+(defn- apply-event [scene event time]
   (timbre/debug ::event scene event)
   (try
     (let [events (loop.event/event->contexts scene event)]
@@ -22,9 +22,9 @@
       (reduce
        (fn [acc context]
          (-> [acc context]
-             (loop.middleware/process)
-             (loop.handler/process)
-             (loop.reactor/process)))
+             (loop.middleware/process time)
+             (loop.handler/process time)
+             (loop.reactor/process time)))
        scene
        events))
     (catch #?(:clj Throwable :cljs :default) e
@@ -36,27 +36,29 @@
   (timbre/error ::threshold-reached scene-key {})
   (throw (ex-info (str "Event threshold reached" scene-key) {:error ::threshold-reached})))
 
-(defn- process-keyboard-events [{:keys [scene/key] :as scene}]
+(defn- process-keyboard-events [{:keys [scene/key] :as scene} time]
   (let [keyboard-events @(state/get-input-events key)]
     (reset! (state/get-input-events key) [])
     (doseq [keyboard-event keyboard-events]
-      (loop.keyboard/process scene keyboard-event))
+      (loop.keyboard/process scene keyboard-event time))
     (doseq [keyboard-down-key (state/get-down-keys)]
       (loop.keyboard/process scene {:input-event/key keyboard-down-key
-                                    :input-event/type :key/while-down}))))
+                                    :input-event/type :key/while-down}
+                             time))))
 
-(defn run-scene [scene-atom delta time]
+(defn run-scene [scene-atom delta current]
   (let [{scene-key :scene/key :as scene} @scene-atom
-        events (state/get-scene-events scene-key)]
-    (process-keyboard-events scene)
-    (loop.ticker/process scene delta time)
+        events (state/get-scene-events scene-key)
+        time {:time/delta delta :time/current current}]
+    (process-keyboard-events scene time)
+    (loop.ticker/process scene time)
     (loop [todo-events @events
            threshold 30]
       (when (zero? threshold)
         (threshold-reached scene-key))
       (reset! events [])
       (doseq [event todo-events]
-        (vswap! scene-atom (fn [scene] (apply-event scene event))))
+        (vswap! scene-atom (fn [scene] (apply-event scene event time))))
       (when-not ^boolean (empty? @events)
         (recur @events (dec threshold))))))
 

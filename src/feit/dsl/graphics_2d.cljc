@@ -44,10 +44,16 @@
   ([config k spritesheet-name spritesheet-animation]
    (component-animated-sprite config k spritesheet-name spritesheet-animation {}))
   ([config k spritesheet-name spritesheet-animation opts]
-   (r/ref-component config [:graphics-2d.component/sprite k]
-                    (merge {:spritesheet/animation spritesheet-animation
-                            :spritesheet/name spritesheet-name}
-                           opts))))
+   (-> config
+       (r/ref-component [:graphics-2d.component/sprite k]
+                        (merge {:spritesheet/animation spritesheet-animation
+                                :spritesheet/name spritesheet-name}
+                               opts))
+       (r/ref-handler :graphics-2d.handler.sprite/play)
+       (r/ref-handler :graphics-2d.handler.sprite/play-loop)
+       (r/ref-handler :graphics-2d.handler.sprite/stop-loop)
+       (r/ref-handler :graphics-2d.handler.sprite/flip)
+       (r/ref-handler :general-2d.handler.position/set))))
 
 (defn component-animated-sprite+ref
   "TODO"
@@ -63,7 +69,13 @@
   ([config k]
    (component-sprite config k {}))
   ([config k opts]
-   (r/component config [:graphics-2d.component/sprite k] opts)))
+   (-> config
+       (r/component [:graphics-2d.component/sprite k] opts)
+       (r/ref-handler :graphics-2d.handler.sprite/play)
+       (r/ref-handler :graphics-2d.handler.sprite/play-loop)
+       (r/ref-handler :graphics-2d.handler.sprite/stop-loop)
+       (r/ref-handler :graphics-2d.handler.sprite/flip)
+       (r/ref-handler :general-2d.handler.position/set))))
 
 (defn component-sprite+ref
   "TODO"
@@ -79,7 +91,12 @@
   ([config k]
    (component-loader config k {}))
   ([config k opts]
-   (r/component config [:graphics-2d.component/loader k] opts)))
+   (-> config
+       (r/component [:graphics-2d.component/loader k] opts)
+       (r/component :graphics-2d.component/loader)
+       (r/ref-handler :graphics-2d.handler.loader/load-complete)
+       (r/ref-handler :graphics-2d.handler.loader/load-texture)
+       (r/ref-handler :graphics-2d.handler.loader/load-spritesheet))))
 
 (defn component-loader+ref
   "TODO"
@@ -97,9 +114,11 @@
   ([config k x y w h fill]
    (component-rectangle config k x y w h fill {}))
   ([config k x y w h fill opts]
-   (r/component config [:graphics-2d.component/rectangle k]
-                (merge {:position/x x :position/y y :shape/w w :shape/h h :shape/fill fill}
-                       opts))))
+   (-> config
+       (r/component [:graphics-2d.component/rectangle k]
+                    (merge {:position/x x :position/y y :shape/w w :shape/h h :shape/fill fill}
+                           opts))
+       (r/ref-handler :general-2d.handler.position/set))))
 
 (defn component-rectangle+ref
   "TODO"

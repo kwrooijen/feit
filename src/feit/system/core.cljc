@@ -28,7 +28,8 @@
   "Starts an feit system (scene or entity). This is used internally by feit
   and should not be called directly."
   [config key]
-  ;; TODO Add assertions
+  ;; TODO Add assertions. We might need to add it when starting a
+  ;; component. Since components can be incomplete if they're referenced.
   (ig/build config [key] init-key (fn [_ _ _]) ig/resolve-key))
 
 (defn prep

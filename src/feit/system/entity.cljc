@@ -61,12 +61,9 @@
              :entity/halt! (system/get-entity-halt-key k))))
 
 (defn halt! [{:entity/keys [components dynamic key] :as entity}]
-  ;; TODO remove dynamic entity
-  ;; OR Create local hierarchy for scenes
   (doseq [[_ component] components]
     ((:component/halt! component) (:component/state component)))
   ((:entity/halt! entity) (:entity/key entity) entity)
-
   (when dynamic
     (doseq [parent (parents key)]
       (underive key parent))))

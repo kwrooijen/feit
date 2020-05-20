@@ -41,20 +41,24 @@
 (defn get-scenes []
   @scenes)
 
+(defn- scene-does-not-exist-error [scene-key]
+  (throw (ex-info (str "Scene " (pr-str scene-key) " does not exist, or is not yet initiated")
+                  {::scene-key scene-key})))
+
 (defn get-scene [scene-key]
   (if-let [scene (get @scenes scene-key)]
     scene
-    (throw (ex-info (str "Scene " (pr-str scene-key) " does not exist, or is not yet initiated")
-                    {::scene-key scene-key}))))
+    (scene-does-not-exist-error scene-key)))
 
 (defn get-scene-events [scene-key]
   (if-let [scene-events (get @events scene-key)]
     scene-events
-    (throw (ex-info (str "Scene " (pr-str scene-key) " does not exist, or is not yet initiated")
-                    {::scene-key scene-key}))))
+    (scene-does-not-exist-error scene-key)))
 
 (defn get-scene-post-events [scene-key]
-  (get @post-events scene-key))
+  (if-let [post-events (get @post-events scene-key)]
+    post-events
+    (scene-does-not-exist-error scene-key)))
 
 (defn save-scene! [scene]
   (swap! scenes assoc (:scene/key scene) (volatile! scene)))

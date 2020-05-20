@@ -34,10 +34,19 @@
       (throw (ex-info (error-msg-system-key system-key) context))
       :else true)))
 
-(defn- add-hierarchy [config k]
-  (if (#{(top-key k)} (bottom-key k))
-    config
-    (update config :keyword/hierarchy meta-merge {(top-key k) [(bottom-key k)]})))
+(defn- add-hierarchy
+  ([config k] (add-hierarchy config k nil))
+  ([config k system-key]
+   (cond
+     (and (#{(top-key k)} (bottom-key k))
+          system-key)
+     (update config :keyword/hierarchy meta-merge {(top-key k) [system-key]})
+
+     (#{(top-key k)} (bottom-key k))
+     config
+
+     :else
+     (update config :keyword/hierarchy meta-merge {(top-key k) [(bottom-key k)]}))))
 
 (defn- ref-system [config system-key system-config parent collection child]
   (let [parent-path (conj ((keyword parent "last") (meta config)) (keyword parent collection))
@@ -61,13 +70,9 @@
   ([config scene-key scene-opts]
    {:pre [(qualified-keyword? scene-key)]}
    (-> config
-       (meta-merge {[:feit/scene scene-key] scene-opts})
-       (vary-meta assoc :scene/last [[:feit/scene scene-key]]))))
-
-(defn- process-key [system-key k]
-  (if (vector? k)
-    (top-key k)
-    [system-key (top-key k)]))
+       (add-hierarchy scene-key :feit/scene)
+       (meta-merge {(top-key scene-key) scene-opts})
+       (vary-meta assoc :scene/last [(top-key scene-key)]))))
 
 (defn entity
   ([entity-key]
@@ -79,9 +84,9 @@
   ([config entity-key entity-opts]
    {:pre [(valid-key? entity-key)]}
    (-> config
-       (add-hierarchy entity-key)
-       (meta-merge {(process-key :feit/entity entity-key) entity-opts})
-       (vary-meta assoc :entity/last [(process-key :feit/entity entity-key)]))))
+       (add-hierarchy entity-key :feit/entity)
+       (meta-merge {(top-key entity-key) entity-opts})
+       (vary-meta assoc :entity/last [(top-key entity-key)]))))
 
 (defn component
   ([component-key]
@@ -93,9 +98,9 @@
   ([config component-key component-opts]
    {:pre [(valid-key? component-key)]}
    (-> config
-       (add-hierarchy component-key)
-       (meta-merge {(process-key :feit/component component-key)  component-opts})
-       (vary-meta assoc :component/last [(process-key :feit/component component-key)]))))
+       (add-hierarchy component-key :feit/component)
+       (meta-merge {(top-key component-key) component-opts})
+       (vary-meta assoc :component/last [(top-key component-key)]))))
 
 (defn handler
   ([handler-key]
@@ -107,9 +112,9 @@
   ([config handler-key handler-opts]
    {:pre [(valid-key? handler-key)]}
    (-> config
-       (add-hierarchy handler-key)
-       (meta-merge {(process-key :feit/handler handler-key) handler-opts})
-       (vary-meta assoc :handler/last [(process-key :feit/handler handler-key)]))))
+       (add-hierarchy handler-key :feit/handler)
+       (meta-merge {(top-key handler-key) handler-opts})
+       (vary-meta assoc :handler/last [(top-key handler-key)]))))
 
 (defn ticker
   ([ticker-key]
@@ -121,9 +126,9 @@
   ([config ticker-key ticker-opts]
    {:pre [(valid-key? ticker-key)]}
    (-> config
-       (add-hierarchy ticker-key)
-       (meta-merge {(process-key :feit/ticker ticker-key) ticker-opts})
-       (vary-meta assoc :ticker/last [(process-key :feit/ticker ticker-key)]))))
+       (add-hierarchy ticker-key :feit/ticker)
+       (meta-merge {(top-key ticker-key) ticker-opts})
+       (vary-meta assoc :ticker/last [(top-key ticker-key)]))))
 
 (defn reactor
   ([reactor-key]
@@ -135,9 +140,9 @@
   ([config reactor-key reactor-opts]
    {:pre [(valid-key? reactor-key)]}
    (-> config
-       (add-hierarchy reactor-key)
-       (meta-merge {(process-key :feit/reactor reactor-key) reactor-opts})
-       (vary-meta assoc :reactor/last [(process-key :feit/reactor reactor-key)]))))
+       (add-hierarchy reactor-key :feit/reactor)
+       (meta-merge {(top-key reactor-key) reactor-opts})
+       (vary-meta assoc :reactor/last [(top-key reactor-key)]))))
 
 (defn middleware
   ([middleware-key]
@@ -149,9 +154,9 @@
   ([config middleware-key middleware-opts]
    {:pre [(valid-key? middleware-key)]}
    (-> config
-       (add-hierarchy middleware-key)
-       (meta-merge {(process-key :feit/middleware middleware-key) middleware-opts})
-       (vary-meta assoc :middleware/last [(process-key :feit/middleware middleware-key)]))))
+       (add-hierarchy middleware-key :feit/middleware)
+       (meta-merge {(top-key middleware-key) middleware-opts})
+       (vary-meta assoc :middleware/last [(top-key middleware-key)]))))
 
 (defn keyboard
   ([keyboard-key]

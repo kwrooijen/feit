@@ -1,6 +1,7 @@
 (ns feit.module.pixi.interface.sprite
   (:require
    ["pixi.js" :as PIXI]
+   [feit.module.pixi.util.position :as util.position]
    [feit.api :refer [emit!]]
    [feit.interface.general-2d.position :refer [FeitGeneral2DPosition]]
    [feit.interface.graphics-2d.sprite :refer [FeitGraphics2DSprite flip]]
@@ -62,9 +63,9 @@
 
 (extend-protocol FeitGeneral2DPosition
   PixiGraphics2DSprite
-  (set-position [{:keys [sprite] :as this} x y angle]
-    (set! (.. sprite -position -x) x)
-    (set! (.. sprite -position -y) y)
+  (set-position [{:keys [sprite] :as this} x y angle opts]
+    (set! (.. sprite -position -x) (util.position/x-with-anchor body x opts))
+    (set! (.. sprite -position -y) (util.position/y-with-anchor body y opts))
     (set! (.. sprite -rotation) angle)
     (assoc this :x x :y y)))
 

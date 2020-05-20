@@ -6,7 +6,7 @@
    [feit.config]))
 
 (defprotocol FeitGeneral2DPosition
-  (set-position [this x y angle])
+  (set-position [this x y angle opts])
   (get-position [this]))
 
 (defn- position-changed?
@@ -35,12 +35,13 @@
            new-position
            [component-key]))))))
 
-(defmethod ig/init-key :general-2d.handler.position/set [_ opts]
-  (fn [_context {:keys [x y angle]} state]
+(defmethod ig/init-key :general-2d.handler.position/set [_ _opts]
+  (fn [_context {:keys [x y angle] :as extra-opts} state]
     (set-position state
                   (or x (:x state))
                   (or y (:y state))
-                  (or angle (:angle state)))))
+                  (or angle (:angle state))
+                  extra-opts)))
 
 (-> (r/handler :general-2d.handler.position/set)
     (r/ticker :general-2d.ticker.position/emitter)

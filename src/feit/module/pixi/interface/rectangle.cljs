@@ -1,6 +1,7 @@
 (ns feit.module.pixi.interface.rectangle
   (:require
    ["pixi.js" :as PIXI]
+   [feit.module.pixi.util.position :as util.position]
    [feit.interface.general-2d.position :refer [FeitGeneral2DPosition]]
    [feit.interface.graphics-2d.rectangle :refer [FeitGraphics2DRectangle]]
    [feit.module.pixi.state :as state]))
@@ -9,12 +10,11 @@
   FeitGraphics2DRectangle
   (halt! [this]
     (.destroy (:body this))))
-
 (extend-protocol FeitGeneral2DPosition
   PixiGraphics2DRectangle
-  (set-position [{:keys [body] :as this} x y angle]
-    (set! (.. body -position -x) x)
-    (set! (.. body -position -y) y)
+  (set-position [{:keys [body] :as this} x y angle opts]
+    (set! (.. body -position -x) (util.position/x-with-anchor body x opts))
+    (set! (.. body -position -y) (util.position/y-with-anchor body y opts))
     (set! (.. body -rotation) angle)
     (assoc this :x x :y y)))
 

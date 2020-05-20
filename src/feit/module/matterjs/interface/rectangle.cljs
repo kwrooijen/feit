@@ -20,7 +20,7 @@
 
 (extend-protocol FeitGeneral2DPosition
   MatterPhysics2DRectangle
-  (set-position [{:keys [main pivot-x pivot-y] :as this} x y angle]
+  (set-position [{:keys [main pivot-x pivot-y] :as this} x y angle opts]
     (.setPosition Body main #js {:x (+ x pivot-x)
                                  :y (+ y pivot-y)})
     (.setAngle Body main angle)

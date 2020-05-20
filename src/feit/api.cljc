@@ -69,6 +69,7 @@
   ([scene-key entity-key filters]
    (keys (entities scene-key entity-key filters))))
 
+;; TODO This should accept `:feit/context`
 (defn entity
   ([scene-key entity-key]
    (entity scene-key entity-key []))

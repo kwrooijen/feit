@@ -15,7 +15,6 @@
       (->> (meta-merge (:handler/ref handler-opts)))
       (dissoc :handler/ref)
       (system/merge-context context)
-      (system/merge-context context)
       (assoc :handler/key handler-key)
       (as-> $ (assoc $ :handler/fn ((:handler/init $) handler-key $)))))
 

@@ -9,13 +9,13 @@
    (get-in scene [:scene/entities entity :entity/routes])
    handler))
 
-(defn ^boolean excludable? [{:component/keys [key]} excludes]
+(defn- ^boolean excludable? [{:component/keys [key]} excludes]
   (some (fn [exclude]
           (or (identical? key exclude)
               (ancestor? exclude key)))
         excludes))
 
-(defn event->context [scene {:event/keys [entity content]} component handler-key]
+(defn- event->context [scene {:event/keys [entity content]} component handler-key]
   (let [component-key (:component/key component)
         entity-state (-> scene :scene/entities entity :entity/state)]
     {:context/scene-key (:scene/key scene)

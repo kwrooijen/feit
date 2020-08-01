@@ -30,7 +30,7 @@
 (defmethod handle-error :integrant.core/build-threw-exception [e]
   (timbre/error (str "The following key threw an error during initialization: \n\n"
                      ;; TODO How do you get .-cause in Clojure?
-                     (.-cause e) "\n\n"
+                     #?(:cljs (.-cause ^js e) "\n\n")
                      (:key (ex-data e)) "\n\n" "With the following opts: \n"
                      (pp (:value (ex-data e))))))
 

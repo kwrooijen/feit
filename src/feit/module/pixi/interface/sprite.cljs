@@ -28,7 +28,7 @@
 (defn ->vec [v]
   (if (coll? v) v [v]))
 
-(defrecord PixiGraphics2DSprite [sprite initial-textures x y flip]
+(defrecord PixiGraphics2DSprite [^js sprite initial-textures x y flip]
   FeitGraphics2DSprite
   (play [this spritesheet animations]
     (-play this spritesheet (->vec animations))

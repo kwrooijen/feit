@@ -84,6 +84,12 @@
        (vals)
        (first))))
 
+(defn start-scene
+  [scene-from scene-to]
+  (swap! (state/get-scene-post-events scene-from) conj
+         {:scene/key scene-to
+          :event/type :scene/start!}))
+
 (defn transition-scene
   "Transition from `scene-from` to `scene-to`. Halts `scene-from` before
   initializing `scene-to`."

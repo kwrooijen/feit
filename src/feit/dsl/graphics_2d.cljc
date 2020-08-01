@@ -104,7 +104,7 @@
   ([config k opts]
    (-> config
        (component-loader k opts)
-       (r/ref-component [:graphics-2d.component/loader k]))))
+       (r/ref-component k))))
 
 (defn component-rectangle
   "TODO"
